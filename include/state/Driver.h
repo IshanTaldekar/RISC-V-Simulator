@@ -2,9 +2,10 @@
 #define RISC_V_SIMULATOR_DRIVER_H
 
 #include "InstructionMemory.h"
-#include "IFIDStageRegisters.h"
-#include "../combinational/adders/IFAdder.h"
+#include "stage-registers/IFIDStageRegisters.h"
+#include "../combinational/adder/IFAdder.h"
 #include "../common/Module.h"
+#include "../common/logger/IFLogger.h"
 
 class Driver: public Module {
     int program_counter;
@@ -13,6 +14,7 @@ class Driver: public Module {
     InstructionMemory *instruction_memory;
     IFIDStageRegisters *if_id_stage_registers;
     IFAdder *if_adder;
+    IFLogger *logger;
 
 public:
     Driver();
@@ -22,7 +24,7 @@ public:
     static Driver *init();
 
     void run() override;
-    void notifyConditionVariable() override;
+    void notifyModuleConditionVariable() override;
 
 private:
     void passProgramCounterToInstructionMemory();

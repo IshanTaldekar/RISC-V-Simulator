@@ -1,10 +1,11 @@
-#include "../../include/combinational/adder/IFAdder.h"
+#include "../../../include/combinational/adder/IFAdder.h"
 
 IFAdder::IFAdder() {
-    program_counter = 0;
-    program_counter_set = false;
+    this->program_counter = 0;
+    this->program_counter_set = false;
 
-    if_mux = IFMux::init();
+    this->if_mux = IFMux::init();
+    this->logger = IFLogger::init();
 }
 
 IFAdder *IFAdder::init() {
@@ -17,16 +18,22 @@ IFAdder *IFAdder::init() {
 
 void IFAdder::run() {
     while (this->isAlive()) {
-        std::unique_lock<std::mutex> adder_lock(this->getMutex());
-        this->getConditionVariable().wait(
+        this->logger->log("[IFAdder] Waiting to acquire lock and wake up.");
+
+        std::unique_lock<std::mutex> adder_lock(this->getModuleMutex());
+        this->getModuleConditionVariable().wait(
                 adder_lock,
                 [this] { return this->program_counter_set; }
         );
 
+        this->logger->log("[IFAdder] Woken up and acquired lock. Loading PC to IFMux.");
+
         this->loadProgramCounterToIFMux();
-        this->if_mux->notifyConditionVariable();
+        this->if_mux->notifyModuleConditionVariable();
 
         this->program_counter_set = false;
+
+        this->logger->log("[IFAdder] Load into IFMux successful.");
     }
 }
 
@@ -35,11 +42,15 @@ void IFAdder::setInput(AdderInputType type, int value) {
         throw std::runtime_error("AdderInputType passed in IFAdder not compatible with IFAdderInputTypes");
     }
 
-    std::unique_lock<std::mutex> adder_lock(this->getMutex());
+    this->logger->log("[IFAdder] Waiting to set input.");
+
+    std::unique_lock<std::mutex> adder_lock(this->getModuleMutex());
 
     if (std::get<IFAdderInputType>(type) == IFAdderInputType::PCValue) {
         this->program_counter = value;
         this->program_counter_set = true;
+
+        this->logger->log("[IFAdder] Input PCValue set.");
     }
 }
 
@@ -47,6 +58,6 @@ void IFAdder::loadProgramCounterToIFMux() {
     this->if_mux->setInput(IFStageMuxInputType::IncrementedPc, this->program_counter);
 }
 
-void IFAdder::notifyConditionVariable() {
-    this->getConditionVariable().notify_one();
+void IFAdder::notifyModuleConditionVariable() {
+    this->getModuleConditionVariable().notify_one();
 }

@@ -1,19 +1,24 @@
 #include "../../include/state/Driver.h"
 
 Driver::Driver() {
-    program_counter = -1;
-    is_new_program_counter_set = false;
+    this->program_counter = -1;
+    this->is_new_program_counter_set = false;
 
-    instruction_memory = InstructionMemory::init();
-    if_id_stage_registers = IFIDStageRegisters::init();
-    if_adder = IFAdder::init();
+    this->instruction_memory = InstructionMemory::init();
+    this->if_id_stage_registers = IFIDStageRegisters::init();
+    this->if_adder = IFAdder::init();
+    this->logger = IFLogger::init();
 }
 
 void Driver::setProgramCounter(int value) {
-    std::unique_lock<std::mutex> driver_lock (this->getMutex());
+    this->logger->log("[Driver] setProgramCounter waiting to acquire lock.");
+
+    std::unique_lock<std::mutex> driver_lock (this->getModuleMutex());
 
     this->program_counter = value;
     this->is_new_program_counter_set = true;
+
+    this->logger->log("[Driver] PC set.");
 }
 
 Driver *Driver::init() {
@@ -26,16 +31,25 @@ Driver *Driver::init() {
 
 void Driver::run() {
     while (this->isAlive()) {
-        std::unique_lock<std::mutex> driver_lock (this->getMutex());
-        this->getConditionVariable().wait(
+        this->logger->log("[Driver] run waiting to be woken up and acquire lock.");
+
+        std::unique_lock<std::mutex> driver_lock (this->getModuleMutex());
+        this->getModuleConditionVariable().wait(
                 driver_lock,
                 [this] { return this->is_new_program_counter_set; }
         );
+
+        this->logger->log("[Driver] run woken up and acquired lock.");
 
         this->passProgramCounterToAdder();
         this->passProgramCounterToInstructionMemory();
 
         this->is_new_program_counter_set = false;
+
+        this->logger->log("[Driver] program counter passed to adder and instruction_bits memory.");
+
+
+        this->logger->log("[Driver] run waiting at barrier.");
 
         // TODO: Add barrier
         this->passProgramCounterToIFIDStageRegisters();
@@ -43,20 +57,33 @@ void Driver::run() {
 }
 
 void Driver::passProgramCounterToInstructionMemory() {
+    this->logger->log("[Driver] Passing program counter to instruction_bits memory.");
+
     this->instruction_memory->setProgramCounter(this->program_counter);
-    this->instruction_memory->notifyConditionVariable();
+    this->instruction_memory->notifyModuleConditionVariable();
+
+
+    this->logger->log("[Driver] program counter passed to instruction_bits memory and instruction_bits memory notified.");
 }
 
 void Driver::passProgramCounterToAdder() {
+    this->logger->log("[Driver] passing program counter to adder.");
+
     this->if_adder->setInput(IFAdderInputType::PCValue, this->program_counter);
-    this->if_adder->notifyConditionVariable();
+    this->if_adder->notifyModuleConditionVariable();
+
+    this->logger->log("[Driver] program counter passed to adder and adder notified.");
 }
 
 void Driver::passProgramCounterToIFIDStageRegisters() {
+    this->logger->log("[Driver] passing program counter to IF/ID stage registers.");
+
     this->if_id_stage_registers->setInput(this->program_counter);
-    this->if_id_stage_registers->notifyConditionVariable();
+    this->if_id_stage_registers->notifyModuleConditionVariable();
+
+    this->logger->log("[Driver] program counter passed to IF/ID stage registers.");
 }
 
-void Driver::notifyConditionVariable() {
-    this->getConditionVariable().notify_one();
+void Driver::notifyModuleConditionVariable() {
+    this->getModuleConditionVariable().notify_one();
 }

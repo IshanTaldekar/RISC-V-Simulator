@@ -4,6 +4,7 @@
 #include <string>
 #include <mutex>
 #include <fstream>
+#include <iostream>
 
 class Logger {
 protected:
@@ -11,8 +12,7 @@ protected:
     std::ofstream log_file;
     std::mutex log_file_mutex;
 
-public:
-    void log(const std::string &text);
+    void openFile();
 };
 
 #endif //RISC_V_SIMULATOR_LOGGER_H

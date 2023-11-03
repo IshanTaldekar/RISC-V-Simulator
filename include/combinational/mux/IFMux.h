@@ -4,6 +4,7 @@
 #include "Mux.h"
 #include "../../state/Driver.h"
 #include "../../common/Config.h"
+#include "../../common/logger/IFLogger.h"
 
 #include <iostream>
 
@@ -17,15 +18,17 @@ class IFMux: protected Mux {
     bool is_pc_src_signal_asserted;
 
     Driver *driver;
+    IFLogger *logger;
+
+    static IFMux *current_instance;
+
 public:
     IFMux();
 
-    static IFMux *current_instance;
     static IFMux *init();
 
     void run() override;
-    void notifyConditionVariable() override;
-
+    void notifyModuleConditionVariable() override;
     void setInput(StageMuxInputType type, int value) override;
     void assertControlSignal() override;
 

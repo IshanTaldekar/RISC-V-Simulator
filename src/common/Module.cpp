@@ -12,10 +12,10 @@ bool Module::isAlive() const {
     return this->is_alive;
 }
 
-std::mutex &Module::getMutex() {
+std::mutex &Module::getModuleMutex() {
     return this->module_mutex;
 }
 
-std::condition_variable &Module::getConditionVariable() {
+std::condition_variable &Module::getModuleConditionVariable() {
     return this->module_condition_variable;
 }

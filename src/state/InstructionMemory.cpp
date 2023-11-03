@@ -5,6 +5,7 @@ InstructionMemory::InstructionMemory() {
     this->is_instruction_file_read = false;
 
     this->if_id_stage_registers = IFIDStageRegisters::init();
+    this->if_logger = IFLogger::init();
 
     this->program_counter = -1;
     this->is_new_program_counter_set = false;
@@ -20,14 +21,14 @@ InstructionMemory *InstructionMemory::init() {
 
 void InstructionMemory::run() {
     while (this->isAlive()) {
-        std::unique_lock<std::mutex> instruction_memory_lock(this->getMutex());
-        this->getConditionVariable().wait(
+        std::unique_lock<std::mutex> instruction_memory_lock(this->getModuleMutex());
+        this->getModuleConditionVariable().wait(
                 instruction_memory_lock,
                 [this] { return this->is_instruction_file_read && this->is_new_program_counter_set; }
         );
 
         this->fetchInstructionFromMemory();
-        this->loadInstructionIntoIFIDStageRegisters();
+        this->passInstructionIntoIFIDStageRegisters();
 
         this->is_new_program_counter_set = false;
     }
@@ -38,14 +39,14 @@ void InstructionMemory::setInstructionMemoryFilePath(const std::string &file_pat
         throw std::runtime_error("instruction_memory_file_path being reset in InstructionMemory");
     }
 
-    std::unique_lock<std::mutex> instruction_memory_lock(this->getMutex());
+    std::unique_lock<std::mutex> instruction_memory_lock(this->getModuleMutex());
 
     this->instruction_memory_file_path = file_path;
     this->readInstructionMemoryFile();
 }
 
 void InstructionMemory::setProgramCounter(int value) {
-    std::unique_lock<std::mutex> instruction_memory_lock(this->getMutex());
+    std::unique_lock<std::mutex> instruction_memory_lock(this->getModuleMutex());
 
     this->program_counter = value;
     this->is_new_program_counter_set = true;
@@ -78,10 +79,10 @@ void InstructionMemory::readInstructionMemoryFile() {
     this->is_instruction_file_read = true;
 }
 
-void InstructionMemory::loadInstructionIntoIFIDStageRegisters() {
+void InstructionMemory::passInstructionIntoIFIDStageRegisters() {
     this->if_id_stage_registers->setInput(this->instruction);
 }
 
-void InstructionMemory::notifyConditionVariable() {
-    this->getConditionVariable().notify_one();
+void InstructionMemory::notifyModuleConditionVariable() {
+    this->getModuleConditionVariable().notify_one();
 }

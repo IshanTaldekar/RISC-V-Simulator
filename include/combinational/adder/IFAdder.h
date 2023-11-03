@@ -4,22 +4,25 @@
 #include "Adder.h"
 #include "../../common/Config.h"
 #include "../mux/IFMux.h"
+#include "../../common/logger/IFLogger.h"
 
 class IFAdder: protected Adder {
     int program_counter;
     bool program_counter_set;
 
+    static IFAdder *current_instance;
+
     IFMux *if_mux;
+    IFLogger *logger;
 
 public:
-    IFAdder();
 
+    IFAdder();
     static IFAdder *init();
-    static IFAdder *current_instance;
 
     void run() override;
     void setInput(AdderInputType type, int value) override;
-    void notifyConditionVariable() override;
+    void notifyModuleConditionVariable() override;
 
 private:
     void loadProgramCounterToIFMux();

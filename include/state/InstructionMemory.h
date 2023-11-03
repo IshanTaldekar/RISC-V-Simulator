@@ -6,8 +6,9 @@
 #include <stdexcept>
 #include <fstream>
 
-#include "IFIDStageRegisters.h"
+#include "stage-registers/IFIDStageRegisters.h"
 #include "../common/Module.h"
+#include "../common/logger/IFLogger.h"
 
 class InstructionMemory: public Module {
 private:
@@ -22,6 +23,8 @@ private:
     std::string instruction;
 
     IFIDStageRegisters *if_id_stage_registers;
+    IFLogger *if_logger;
+
 public:
     InstructionMemory();
 
@@ -29,7 +32,7 @@ public:
     static InstructionMemory *current_instance;
 
     void run() override;
-    void notifyConditionVariable() override;
+    void notifyModuleConditionVariable() override;
 
     void setInstructionMemoryFilePath(const std::string &file_path);
     void setProgramCounter(int value);
@@ -37,7 +40,8 @@ public:
 private:
     void fetchInstructionFromMemory();
     void readInstructionMemoryFile();
-    void loadInstructionIntoIFIDStageRegisters();
+
+    void passInstructionIntoIFIDStageRegisters();
 };
 
 #endif //RISC_V_SIMULATOR_INSTRUCTIONMEMORY_H
