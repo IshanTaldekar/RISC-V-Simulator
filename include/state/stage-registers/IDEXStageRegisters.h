@@ -4,6 +4,9 @@
 #include "../../common/Module.h"
 #include "../../common/Instruction.h"
 #include "../../common/Control.h"
+#include "../../combinational/adder/EXAdder.h"
+#include "../../combinational/mux/EXMux.h"
+#include "../../combinational/ALU.h"
 
 #include <bitset>
 
@@ -16,8 +19,8 @@ class IDEXStageRegisters: public Module {
     std::bitset<WORD_BIT_COUNT> read_data_1;
     std::bitset<WORD_BIT_COUNT> read_data_2;
     std::bitset<WORD_BIT_COUNT> immediate;
-    int register_destination;
-    int program_counter;
+    unsigned long register_destination;
+    unsigned long program_counter;
 
     static IDEXStageRegisters *current_instance;
 
@@ -27,6 +30,10 @@ class IDEXStageRegisters: public Module {
     bool is_register_destination_set;
     bool is_program_counter_set;
     bool is_control_set;
+
+    EXMux *ex_mux;
+    EXAdder *ex_adder;
+    ALU *alu;
 
 public:
     IDEXStageRegisters();
@@ -42,6 +49,18 @@ public:
     void setRegisterDestination(unsigned long rd);
     void setProgramCounter(int pc);
     void setControlModule(Control *new_control);
+
+private:
+    void passProgramCounterToEXAdder();
+    void passReadData1ToALU();
+    void passReadData2ToExMux();
+    void passImmediateToEXMux();
+    void passImmediateToEXAdder();
+    void passRegisterDestinationToEXMEMStageRegisters();
+    void passReadData2ToEXMEMStageRegisters();
+    void passControlToEXMEMStageRegisters();
 };
+
+IDEXStageRegisters *IDEXStageRegisters::current_instance = nullptr;
 
 #endif //RISC_V_SIMULATOR_IDEXSTAGEREGISTERS_H

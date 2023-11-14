@@ -8,7 +8,7 @@
 
 class Adder: public Module {
 public:
-    virtual void setInput(AdderInputType type, int value) = 0;
+    virtual void setInput(AdderInputType type, unsigned long value) = 0;
 };
 
 

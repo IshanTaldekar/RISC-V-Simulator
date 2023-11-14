@@ -23,7 +23,7 @@ private:
     std::string instruction;
 
     IFIDStageRegisters *if_id_stage_registers;
-    IFLogger *if_logger;
+    IFLogger *logger;
 
 public:
     InstructionMemory();
@@ -43,5 +43,7 @@ private:
 
     void passInstructionIntoIFIDStageRegisters();
 };
+
+InstructionMemory *InstructionMemory::current_instance = nullptr;
 
 #endif //RISC_V_SIMULATOR_INSTRUCTIONMEMORY_H

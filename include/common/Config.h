@@ -21,7 +21,8 @@ enum class IFStageMuxInputType {
 };
 
 enum class EXStageMuxInputType {
-
+    ReadData2 = 0,
+    ImmediateValue
 };
 
 enum class WBStageMuxInputType {

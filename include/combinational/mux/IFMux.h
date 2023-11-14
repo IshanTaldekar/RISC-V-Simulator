@@ -9,8 +9,8 @@
 #include <iostream>
 
 class IFMux: protected Mux {
-    int incremented_pc;
-    int branched_pc;
+    unsigned long incremented_pc;
+    unsigned long branched_pc;
 
     bool is_incremented_pc_set;
     bool is_branched_pc_set;
@@ -29,11 +29,11 @@ public:
 
     void run() override;
     void notifyModuleConditionVariable() override;
-    void setInput(StageMuxInputType type, int value) override;
-    void assertControlSignal() override;
+    void setInput(StageMuxInputType type, unsigned long value) override;
+    void assertControlSignal(bool is_asserted) override;
 
 protected:
-    void loadOutput() override;
+    void passOutput() override;
 };
 
 IFMux *IFMux::current_instance = nullptr;

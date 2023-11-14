@@ -27,6 +27,15 @@ add_executable(RISC_V_Simulator
         src/common/Control.cpp
         include/state/stage-registers/IDEXStageRegisters.h
         src/state/stage-registers/IDEXStageRegisters.cpp
+        include/combinational/adder/EXAdder.h
+        src/combinational/adder/EXAdder.cpp
+        include/combinational/mux/EXMux.h
+        src/combinational/mux/EXMux.cpp
+        include/combinational/ALU.h
+        src/combinational/ALU.cpp
+        include/state/stage-registers/EXMEMStageRegisters.h
+        src/state/stage-registers/EXMEMStageRegisters.cpp
+        include/state/DataMemory.h
 )
 
 target_sources(RISC_V_Simulator PUBLIC ${CMAKE_SOURCE_DIR}/include)

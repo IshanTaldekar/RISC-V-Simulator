@@ -8,7 +8,7 @@
 
 class IFAdder: protected Adder {
     int program_counter;
-    bool program_counter_set;
+    bool is_program_counter_set;
 
     static IFAdder *current_instance;
 
@@ -16,16 +16,15 @@ class IFAdder: protected Adder {
     IFLogger *logger;
 
 public:
-
     IFAdder();
     static IFAdder *init();
 
     void run() override;
-    void setInput(AdderInputType type, int value) override;
+    void setInput(AdderInputType type, unsigned long value) override;
     void notifyModuleConditionVariable() override;
 
 private:
-    void loadProgramCounterToIFMux();
+    void passProgramCounterToIFMux();
 };
 
 IFAdder *IFAdder::current_instance = nullptr;

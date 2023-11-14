@@ -13,6 +13,10 @@ IDEXStageRegisters::IDEXStageRegisters() {
     this->is_register_destination_set = false;
     this->is_program_counter_set = false;
     this->is_control_set = false;
+
+    this->ex_mux = EXMux::init();
+    this->ex_adder = EXAdder::init();
+    this->alu = ALU::init();
 }
 
 IDEXStageRegisters *IDEXStageRegisters::init() {
@@ -37,7 +41,15 @@ void IDEXStageRegisters::run() {
 
         this->control->setEXStageControlSignals();
 
-        // TODO: load data to next stage
+        this->passProgramCounterToEXAdder();
+        this->passReadData1ToALU();
+        this->passReadData2ToExMux();
+        this->passImmediateToEXMux();
+        this->passImmediateToEXAdder();
+
+        std::thread pass_register_destination_thread (&IDEXStageRegisters::passRegisterDestinationToEXMEMStageRegisters, this);
+        std::thread pass_read_data2_thread (&IDEXStageRegisters::passReadData2ToEXMEMStageRegisters, this);
+        std::thread pass_control_thread (&IDEXStageRegisters::passControlToEXMEMStageRegisters, this);
 
         this->is_single_read_register_data_set = false;
         this->is_double_read_register_data_set = false;
@@ -94,4 +106,36 @@ void IDEXStageRegisters::setControlModule(Control *new_control) {
 
     this->control = new_control;
     this->is_control_set = true;
+}
+
+void IDEXStageRegisters::passProgramCounterToEXAdder() {
+    this->ex_adder->setInput(EXAdderInputType::PCValue, this->program_counter);
+}
+
+void IDEXStageRegisters::passReadData1ToALU() {
+    this->alu->setInput1(this->read_data_1.to_ulong());
+}
+
+void IDEXStageRegisters::passReadData2ToExMux() {
+    this->ex_mux->setInput(EXStageMuxInputType::ReadData2, this->read_data_2.to_ulong());
+}
+
+void IDEXStageRegisters::passImmediateToEXMux() {
+    this->ex_mux->setInput(EXStageMuxInputType::ImmediateValue, this->immediate.to_ulong());
+}
+
+void IDEXStageRegisters::passImmediateToEXAdder() {
+    this->ex_adder->setInput(EXAdderInputType::ImmediateValue, this->immediate.to_ulong());
+}
+
+void IDEXStageRegisters::passRegisterDestinationToEXMEMStageRegisters() {
+    // TODO
+}
+
+void IDEXStageRegisters::passReadData2ToEXMEMStageRegisters() {
+    // TODO
+}
+
+void IDEXStageRegisters::passControlToEXMEMStageRegisters() {
+    // TODO
 }

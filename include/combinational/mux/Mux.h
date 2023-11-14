@@ -8,11 +8,12 @@
 
 class Mux: protected Module {
 public:
-    virtual void setInput(StageMuxInputType type, int value) = 0;
-    virtual void assertControlSignal() = 0;
+    virtual void setInput(StageMuxInputType type, unsigned long value) = 0;
+    virtual void assertControlSignal(bool is_asserted) = 0;
 
 protected:
-    virtual void loadOutput() = 0;
+    bool is_control_signal_set;
+    virtual void passOutput() = 0;
 };
 
 #endif //RISC_V_SIMULATOR_MUX_H

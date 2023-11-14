@@ -5,8 +5,11 @@
 #include "Instruction.h"
 #include "../state/RegisterFile.h"
 #include "../combinational/mux/IFMux.h"
+#include "../combinational/mux/EXMux.h"
+#include "../combinational/ALU.h"
 
 class Control {
+private:
     const Instruction *instruction;
 
     RegisterFile *register_file;
@@ -19,6 +22,11 @@ class Control {
     bool is_mem_write_asserted;
     bool is_mem_to_reg_asserted;
 
+    std::bitset<ALU::ALU_OP_BIT_COUNT> alu_op;
+
+    EXMux *ex_mux;
+    ALU *alu;
+
 public:
     explicit Control(const Instruction *instruction);
 
@@ -28,6 +36,7 @@ public:
 
 private:
     void generateSignals();
+    void generateALUOpCode();
 };
 
 #endif //RISC_V_SIMULATOR_CONTROL_H

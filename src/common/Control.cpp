@@ -5,13 +5,19 @@ Control::Control(const Instruction *current_instruction) {
 
     this->register_file = RegisterFile::init();
     this->if_mux = IFMux::init();
+    this->ex_mux = EXMux::init();
+    this->alu = ALU::init();
 
     this->is_reg_write_asserted = false;
     this->is_pc_src_asserted = false;
     this->is_alu_src_asserted = false;
+    this->is_mem_write_asserted = false;
     this->is_mem_read_asserted = false;
+    this->is_reg_write_asserted = false;
+    this->is_mem_to_reg_asserted = false;
 
     this->generateSignals();
+    this->generateALUOpCode();
 }
 
 void Control::generateSignals() {
@@ -39,8 +45,39 @@ void Control::generateSignals() {
     }
 }
 
-void Control::setEXStageControlSignals() {
+void Control::generateALUOpCode() {
+    InstructionType type = this->instruction->getType();
 
+    if (type == InstructionType::R || type == InstructionType::I) {
+        std::bitset<Instruction::FUNCT3_BIT_COUNT> funct3 = this->instruction->getFunct3();
+        std::bitset<Instruction::FUNCT7_BIT_COUNT> funct7 = this->instruction->getFunct7();
+
+        if (funct3 == std::bitset<Instruction::FUNCT3_BIT_COUNT>("000")) {
+            if (this->instruction->getOpcode() == std::bitset<Instruction::OPCODE_BIT_COUNT>("0010011") ||
+                    this->instruction->getOpcode() == std::bitset<Instruction::OPCODE_BIT_COUNT>("0000011") ||
+                    funct7 == std::bitset<Instruction::FUNCT7_BIT_COUNT>("0000000")) {
+                this->alu_op = std::bitset<ALU::ALU_OP_BIT_COUNT>("0000");  // Add
+            } else if (funct7 == std::bitset<Instruction::FUNCT7_BIT_COUNT>("0100000") &&
+                    this->instruction->getOpcode() != std::bitset<Instruction::OPCODE_BIT_COUNT>("0010011")) {
+                this->alu_op = std::bitset<ALU::ALU_OP_BIT_COUNT>("0001");  // Subtract
+            }
+        } else if (funct3 == std::bitset<Instruction::FUNCT3_BIT_COUNT>("100")) {
+            this->alu_op = std::bitset<ALU::ALU_OP_BIT_COUNT>("0010");  // Xor
+        } else if (funct3 == std::bitset<Instruction::FUNCT3_BIT_COUNT>("110")) {
+            this->alu_op = std::bitset<ALU::ALU_OP_BIT_COUNT>("0011");  // Or
+        } else if (funct3 == std::bitset<Instruction::FUNCT3_BIT_COUNT>("111")) {
+            this->alu_op = std::bitset<ALU::ALU_OP_BIT_COUNT>("0100");  // And
+        }
+    } else if (type == InstructionType::J || type == InstructionType::S) {
+        this->alu_op = std::bitset<ALU::ALU_OP_BIT_COUNT>("0000");  // Add
+    } else if (type == InstructionType::B) {
+        this->alu_op = std::bitset<ALU::ALU_OP_BIT_COUNT>("0001");  // Subtract
+    }
+}
+
+void Control::setEXStageControlSignals() {
+    this->alu->setALUOp(this->alu_op);
+    this->ex_mux->assertControlSignal(this->is_alu_src_asserted);
 }
 
 void Control::setMEMStageControlSignals() {

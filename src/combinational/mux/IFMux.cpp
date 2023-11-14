@@ -10,6 +10,8 @@ IFMux::IFMux() {
 
     this->incremented_pc = -1;
     this->branched_pc = -1;
+
+    this->is_control_signal_set = false;
 }
 
 IFMux *IFMux::init() {
@@ -27,22 +29,25 @@ void IFMux::run() {
         std::unique_lock<std::mutex> mux_lock (this->getModuleMutex());
         this->getModuleConditionVariable().wait(
                 mux_lock,
-                [this] { return this->is_branched_pc_set && this->is_incremented_pc_set; }
+                [this] {
+                    return this->is_branched_pc_set && this->is_incremented_pc_set && this->is_control_signal_set;
+                }
         );
 
         this->logger->log("[IFMux] Woken up and acquired lock. Loading output");
 
-        this->loadOutput();
+        this->passOutput();
 
         this->is_pc_src_signal_asserted = false;
         this->is_branched_pc_set = false;
         this->is_incremented_pc_set = false;
+        this->is_control_signal_set = false;
 
         this->logger->log("[IFMux] Woken up and acquired lock. Loading output");
     }
 }
 
-void IFMux::setInput(StageMuxInputType type, int value) {
+void IFMux::setInput(StageMuxInputType type, unsigned long value) {
     if (!std::holds_alternative<IFStageMuxInputType>(type)) {
         throw std::runtime_error("StageMuxInputType passed to IFMux not compatible with IFStageMuxInputTypes");
     }
@@ -52,13 +57,13 @@ void IFMux::setInput(StageMuxInputType type, int value) {
     std::unique_lock<std::mutex> mux_lock (this->getModuleMutex());
 
     if (std::get<IFStageMuxInputType>(type) == IFStageMuxInputType::IncrementedPc) {
-        incremented_pc = value;
-        is_incremented_pc_set = true;
+        this->incremented_pc = value;
+        this->is_incremented_pc_set = true;
 
         this->logger->log("[IFMux] incremented PC value set");
     } else if (std::get<IFStageMuxInputType>(type) == IFStageMuxInputType::BranchedPc) {
-        branched_pc = value;
-        is_branched_pc_set = true;
+        this->branched_pc = value;
+        this->is_branched_pc_set = true;
 
         this->logger->log("[IFMux] branched PC value set");
     } else {
@@ -66,15 +71,17 @@ void IFMux::setInput(StageMuxInputType type, int value) {
     }
 }
 
-void IFMux::assertControlSignal() {
-    this->is_pc_src_signal_asserted = true;
+void IFMux::assertControlSignal(bool is_asserted) {
+    this->is_pc_src_signal_asserted = is_asserted;
+    this->is_control_signal_set = true;
+
     this->logger->log("[IFMux] PCSrc asserted: " + std::to_string(this->is_pc_src_signal_asserted) + ".");
 }
 
 /**
  * Loading output to the driver
  */
-void IFMux::loadOutput() {
+void IFMux::passOutput() {
     this->logger->log("[IFMux] Loading output to Driver.");
 
     if (this->is_pc_src_signal_asserted) {

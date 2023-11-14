@@ -32,6 +32,8 @@ RegisterFile *RegisterFile::init() {
 
 void RegisterFile::run() {
     while (this->isAlive()) {
+        this->logger->log("[RegisterFile] run waiting to be woken up.");
+
         std::unique_lock<std::mutex> register_file_lock (this->getModuleMutex());
         this->getModuleConditionVariable().wait(
                 register_file_lock,
@@ -125,13 +127,9 @@ void RegisterFile::passReadRegisterDataToIDEXStageRegister() {
 }
 
 void RegisterFile::writeDataToRegisterFile() {
-    std::unique_lock<std::mutex> register_file_lock (this->getModuleMutex());
-
     if (this->is_reg_write_signal_set) {
         this->registers.at(this->register_destination) = this->write_data;
     }
-
-    register_file_lock.unlock();
 
     std::lock_guard<std::mutex> load_lock (this->write_load_mutex);
     this->is_write_thread_finished = true;
