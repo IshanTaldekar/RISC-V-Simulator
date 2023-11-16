@@ -5,6 +5,8 @@ ALU::ALU() {
     this->input2 = -1UL;
     this->result = -1UL;
 
+    this->ex_mem_stage_registers = EXMEMStageRegisters::init();
+
     this->is_result_zero = false;
     this->is_input1_set = false;
     this->is_input2_set = false;
@@ -83,9 +85,9 @@ void ALU::computeResult() {
 }
 
 void ALU::passZeroFlagToEXMEMStageRegisters() {
-
+    this->ex_mem_stage_registers->setIsResultZeroFlag(this->is_result_zero);
 }
 
 void ALU::passResultToEXMEMStageRegisters() {
-
+    this->ex_mem_stage_registers->setALUResult(this->result);
 }

@@ -24,6 +24,8 @@ private:
 
     static ALU *current_instance;
 
+    EXMEMStageRegisters *ex_mem_stage_registers;
+
 public:
     ALU();
 

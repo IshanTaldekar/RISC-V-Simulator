@@ -3,6 +3,7 @@
 
 #include "Mux.h"
 #include "../../common/Config.h"
+#include "../ALU.h"
 
 #include <iostream>
 
@@ -14,6 +15,8 @@ class EXMux: protected Mux {
     bool is_read_data_2_set;
 
     bool is_alu_src_asserted;
+
+    ALU *alu;
 
     static EXMux *current_instance;
 

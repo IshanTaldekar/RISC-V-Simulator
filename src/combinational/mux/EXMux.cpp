@@ -6,6 +6,8 @@ EXMux::EXMux() {
 
     this->is_alu_src_asserted = false;
 
+    this->alu = ALU::init();
+
     this->is_immediate_set = false;
     this->is_read_data_2_set = false;
 }
@@ -65,8 +67,8 @@ void EXMux::assertControlSignal(bool is_asserted) {
 
 void EXMux::passOutput() {
     if (this->is_alu_src_asserted) {
-        // load immediate
+        this->alu->setInput2(this->immediate);
     } else {
-        // load read data 2
+        this->alu->setInput2(this->read_data_2);
     }
 }

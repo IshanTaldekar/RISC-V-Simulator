@@ -1,8 +1,11 @@
 #include "../../../include/combinational/adder/EXAdder.h"
 
 EXAdder::EXAdder() {
-    this->program_counter = -1;
-    this->immediate = -1;
+    this->program_counter = 0UL;
+    this->immediate = 0UL;
+    this->result = 0UL;
+
+    this->ex_mem_stage_registers = EXMEMStageRegisters::init();
 
     this->is_program_counter_set = false;
     this->is_immediate_set = false;
@@ -24,6 +27,7 @@ void EXAdder::run() {
                 [this] { return this->is_program_counter_set && this->is_immediate_set; }
         );
 
+        this->computeResult();
         this->passBranchAddressToEXMEMStageRegisters();
 
         this->is_immediate_set = false;
@@ -47,10 +51,14 @@ void EXAdder::setInput(AdderInputType type, unsigned long value) {
     }
 }
 
+void EXAdder::computeResult() {
+    this->result = this->program_counter + this->immediate;
+}
+
 void EXAdder::notifyModuleConditionVariable() {
     this->getModuleConditionVariable().notify_one();
 }
 
 void EXAdder::passBranchAddressToEXMEMStageRegisters() {
-
+    this->ex_mem_stage_registers->setBranchedProgramCounter(this->result);
 }

@@ -7,6 +7,7 @@ Control::Control(const Instruction *current_instruction) {
     this->if_mux = IFMux::init();
     this->ex_mux = EXMux::init();
     this->alu = ALU::init();
+    this->data_memory = DataMemory::init();
 
     this->is_reg_write_asserted = false;
     this->is_pc_src_asserted = false;
@@ -15,6 +16,8 @@ Control::Control(const Instruction *current_instruction) {
     this->is_mem_read_asserted = false;
     this->is_reg_write_asserted = false;
     this->is_mem_to_reg_asserted = false;
+    this->is_branch_instruction = false;
+    this->is_alu_result_zero = false;
 
     this->generateSignals();
     this->generateALUOpCode();
@@ -75,15 +78,23 @@ void Control::generateALUOpCode() {
     }
 }
 
-void Control::setEXStageControlSignals() {
+void Control::setIsALUResultZero(bool is_result_zero) {
+    this->is_alu_result_zero = is_result_zero;
+}
+
+void Control::toggleEXStageControlSignals() {
     this->alu->setALUOp(this->alu_op);
     this->ex_mux->assertControlSignal(this->is_alu_src_asserted);
 }
 
-void Control::setMEMStageControlSignals() {
+void Control::toggleMEMStageControlSignals() {
+    this->is_pc_src_asserted &= this->is_alu_result_zero;
 
+    this->if_mux->assertControlSignal(this->is_pc_src_asserted);
+    this->data_memory->setMemWrite(this->is_mem_write_asserted);
+    this->data_memory->setMemRead(this->is_mem_read_asserted);
 }
 
-void Control::setWBStageControlSignals() {
+void Control::toggleWBStageControlSignals() {
 
 }

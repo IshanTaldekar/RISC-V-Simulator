@@ -48,7 +48,7 @@ void InstructionMemory::setInstructionMemoryFilePath(const std::string &file_pat
 
     this->logger->log("[InstructionMemory] waiting to set file path.");
 
-    std::unique_lock<std::mutex> instruction_memory_lock(this->getModuleMutex());
+    std::lock_guard<std::mutex> instruction_memory_lock(this->getModuleMutex());
 
     this->instruction_memory_file_path = file_path;
     this->readInstructionMemoryFile();
@@ -59,7 +59,7 @@ void InstructionMemory::setInstructionMemoryFilePath(const std::string &file_pat
 void InstructionMemory::setProgramCounter(int value) {
     this->logger->log("[InstructionMemory] waiting to set program counter.");
 
-    std::unique_lock<std::mutex> instruction_memory_lock(this->getModuleMutex());
+    std::lock_guard<std::mutex> instruction_memory_lock(this->getModuleMutex());
 
     this->program_counter = value;
     this->is_new_program_counter_set = true;
@@ -68,7 +68,7 @@ void InstructionMemory::setProgramCounter(int value) {
 }
 
 void InstructionMemory::fetchInstructionFromMemory() {
-    this->logger->log("[InstructionMemory] fetching instruction from memory.");
+    this->logger->log("[InstructionMemory] fetching instruction from data.");
 
     this->instruction = "";
 
@@ -80,7 +80,7 @@ void InstructionMemory::fetchInstructionFromMemory() {
         this->instruction += this->data.at(i);
     }
 
-    this->logger->log("[InstructionMemory] instruction fetched from memory.");
+    this->logger->log("[InstructionMemory] instruction fetched from data.");
 }
 
 void InstructionMemory::readInstructionMemoryFile() {
@@ -95,7 +95,7 @@ void InstructionMemory::readInstructionMemoryFile() {
     std::ifstream instruction_memory_file (this->instruction_memory_file_path);
     std::string byte_instruction;
 
-    this->data = std::vector<std::string>{};
+    this->data = std::vector<std::string> {};
 
     while (std::getline(instruction_memory_file, byte_instruction)) {
         this->data.push_back(byte_instruction);

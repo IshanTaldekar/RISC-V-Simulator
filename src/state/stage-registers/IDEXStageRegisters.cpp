@@ -17,6 +17,7 @@ IDEXStageRegisters::IDEXStageRegisters() {
     this->ex_mux = EXMux::init();
     this->ex_adder = EXAdder::init();
     this->alu = ALU::init();
+    this->ex_mem_stage_register = EXMEMStageRegisters::init();
 }
 
 IDEXStageRegisters *IDEXStageRegisters::init() {
@@ -39,7 +40,7 @@ void IDEXStageRegisters::run() {
                 }
         );
 
-        this->control->setEXStageControlSignals();
+        this->control->toggleEXStageControlSignals();
 
         this->passProgramCounterToEXAdder();
         this->passReadData1ToALU();
@@ -129,13 +130,13 @@ void IDEXStageRegisters::passImmediateToEXAdder() {
 }
 
 void IDEXStageRegisters::passRegisterDestinationToEXMEMStageRegisters() {
-    // TODO
+    this->ex_mem_stage_register->setRegisterDestination(this->register_destination);
 }
 
 void IDEXStageRegisters::passReadData2ToEXMEMStageRegisters() {
-    // TODO
+    this->ex_mem_stage_register->setReadData2(this->read_data_2.to_ulong());
 }
 
 void IDEXStageRegisters::passControlToEXMEMStageRegisters() {
-    // TODO
+    this->ex_mem_stage_register->setControl(this->control);
 }

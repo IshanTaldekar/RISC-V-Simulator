@@ -46,7 +46,7 @@ void Driver::run() {
 
         this->is_new_program_counter_set = false;
 
-        this->logger->log("[Driver] program counter passed to adder and instruction_bits memory.");
+        this->logger->log("[Driver] program counter passed to adder and instruction_bits data.");
 
 
         this->logger->log("[Driver] run waiting at barrier.");
@@ -57,13 +57,13 @@ void Driver::run() {
 }
 
 void Driver::passProgramCounterToInstructionMemory() {
-    this->logger->log("[Driver] Passing program counter to instruction_bits memory.");
+    this->logger->log("[Driver] Passing program counter to instruction_bits data.");
 
     this->instruction_memory->setProgramCounter(this->program_counter);
     this->instruction_memory->notifyModuleConditionVariable();
 
 
-    this->logger->log("[Driver] program counter passed to instruction_bits memory and instruction_bits memory notified.");
+    this->logger->log("[Driver] program counter passed to instruction_bits data and instruction_bits data notified.");
 }
 
 void Driver::passProgramCounterToAdder() {

@@ -7,6 +7,7 @@
 #include "../../combinational/adder/EXAdder.h"
 #include "../../combinational/mux/EXMux.h"
 #include "../../combinational/ALU.h"
+#include "EXMEMStageRegisters.h"
 
 #include <bitset>
 
@@ -34,6 +35,7 @@ class IDEXStageRegisters: public Module {
     EXMux *ex_mux;
     EXAdder *ex_adder;
     ALU *alu;
+    EXMEMStageRegisters *ex_mem_stage_register;
 
 public:
     IDEXStageRegisters();

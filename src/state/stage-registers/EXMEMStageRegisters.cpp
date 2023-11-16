@@ -16,6 +16,7 @@ EXMEMStageRegisters::EXMEMStageRegisters() {
     this->is_control_set = false;
 
     this->control = nullptr;
+    this->data_memory = DataMemory::init();
 }
 
 EXMEMStageRegisters *EXMEMStageRegisters::init() {
@@ -27,7 +28,33 @@ EXMEMStageRegisters *EXMEMStageRegisters::init() {
 }
 
 void EXMEMStageRegisters::run() {
+    while (this->isAlive()) {
+        std::unique_lock<std::mutex> ex_mem_stage_registers_lock (this->getModuleMutex());
+        this->getModuleConditionVariable().wait(
+                ex_mem_stage_registers_lock,
+                [this] {
+                    return this->is_branch_program_counter_set && this->is_alu_result_set &&
+                            this->is_read_data_2_set && this->is_register_destination_set &&
+                            this->is_alu_result_zero_flag_set && this->is_control_set;
+                }
+        );
 
+        this->control->setIsALUResultZero(this->is_alu_result_zero);
+        this->control->toggleMEMStageControlSignals();
+
+        this->passWriteDataToDataMemory();
+        this->passALUResultToDataMemory();
+
+        std::thread pass_alu_result_thread (&EXMEMStageRegisters::passALUResultToMEMWBStageRegisters, this);
+        std::thread pass_register_destination_thread (&EXMEMStageRegisters::passRegisterDestinationToMEMWBStageRegisters, this);
+
+        this->is_branch_program_counter_set = false;
+        this->is_alu_result_set = false;
+        this->is_read_data_2_set = false;
+        this->is_register_destination_set = false;
+        this->is_alu_result_zero_flag_set = false;
+        this->is_control_set = false;
+    }
 }
 
 void EXMEMStageRegisters::notifyModuleConditionVariable() {
@@ -74,4 +101,20 @@ void EXMEMStageRegisters::setControl(Control *new_control) {
 
     this->control = new_control;
     this->is_control_set = true;
+}
+
+void EXMEMStageRegisters::passALUResultToDataMemory() {
+    this->data_memory->setAddress(this->alu_result);
+}
+
+void EXMEMStageRegisters::passWriteDataToDataMemory() {
+    this->data_memory->setWriteData(this->read_data_2);
+}
+
+void EXMEMStageRegisters::passALUResultToMEMWBStageRegisters() {
+    // TODO
+}
+
+void EXMEMStageRegisters::passRegisterDestinationToMEMWBStageRegisters() {
+    // TODO
 }

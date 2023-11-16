@@ -20,6 +20,7 @@ class EXMEMStageRegisters: public Module {
     bool is_control_set;
 
     Control *control;
+    DataMemory *data_memory;
 
     static EXMEMStageRegisters *current_instance;
 
@@ -37,6 +38,12 @@ public:
     void setReadData2(unsigned long value);
     void setRegisterDestination(unsigned long value);
     void setControl(Control *new_control);
+
+private:
+    void passALUResultToDataMemory();
+    void passALUResultToMEMWBStageRegisters();
+    void passWriteDataToDataMemory();
+    void passRegisterDestinationToMEMWBStageRegisters();
 };
 
 EXMEMStageRegisters *EXMEMStageRegisters::current_instance = nullptr;
