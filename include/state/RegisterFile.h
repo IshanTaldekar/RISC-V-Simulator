@@ -10,6 +10,8 @@
 #include "../common/logger/IDLogger.h"
 #include "../state/stage-registers/IDEXStageRegisters.h"
 
+class IDEXStageRegisters;
+
 class RegisterFile: public Module {
     static constexpr int REGISTERS_COUNT = 32;
     static constexpr int WORD_BIT_COUNT = 32;

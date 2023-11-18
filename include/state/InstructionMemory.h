@@ -10,6 +10,8 @@
 #include "../common/Module.h"
 #include "../common/logger/IFLogger.h"
 
+class IFIDStageRegisters;
+
 class InstructionMemory: public Module {
 private:
     std::string instruction_memory_file_path;

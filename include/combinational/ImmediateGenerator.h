@@ -6,6 +6,9 @@
 #include "../common/Config.h"
 #include "../state/stage-registers/IDEXStageRegisters.h"
 
+class Instruction;
+class IDEXStageRegisters;
+
 class ImmediateGenerator: public Module {
     static constexpr int WORD_BIT_COUNT = 32;
 

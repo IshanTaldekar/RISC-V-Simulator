@@ -6,6 +6,8 @@
 #include "../common/Module.h"
 #include "../common/Control.h"
 
+class EXMEMStageRegisters;
+
 class ALU: public Module {
 public:
     static constexpr int ALU_OP_BIT_COUNT = 4;

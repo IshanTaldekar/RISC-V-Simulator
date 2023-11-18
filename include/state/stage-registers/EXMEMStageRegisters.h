@@ -6,6 +6,11 @@
 #include "../../combinational/mux/IFMux.h"
 #include "MEMWBStageRegisters.h"
 
+class Control;
+class DataMemory;
+class MEMWBStageRegisters;
+class IFMux;
+
 class EXMEMStageRegisters: public Module {
     unsigned long branch_program_counter;
     unsigned long alu_result;

@@ -7,6 +7,8 @@
 
 #include <iostream>
 
+class ALU;
+
 class EXMux: protected Mux {
     unsigned long immediate;
     unsigned long read_data_2;

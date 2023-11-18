@@ -6,6 +6,9 @@
 #include "../mux/IFMux.h"
 #include "../../common/logger/IFLogger.h"
 
+class IFMux;
+class IFLogger;
+
 class IFAdder: protected Adder {
     int program_counter;
     bool is_program_counter_set;

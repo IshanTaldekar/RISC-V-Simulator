@@ -10,6 +10,8 @@
 #include "../common/Module.h"
 #include "../state/stage-registers/MEMWBStageRegisters.h"
 
+class MEMWBStageRegisters;
+
 class DataMemory: public Module {
     static constexpr int WORD_BIT_COUNT = 32;
 

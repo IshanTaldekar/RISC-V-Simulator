@@ -10,7 +10,19 @@
 #include "../combinational/ALU.h"
 #include "../state/DataMemory.h"
 
+#include <bitset>
+
+class RegisterFile;
+class IFMux;
+class EXMux;
+class ALU;
+class DataMemory;
+class WBMux;
+
 class Control {
+public:
+    static constexpr int ALU_OP_BIT_COUNT = 4;
+
 private:
     const Instruction *instruction;
 
@@ -30,7 +42,7 @@ private:
     bool is_branch_instruction;
     bool is_alu_result_zero;
 
-    std::bitset<ALU::ALU_OP_BIT_COUNT> alu_op;
+    std::bitset<ALU_OP_BIT_COUNT> alu_op;
 
 public:
     explicit Control(const Instruction *instruction);

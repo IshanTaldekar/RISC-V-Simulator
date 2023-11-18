@@ -61,22 +61,22 @@ void Control::generateALUOpCode() {
             if (this->instruction->getOpcode() == std::bitset<Instruction::OPCODE_BIT_COUNT>("0010011") ||
                     this->instruction->getOpcode() == std::bitset<Instruction::OPCODE_BIT_COUNT>("0000011") ||
                     funct7 == std::bitset<Instruction::FUNCT7_BIT_COUNT>("0000000")) {
-                this->alu_op = std::bitset<ALU::ALU_OP_BIT_COUNT>("0000");  // Add
+                this->alu_op = std::bitset<ALU_OP_BIT_COUNT>("0000");  // Add
             } else if (funct7 == std::bitset<Instruction::FUNCT7_BIT_COUNT>("0100000") &&
                     this->instruction->getOpcode() != std::bitset<Instruction::OPCODE_BIT_COUNT>("0010011")) {
-                this->alu_op = std::bitset<ALU::ALU_OP_BIT_COUNT>("0001");  // Subtract
+                this->alu_op = std::bitset<ALU_OP_BIT_COUNT>("0001");  // Subtract
             }
         } else if (funct3 == std::bitset<Instruction::FUNCT3_BIT_COUNT>("100")) {
-            this->alu_op = std::bitset<ALU::ALU_OP_BIT_COUNT>("0010");  // Xor
+            this->alu_op = std::bitset<ALU_OP_BIT_COUNT>("0010");  // Xor
         } else if (funct3 == std::bitset<Instruction::FUNCT3_BIT_COUNT>("110")) {
-            this->alu_op = std::bitset<ALU::ALU_OP_BIT_COUNT>("0011");  // Or
+            this->alu_op = std::bitset<ALU_OP_BIT_COUNT>("0011");  // Or
         } else if (funct3 == std::bitset<Instruction::FUNCT3_BIT_COUNT>("111")) {
-            this->alu_op = std::bitset<ALU::ALU_OP_BIT_COUNT>("0100");  // And
+            this->alu_op = std::bitset<ALU_OP_BIT_COUNT>("0100");  // And
         }
     } else if (type == InstructionType::J || type == InstructionType::S) {
-        this->alu_op = std::bitset<ALU::ALU_OP_BIT_COUNT>("0000");  // Add
+        this->alu_op = std::bitset<ALU_OP_BIT_COUNT>("0000");  // Add
     } else if (type == InstructionType::B) {
-        this->alu_op = std::bitset<ALU::ALU_OP_BIT_COUNT>("0001");  // Subtract
+        this->alu_op = std::bitset<ALU_OP_BIT_COUNT>("0001");  // Subtract
     }
 }
 

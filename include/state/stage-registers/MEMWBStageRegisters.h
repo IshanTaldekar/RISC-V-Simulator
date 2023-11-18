@@ -6,6 +6,10 @@
 #include "../../state/RegisterFile.h"
 #include "../../combinational/mux/WBMux.h"
 
+class Control;
+class RegisterFile;
+class WBMux;
+
 class MEMWBStageRegisters: public Module {
     unsigned long read_data;
     unsigned long alu_result;

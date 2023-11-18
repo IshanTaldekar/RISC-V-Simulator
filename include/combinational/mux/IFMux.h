@@ -8,6 +8,9 @@
 
 #include <iostream>
 
+class Driver;
+class IFLogger;
+
 class IFMux: protected Mux {
     unsigned long incremented_pc;
     unsigned long branched_pc;

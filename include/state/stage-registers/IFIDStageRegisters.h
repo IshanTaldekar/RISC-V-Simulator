@@ -15,6 +15,10 @@
 #include <iostream>
 #include <queue>
 
+class Control;
+class RegisterFile;
+class ImmediateGenerator;
+
 class IFIDStageRegisters: public Module {
     static constexpr int WORD_BIT_COUNT = 32;
 

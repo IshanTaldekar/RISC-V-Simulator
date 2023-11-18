@@ -7,6 +7,10 @@
 #include "../common/Module.h"
 #include "../common/logger/IFLogger.h"
 
+class InstructionMemory;
+class IFIDStageRegisters;
+class IFAdder;
+
 class Driver: public Module {
     int program_counter;
     bool is_new_program_counter_set;

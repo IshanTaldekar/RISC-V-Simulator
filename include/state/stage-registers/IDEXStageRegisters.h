@@ -11,6 +11,13 @@
 
 #include <bitset>
 
+class Control;
+class Instruction;
+class EXMux;
+class EXAdder;
+class ALU;
+class EXMEMStageRegisters;
+
 class IDEXStageRegisters: public Module {
     static constexpr int WORD_BIT_COUNT = 32;
 

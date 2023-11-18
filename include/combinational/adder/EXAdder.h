@@ -8,6 +8,8 @@
 #include <bitset>
 #include <iostream>
 
+class EXMEMStageRegisters;
+
 class EXAdder: protected Adder {
     static constexpr int WORD_BIT_COUNT = 32;
 

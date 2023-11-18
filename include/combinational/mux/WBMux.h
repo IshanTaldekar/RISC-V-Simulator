@@ -5,6 +5,9 @@
 #include "../../state/RegisterFile.h"
 #include "../../common/logger/WBLogger.h"
 
+class RegisterFile;
+class WBLogger;
+
 class WBMux: protected Mux {
     unsigned int read_data;
     unsigned int alu_result;

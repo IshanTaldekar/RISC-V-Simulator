@@ -1,0 +1,3 @@
+/home/wasp/Code/RISC-V-Simulator/build/CMakeFiles/RISC_V_Simulator.dir
+/home/wasp/Code/RISC-V-Simulator/build/CMakeFiles/edit_cache.dir
+/home/wasp/Code/RISC-V-Simulator/build/CMakeFiles/rebuild_cache.dir
