@@ -12,6 +12,4 @@ public:
     void log(const std::string &text);
 };
 
-IFLogger *IFLogger::current_instance = nullptr;
-
 #endif //RISC_V_SIMULATOR_IFLOGGER_H

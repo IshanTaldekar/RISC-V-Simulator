@@ -1,5 +1,7 @@
 #include "../../include/combinational/ALU.h"
 
+ALU *ALU::current_instance = nullptr;
+
 ALU::ALU() {
     this->input1 = -1UL;
     this->input2 = -1UL;

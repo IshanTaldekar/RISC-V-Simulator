@@ -30,6 +30,4 @@ private:
     void passProgramCounterToIFMux();
 };
 
-IFAdder *IFAdder::current_instance = nullptr;
-
 #endif //RISC_V_SIMULATOR_IFADDER_H

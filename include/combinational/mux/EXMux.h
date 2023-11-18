@@ -36,6 +36,4 @@ protected:
     void passOutput() override;
 };
 
-EXMux *EXMux::current_instance = nullptr;
-
 #endif //RISC_V_SIMULATOR_EXMUX_H

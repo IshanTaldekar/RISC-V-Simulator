@@ -1,5 +1,7 @@
 #include "../../include/state/RegisterFile.h"
 
+RegisterFile *RegisterFile::current_instance = nullptr;
+
 RegisterFile::RegisterFile() {
     this->is_single_read_register_set = false;
     this->is_double_read_register_set = false;

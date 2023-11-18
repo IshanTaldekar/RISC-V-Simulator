@@ -58,6 +58,4 @@ private:
     void passRegisterDestinationToIDEXStageRegisters();
 };
 
-IFIDStageRegisters *IFIDStageRegisters::current_instance = nullptr;
-
 #endif //RISC_V_SIMULATOR_IFIDSTAGEREGISTERS_H

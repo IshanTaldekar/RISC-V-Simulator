@@ -1,5 +1,7 @@
 #include "../../../include/common/logger/EXLogger.h"
 
+EXLogger *EXLogger::current_instance = nullptr;
+
 EXLogger::EXLogger() {
     this->log_file_path = EX_STAGE_LOG_FILE_PATH;
 }

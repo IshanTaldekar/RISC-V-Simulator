@@ -61,6 +61,4 @@ private:
     void writeDataToRegisterFile();
 };
 
-RegisterFile *RegisterFile::current_instance = nullptr;
-
 #endif //RISC_V_SIMULATOR_REGISTERFILE_H

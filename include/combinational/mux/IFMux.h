@@ -39,6 +39,4 @@ protected:
     void passOutput() override;
 };
 
-IFMux *IFMux::current_instance = nullptr;
-
 #endif //RISC_V_SIMULATOR_IFMUX_H

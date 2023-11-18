@@ -59,6 +59,4 @@ private:
     void passReadData();
 };
 
-DataMemory *DataMemory::current_instance = nullptr;
-
 #endif //RISC_V_SIMULATOR_DATAMEMORY_H

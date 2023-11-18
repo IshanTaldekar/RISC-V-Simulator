@@ -1,5 +1,7 @@
 #include "../../../include/combinational/mux/IFMux.h"
 
+IFMux *IFMux::current_instance = nullptr;
+
 IFMux::IFMux() {
     this->driver = Driver::init();
     this->logger = IFLogger::init();

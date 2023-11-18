@@ -1,5 +1,7 @@
 #include "../../include/state/DataMemory.h"
 
+DataMemory *DataMemory::current_instance = nullptr;
+
 DataMemory::DataMemory() {
     this->address = 0UL;
     this->write_data = 0UL;

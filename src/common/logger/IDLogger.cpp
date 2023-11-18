@@ -1,5 +1,7 @@
 #include "../../../include/common/logger/IDLogger.h"
 
+IDLogger *IDLogger::current_instance = nullptr;
+
 IDLogger::IDLogger() {
     this->log_file_path = ID_STAGE_LOG_FILE_PATH;
 }

@@ -46,6 +46,4 @@ private:
     void passInstructionIntoIFIDStageRegisters();
 };
 
-InstructionMemory *InstructionMemory::current_instance = nullptr;
-
 #endif //RISC_V_SIMULATOR_INSTRUCTIONMEMORY_H

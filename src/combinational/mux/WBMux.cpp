@@ -1,5 +1,7 @@
 #include "../../../include/combinational/mux/WBMux.h"
 
+WBMux *WBMux::current_instance = nullptr;
+
 WBMux::WBMux() {
     this->read_data = 0UL;
     this->alu_result = 0UL;

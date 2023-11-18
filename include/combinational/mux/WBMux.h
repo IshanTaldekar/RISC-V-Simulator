@@ -37,6 +37,4 @@ protected:
     void passOutput() override;
 };
 
-WBMux *WBMux::current_instance = nullptr;
-
 #endif //RISC_V_SIMULATOR_WBMUX_H

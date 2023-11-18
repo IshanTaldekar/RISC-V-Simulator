@@ -1,5 +1,7 @@
 #include "../../../include/common/logger/IFLogger.h"
 
+IFLogger *IFLogger::current_instance = nullptr;
+
 IFLogger::IFLogger() {
     this->log_file_path = IF_STAGE_LOG_FILE_PATH;
 }

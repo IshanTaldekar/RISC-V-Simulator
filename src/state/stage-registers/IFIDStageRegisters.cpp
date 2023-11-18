@@ -1,5 +1,7 @@
 #include "../../../include/state/stage-registers/IFIDStageRegisters.h"
 
+IFIDStageRegisters *IFIDStageRegisters::current_instance = nullptr;
+
 IFIDStageRegisters::IFIDStageRegisters() {
     this->program_counter = -1;
     this->instruction_bits = "";

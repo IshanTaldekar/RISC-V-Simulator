@@ -37,6 +37,4 @@ private:
     void passBranchAddressToEXMEMStageRegisters();
 };
 
-EXAdder *EXAdder::current_instance = nullptr;
-
 #endif //RISC_V_SIMULATOR_EXADDER_H

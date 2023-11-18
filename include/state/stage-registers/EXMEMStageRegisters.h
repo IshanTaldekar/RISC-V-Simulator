@@ -56,6 +56,4 @@ private:
     void passBranchedAddressToIFMux();
 };
 
-EXMEMStageRegisters *EXMEMStageRegisters::current_instance = nullptr;
-
 #endif //RISC_V_SIMULATOR_EXMEMSTAGEREGISTERS_H

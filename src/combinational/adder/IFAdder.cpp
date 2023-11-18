@@ -1,5 +1,7 @@
 #include "../../../include/combinational/adder/IFAdder.h"
 
+IFAdder *IFAdder::current_instance = nullptr;
+
 IFAdder::IFAdder() {
     this->program_counter = 0;
     this->is_program_counter_set = false;

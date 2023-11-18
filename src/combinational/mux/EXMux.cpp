@@ -1,5 +1,7 @@
 #include "../../../include/combinational/mux/EXMux.h"
 
+EXMux *EXMux::current_instance = nullptr;
+
 EXMux::EXMux() {
     this->immediate = -1;
     this->read_data_2 = -1;

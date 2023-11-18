@@ -36,6 +36,4 @@ private:
     void passProgramCounterToIFIDStageRegisters();
 };
 
-Driver *Driver::current_instance = nullptr;
-
 #endif //RISC_V_SIMULATOR_DRIVER_H

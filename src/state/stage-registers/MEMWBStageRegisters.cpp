@@ -1,5 +1,7 @@
 #include "../../../include/state/stage-registers/MEMWBStageRegisters.h"
 
+MEMWBStageRegisters *MEMWBStageRegisters::current_instance = nullptr;
+
 MEMWBStageRegisters::MEMWBStageRegisters() {
     this->read_data = 0UL;
     this->alu_result = 0UL;

@@ -45,6 +45,4 @@ private:
     void passRegisterDestinationToRegisterFile();
 };
 
-MEMWBStageRegisters *MEMWBStageRegisters::current_instance = nullptr;
-
 #endif //RISC_V_SIMULATOR_MEMWBSTAGEREGISTERS_H

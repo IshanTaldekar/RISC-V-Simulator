@@ -16,6 +16,4 @@ public:
     void log(const std::string &text);
 };
 
-EXLogger *EXLogger::current_instance = nullptr;
-
 #endif //RISC_V_SIMULATOR_EXLOGGER_H

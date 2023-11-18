@@ -1,5 +1,7 @@
 #include "../../../include/combinational/adder/EXAdder.h"
 
+EXAdder *EXAdder::current_instance = nullptr;
+
 EXAdder::EXAdder() {
     this->program_counter = 0UL;
     this->immediate = 0UL;

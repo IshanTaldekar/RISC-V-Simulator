@@ -12,6 +12,4 @@ public:
     void log(const std::string &text);
 };
 
-MEMLogger *MEMLogger::current_instance = nullptr;
-
 #endif //RISC_V_SIMULATOR_MEMLOGGER_H

@@ -16,6 +16,4 @@ public:
     void log(const std::string &text);
 };
 
-WBLogger *WBLogger::current_instance = nullptr;
-
 #endif //RISC_V_SIMULATOR_WBLOGGER_H

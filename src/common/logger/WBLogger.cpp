@@ -1,5 +1,7 @@
 #include "../../../include/common/logger/WBLogger.h"
 
+WBLogger *WBLogger::current_instance = nullptr;
+
 WBLogger::WBLogger() {
     this->log_file_path = WB_STAGE_LOG_FILE_PATH;
     this->openFile();

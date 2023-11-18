@@ -33,6 +33,4 @@ private:
     void loadImmediateToIDEXStageRegisters();
 };
 
-ImmediateGenerator *ImmediateGenerator::current_instance = nullptr;
-
 #endif //RISC_V_SIMULATOR_IMMEDIATEGENERATOR_H

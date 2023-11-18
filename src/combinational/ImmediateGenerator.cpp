@@ -1,5 +1,7 @@
 #include "../../include/combinational/ImmediateGenerator.h"
 
+ImmediateGenerator *ImmediateGenerator::current_instance = nullptr;
+
 ImmediateGenerator::ImmediateGenerator() {
     this->is_instruction_set = false;
     this->instruction = nullptr;

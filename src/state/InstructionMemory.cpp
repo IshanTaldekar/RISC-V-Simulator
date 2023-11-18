@@ -1,5 +1,7 @@
 #include "../../include/state/InstructionMemory.h"
 
+InstructionMemory *InstructionMemory::current_instance = nullptr;
+
 InstructionMemory::InstructionMemory() {
     this->instruction_memory_file_path = "";
     this->is_instruction_file_read = false;

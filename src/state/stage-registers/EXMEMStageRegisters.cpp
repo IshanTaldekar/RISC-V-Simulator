@@ -1,5 +1,7 @@
 #include "../../../include/state/stage-registers/EXMEMStageRegisters.h"
 
+EXMEMStageRegisters *EXMEMStageRegisters::current_instance = nullptr;
+
 EXMEMStageRegisters::EXMEMStageRegisters() {
     this->branch_program_counter = -1;
     this->alu_result = -1;

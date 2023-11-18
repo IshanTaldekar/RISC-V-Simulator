@@ -1,5 +1,7 @@
 #include "../../../include/common/logger/MEMLogger.h"
 
+MEMLogger *MEMLogger::current_instance = nullptr;
+
 MEMLogger::MEMLogger() {
     this->log_file_path = MEM_STAGE_LOG_FILE_PATH;
 }

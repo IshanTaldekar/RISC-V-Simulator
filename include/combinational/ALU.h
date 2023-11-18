@@ -47,6 +47,4 @@ private:
     void passResultToEXMEMStageRegisters();
 };
 
-ALU *ALU::current_instance = nullptr;
-
 #endif //RISC_V_SIMULATOR_ALU_H

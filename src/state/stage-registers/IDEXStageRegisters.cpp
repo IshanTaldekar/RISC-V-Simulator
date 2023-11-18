@@ -1,5 +1,7 @@
 #include "../../../include/state/stage-registers/IDEXStageRegisters.h"
 
+IDEXStageRegisters *IDEXStageRegisters::current_instance = nullptr;
+
 IDEXStageRegisters::IDEXStageRegisters() {
     this->instruction = nullptr;
     this->control = nullptr;

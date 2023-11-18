@@ -70,6 +70,4 @@ private:
     void passControlToEXMEMStageRegisters();
 };
 
-IDEXStageRegisters *IDEXStageRegisters::current_instance = nullptr;
-
 #endif //RISC_V_SIMULATOR_IDEXSTAGEREGISTERS_H

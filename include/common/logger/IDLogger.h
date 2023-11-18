@@ -17,6 +17,4 @@ public:
     void log(const std::string &text);
 };
 
-IDLogger *IDLogger::current_instance = nullptr;
-
 #endif //RISC_V_SIMULATOR_IDLOGGER_H
