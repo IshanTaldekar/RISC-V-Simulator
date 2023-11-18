@@ -3,10 +3,10 @@
 EXMEMStageRegisters *EXMEMStageRegisters::current_instance = nullptr;
 
 EXMEMStageRegisters::EXMEMStageRegisters() {
-    this->branch_program_counter = -1;
-    this->alu_result = -1;
-    this->read_data_2 = -1;
-    this->register_destination = -1;
+    this->branch_program_counter = 0UL;
+    this->alu_result = 0UL;
+    this->read_data_2 = 0UL;
+    this->register_destination = 0UL;
 
     this->is_alu_result_zero = false;
 
