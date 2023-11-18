@@ -77,6 +77,8 @@ void Control::generateALUOpCode() {
         this->alu_op = std::bitset<ALU_OP_BIT_COUNT>("0000");  // Add
     } else if (type == InstructionType::B) {
         this->alu_op = std::bitset<ALU_OP_BIT_COUNT>("0001");  // Subtract
+    } else {
+        this->alu_op = std::bitset<ALU_OP_BIT_COUNT>("0000");  // Add (Default)
     }
 }
 

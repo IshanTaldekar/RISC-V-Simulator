@@ -3,17 +3,17 @@
 IFIDStageRegisters *IFIDStageRegisters::current_instance = nullptr;
 
 IFIDStageRegisters::IFIDStageRegisters() {
-    this->program_counter = -1;
-    this->instruction_bits = "";
+    this->program_counter = 0UL;
+    this->instruction_bits = std::string(32, '0');
 
-    this->is_program_counter_set = false;
-    this->is_instruction_set = false;
+    this->is_program_counter_set = true;
+    this->is_instruction_set = true;
 
     this->if_logger = IFLogger::init();
     this->id_logger = IDLogger::init();
 
-    this->instruction = nullptr;
-    this->control = nullptr;
+    this->instruction = new Instruction(std::string(32, '0'));
+    this->control = new Control(this->instruction);
 
     this->register_file = RegisterFile::init();
     this->id_ex_stage_registers = IDEXStageRegisters::init();
@@ -79,10 +79,10 @@ void IFIDStageRegisters::passControlToIDEXStageRegisters() {
 void IFIDStageRegisters::passReadRegistersToRegisterFile() {
     InstructionType type = this->instruction->getType();
 
-    if (type == InstructionType::R || type == InstructionType::B) {
-        this->register_file->setReadRegisters(this->instruction->getRs1().to_ulong(), this->instruction->getRs2().to_ulong());
-    } else if (type == InstructionType::I || type == InstructionType::S) {
+    if (type == InstructionType::I || type == InstructionType::S) {
         this->register_file->setReadRegister(this->instruction->getRs1().to_ulong());
+    } else {
+        this->register_file->setReadRegisters(this->instruction->getRs1().to_ulong(), this->instruction->getRs2().to_ulong());
     }
 }
 

@@ -3,18 +3,17 @@
 IDEXStageRegisters *IDEXStageRegisters::current_instance = nullptr;
 
 IDEXStageRegisters::IDEXStageRegisters() {
-    this->instruction = nullptr;
-    this->control = nullptr;
+    this->control = new Control(new Instruction(std::string(32, '0')));
 
-    this->register_destination = -1;
-    this->program_counter = -1;
+    this->register_destination = 0UL;
+    this->program_counter = 0UL;
 
-    this->is_single_read_register_data_set = false;
-    this->is_double_read_register_data_set = false;
-    this->is_immediate_set = false;
-    this->is_register_destination_set = false;
-    this->is_program_counter_set = false;
-    this->is_control_set = false;
+    this->is_single_read_register_data_set = true;
+    this->is_double_read_register_data_set = true;
+    this->is_immediate_set = true;
+    this->is_register_destination_set = true;
+    this->is_program_counter_set = true;
+    this->is_control_set = true;
 
     this->ex_mux = EXMux::init();
     this->ex_adder = EXAdder::init();

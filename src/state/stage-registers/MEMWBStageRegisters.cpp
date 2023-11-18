@@ -7,12 +7,12 @@ MEMWBStageRegisters::MEMWBStageRegisters() {
     this->alu_result = 0UL;
     this->register_destination = 0L;
 
-    this->is_read_data_set = false;
-    this->is_alu_result_set = false;
-    this->is_register_destination_set = false;
-    this->is_control_set = false;
+    this->is_read_data_set = true;
+    this->is_alu_result_set = true;
+    this->is_register_destination_set = true;
+    this->is_control_set = true;
 
-    this->control = nullptr;
+    this->control = new Control(new Instruction(std::string(32, '0')));
 
     this->register_file = RegisterFile::init();
     this->wb_mux = WBMux::init();

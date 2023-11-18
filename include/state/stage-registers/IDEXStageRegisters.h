@@ -21,12 +21,12 @@ class EXMEMStageRegisters;
 class IDEXStageRegisters: public Module {
     static constexpr int WORD_BIT_COUNT = 32;
 
-    const Instruction *instruction;
     Control *control;
 
     std::bitset<WORD_BIT_COUNT> read_data_1;
     std::bitset<WORD_BIT_COUNT> read_data_2;
     std::bitset<WORD_BIT_COUNT> immediate;
+
     unsigned long register_destination;
     unsigned long program_counter;
 
