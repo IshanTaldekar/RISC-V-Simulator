@@ -6,7 +6,7 @@
 
 #include <variant>
 
-class Mux: protected Module {
+class Mux: public Module {
 public:
     virtual void setInput(StageMuxInputType type, unsigned long value) = 0;
     virtual void assertControlSignal(bool is_asserted) = 0;

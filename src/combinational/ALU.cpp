@@ -75,9 +75,9 @@ void ALU::computeResult() {
         this->result = this->input1 - this->input2;
     } else if (this->alu_op == std::bitset<ALU_OP_BIT_COUNT>("0010")) {  // Xor
         this->result = this->input1 ^ this->input2;
-    } else if (this->alu_op == std::bitset<ALU_OP_BIT_COUNT>("0011")) {
+    } else if (this->alu_op == std::bitset<ALU_OP_BIT_COUNT>("0011")) {  // Or
         this->result = this->input1 | this->input2;
-    } else if (this->alu_op == std::bitset<ALU_OP_BIT_COUNT>("0100")) {
+    } else if (this->alu_op == std::bitset<ALU_OP_BIT_COUNT>("0100")) {  // And
         this->result = this->input1 & this->input2;
     }
 

@@ -28,6 +28,7 @@ class RegisterFile: public Module {
     bool is_double_read_register_set;
     bool is_write_register_set;
     bool is_reg_write_signal_set;
+    bool is_write_data_set;
 
     std::mutex write_load_mutex;
     std::condition_variable load_condition_variable;
@@ -48,8 +49,10 @@ public:
     void setReadRegister(unsigned long rs1);
     void setReadRegisters(unsigned long rs1, unsigned long rs2);
 
-    void setWriteRegister(unsigned long rd, const std::bitset<WORD_BIT_COUNT> &write_data);
-    void setRegWriteSignal();
+    void setWriteRegister(unsigned long rd);
+    void setWriteData(unsigned long value);
+
+    void setRegWriteSignal(bool is_asserted);
 
 private:
     void passReadRegisterDataToIDEXStageRegister();

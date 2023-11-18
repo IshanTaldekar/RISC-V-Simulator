@@ -37,6 +37,10 @@ add_executable(RISC_V_Simulator
         src/state/stage-registers/EXMEMStageRegisters.cpp
         include/state/DataMemory.h
         src/state/DataMemory.cpp
+        include/state/stage-registers/MEMWBStageRegisters.h
+        src/state/stage-registers/MEMWBStageRegisters.cpp
+        include/combinational/mux/WBMux.h
+        src/combinational/mux/WBMux.cpp
 )
 
 target_sources(RISC_V_Simulator PUBLIC ${CMAKE_SOURCE_DIR}/include)

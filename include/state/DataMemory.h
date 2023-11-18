@@ -8,11 +8,12 @@
 #include <fstream>
 
 #include "../common/Module.h"
+#include "../state/stage-registers/MEMWBStageRegisters.h"
 
 class DataMemory: public Module {
     static constexpr int WORD_BIT_COUNT = 32;
 
-    std::vector<std::string> data;
+    std::vector<std::string> data_memory;
 
     std::string data_memory_file_path;
 
@@ -32,6 +33,8 @@ class DataMemory: public Module {
 
     static DataMemory *current_instance;
 
+    MEMWBStageRegisters *mem_wb_stage_registers;
+
 public:
     DataMemory();
 
@@ -49,6 +52,8 @@ public:
 
 private:
     void readDataMemoryFile();
+    void writeData();
+    void readData();
     void passReadData();
 };
 

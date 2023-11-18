@@ -68,7 +68,7 @@ void InstructionMemory::setProgramCounter(int value) {
 }
 
 void InstructionMemory::fetchInstructionFromMemory() {
-    this->logger->log("[InstructionMemory] fetching instruction from data.");
+    this->logger->log("[InstructionMemory] fetching instruction from data_memory.");
 
     this->instruction = "";
 
@@ -80,7 +80,7 @@ void InstructionMemory::fetchInstructionFromMemory() {
         this->instruction += this->data.at(i);
     }
 
-    this->logger->log("[InstructionMemory] instruction fetched from data.");
+    this->logger->log("[InstructionMemory] instruction fetched from data_memory.");
 }
 
 void InstructionMemory::readInstructionMemoryFile() {

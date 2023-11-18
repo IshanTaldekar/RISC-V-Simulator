@@ -8,6 +8,7 @@ Control::Control(const Instruction *current_instruction) {
     this->ex_mux = EXMux::init();
     this->alu = ALU::init();
     this->data_memory = DataMemory::init();
+    this->wb_mux = WBMux::init();
 
     this->is_reg_write_asserted = false;
     this->is_pc_src_asserted = false;
@@ -36,6 +37,7 @@ void Control::generateSignals() {
 
     if (type == InstructionType::B || type == InstructionType::J) {
         this->is_pc_src_asserted = true;
+        this->is_branch_instruction = true;
     }
 
     if (type == InstructionType::I && this->instruction->getOpcode().to_string() == "0000011") {
@@ -88,7 +90,7 @@ void Control::toggleEXStageControlSignals() {
 }
 
 void Control::toggleMEMStageControlSignals() {
-    this->is_pc_src_asserted &= this->is_alu_result_zero;
+    this->is_pc_src_asserted &= (this->is_alu_result_zero & this->is_branch_instruction);
 
     this->if_mux->assertControlSignal(this->is_pc_src_asserted);
     this->data_memory->setMemWrite(this->is_mem_write_asserted);
@@ -96,5 +98,6 @@ void Control::toggleMEMStageControlSignals() {
 }
 
 void Control::toggleWBStageControlSignals() {
-
+    this->register_file->setRegWriteSignal(this->is_reg_write_asserted);
+    this->wb_mux->assertControlSignal(this->is_mem_to_reg_asserted);
 }

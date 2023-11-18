@@ -16,7 +16,10 @@ EXMEMStageRegisters::EXMEMStageRegisters() {
     this->is_control_set = false;
 
     this->control = nullptr;
+
     this->data_memory = DataMemory::init();
+    this->mem_wb_stage_registers = MEMWBStageRegisters::init();
+    this->if_mux = IFMux::init();
 }
 
 EXMEMStageRegisters *EXMEMStageRegisters::init() {
@@ -44,6 +47,7 @@ void EXMEMStageRegisters::run() {
 
         this->passWriteDataToDataMemory();
         this->passALUResultToDataMemory();
+        this->passBranchedAddressToIFMux();
 
         std::thread pass_alu_result_thread (&EXMEMStageRegisters::passALUResultToMEMWBStageRegisters, this);
         std::thread pass_register_destination_thread (&EXMEMStageRegisters::passRegisterDestinationToMEMWBStageRegisters, this);
@@ -112,9 +116,13 @@ void EXMEMStageRegisters::passWriteDataToDataMemory() {
 }
 
 void EXMEMStageRegisters::passALUResultToMEMWBStageRegisters() {
-    // TODO
+    this->mem_wb_stage_registers->setALUResult(this->alu_result);
 }
 
 void EXMEMStageRegisters::passRegisterDestinationToMEMWBStageRegisters() {
-    // TODO
+    this->mem_wb_stage_registers->setRegisterDestination(this->register_destination);
+}
+
+void EXMEMStageRegisters::passBranchedAddressToIFMux() {
+    this->if_mux->setInput(IFStageMuxInputType::BranchedPc, this->branch_program_counter);
 }

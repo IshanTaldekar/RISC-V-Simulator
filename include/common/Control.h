@@ -5,6 +5,7 @@
 #include "Instruction.h"
 #include "../state/RegisterFile.h"
 #include "../combinational/mux/IFMux.h"
+#include "../combinational/mux/WBMux.h"
 #include "../combinational/mux/EXMux.h"
 #include "../combinational/ALU.h"
 #include "../state/DataMemory.h"
@@ -18,6 +19,7 @@ private:
     EXMux *ex_mux;
     ALU *alu;
     DataMemory *data_memory;
+    WBMux *wb_mux;
 
     bool is_reg_write_asserted;
     bool is_pc_src_asserted;

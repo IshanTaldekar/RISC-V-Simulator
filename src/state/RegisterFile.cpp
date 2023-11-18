@@ -6,6 +6,7 @@ RegisterFile::RegisterFile() {
     this->is_write_register_set = false;
     this->is_reg_write_signal_set = false;
     this->is_write_thread_finished = false;
+    this->is_write_data_set = false;
 
     this->register_source1 = -1;
     this->register_source2 = -1;
@@ -38,7 +39,7 @@ void RegisterFile::run() {
         this->getModuleConditionVariable().wait(
                 register_file_lock,
                 [this] {
-                    return this->is_write_register_set &&
+                    return this->is_write_register_set && this->is_write_data_set &&
                            (this->is_single_read_register_set || this->is_double_read_register_set);
                 }
         );
@@ -49,7 +50,7 @@ void RegisterFile::run() {
         this->getModuleConditionVariable().wait(
                 register_file_lock,
                 [this] {
-                    return !this->is_write_register_set &&
+                    return !this->is_write_register_set && !this->is_write_data_set &&
                             !(this->is_single_read_register_set || this->is_double_read_register_set);
                 }
         );
@@ -80,16 +81,14 @@ void RegisterFile::setReadRegisters(unsigned long rs1, unsigned long rs2) {
     this->is_double_read_register_set = true;
 }
 
-void RegisterFile::setWriteRegister(unsigned long rd, const std::bitset<WORD_BIT_COUNT> &data) {
+void RegisterFile::setWriteRegister(unsigned long rd) {
     std::lock_guard<std::mutex> register_file_lock (this->getModuleMutex());
 
     this->register_destination = rd;
-    this->write_data = data;
-
     this->is_write_register_set = true;
 }
 
-void RegisterFile::setRegWriteSignal() {
+void RegisterFile::setRegWriteSignal(bool is_asserted) {
     std::lock_guard<std::mutex> register_file_lock (this->getModuleMutex());
     this->is_reg_write_signal_set = true;
 }
@@ -137,9 +136,16 @@ void RegisterFile::writeDataToRegisterFile() {
     this->load_condition_variable.notify_one();
 
     this->is_write_register_set = false;
+    this->is_write_data_set = false;
     this->is_reg_write_signal_set = false;
 
     this->notifyModuleConditionVariable();
 }
 
+void RegisterFile::setWriteData(unsigned long value) {
+    std::lock_guard<std::mutex> register_file_lock (this->getModuleMutex());
+
+    this->write_data = std::bitset<WORD_BIT_COUNT>(value);
+    this->is_write_data_set = true;
+}
 

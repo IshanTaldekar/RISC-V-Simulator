@@ -3,6 +3,8 @@
 
 #include "../../common/Module.h"
 #include "../../common/Control.h"
+#include "../../combinational/mux/IFMux.h"
+#include "MEMWBStageRegisters.h"
 
 class EXMEMStageRegisters: public Module {
     unsigned long branch_program_counter;
@@ -21,6 +23,8 @@ class EXMEMStageRegisters: public Module {
 
     Control *control;
     DataMemory *data_memory;
+    MEMWBStageRegisters *mem_wb_stage_registers;
+    IFMux *if_mux;
 
     static EXMEMStageRegisters *current_instance;
 
@@ -44,6 +48,7 @@ private:
     void passALUResultToMEMWBStageRegisters();
     void passWriteDataToDataMemory();
     void passRegisterDestinationToMEMWBStageRegisters();
+    void passBranchedAddressToIFMux();
 };
 
 EXMEMStageRegisters *EXMEMStageRegisters::current_instance = nullptr;

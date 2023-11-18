@@ -26,7 +26,8 @@ enum class EXStageMuxInputType {
 };
 
 enum class WBStageMuxInputType {
-
+    ReadData = 0,
+    ALUResult
 };
 
 /**
