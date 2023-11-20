@@ -51,6 +51,8 @@ void EXAdder::setInput(AdderInputType type, unsigned long value) {
         this->immediate = value;
         this->is_immediate_set = true;
     }
+
+    this->notifyModuleConditionVariable();
 }
 
 void EXAdder::computeResult() {

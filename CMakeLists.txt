@@ -56,7 +56,6 @@ add_executable(RISC_V_Simulator
         src/combinational/mux/IFMux.cpp
         src/state/InstructionMemory.cpp
         src/state/Driver.cpp
-        src/common/Config.cpp
         src/combinational/adder/IFAdder.cpp
         src/main.cpp
         include/common/StageSynchronizer.h

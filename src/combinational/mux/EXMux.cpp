@@ -58,6 +58,8 @@ void EXMux::setInput(StageMuxInputType type, unsigned long value) {
         this->immediate = value;
         this->is_immediate_set = true;
     }
+
+    this->notifyModuleConditionVariable();
 }
 
 void EXMux::assertControlSignal(bool is_asserted) {
@@ -65,6 +67,8 @@ void EXMux::assertControlSignal(bool is_asserted) {
 
     this->is_alu_src_asserted = is_asserted;
     this->is_control_signal_set = true;
+
+    this->notifyModuleConditionVariable();
 }
 
 void EXMux::passOutput() {

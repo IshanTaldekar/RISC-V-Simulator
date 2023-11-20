@@ -60,6 +60,8 @@ void MEMWBStageRegisters::setReadData(unsigned long value) {
 
     this->read_data = value;
     this->is_read_data_set = true;
+
+    this->notifyModuleConditionVariable();
 }
 
 void MEMWBStageRegisters::setALUResult(unsigned long value) {
@@ -67,6 +69,8 @@ void MEMWBStageRegisters::setALUResult(unsigned long value) {
 
     this->alu_result = value;
     this->is_alu_result_set = true;
+
+    this->notifyModuleConditionVariable();
 }
 
 void MEMWBStageRegisters::setRegisterDestination(unsigned long value) {
@@ -74,6 +78,8 @@ void MEMWBStageRegisters::setRegisterDestination(unsigned long value) {
 
     this->register_destination = value;
     this->is_register_destination_set = true;
+
+    this->notifyModuleConditionVariable();
 }
 
 void MEMWBStageRegisters::passALUResultToWBMux() {

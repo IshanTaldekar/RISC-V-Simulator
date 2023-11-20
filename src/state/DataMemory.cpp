@@ -77,6 +77,8 @@ void DataMemory::setAddress(unsigned long value) {
 
     this->address = value;
     this->is_address_set = true;
+
+    this->notifyModuleConditionVariable();
 }
 
 void DataMemory::setWriteData(unsigned long value) {
@@ -84,6 +86,8 @@ void DataMemory::setWriteData(unsigned long value) {
 
     this->write_data = value;
     this->is_write_data_set = true;
+
+    this->notifyModuleConditionVariable();
 }
 
 void DataMemory::setMemWrite(bool is_asserted) {
@@ -91,6 +95,8 @@ void DataMemory::setMemWrite(bool is_asserted) {
 
     this->is_mem_write_asserted = is_asserted;
     this->is_mem_write_flag_set = true;
+
+    this->notifyModuleConditionVariable();
 }
 
 void DataMemory::setMemRead(bool is_asserted) {
@@ -98,6 +104,8 @@ void DataMemory::setMemRead(bool is_asserted) {
 
     this->is_mem_read_asserted = is_asserted;
     this->is_mem_read_flag_set = true;
+
+    this->notifyModuleConditionVariable();
 }
 
 void DataMemory::readDataMemoryFile() {

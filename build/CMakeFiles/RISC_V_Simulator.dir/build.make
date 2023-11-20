@@ -391,24 +391,10 @@ CMakeFiles/RISC_V_Simulator.dir/src/state/Driver.cpp.s: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling CXX source to assembly CMakeFiles/RISC_V_Simulator.dir/src/state/Driver.cpp.s"
 	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/wasp/Code/RISC-V-Simulator/src/state/Driver.cpp -o CMakeFiles/RISC_V_Simulator.dir/src/state/Driver.cpp.s
 
-CMakeFiles/RISC_V_Simulator.dir/src/common/Config.cpp.o: CMakeFiles/RISC_V_Simulator.dir/flags.make
-CMakeFiles/RISC_V_Simulator.dir/src/common/Config.cpp.o: ../src/common/Config.cpp
-CMakeFiles/RISC_V_Simulator.dir/src/common/Config.cpp.o: CMakeFiles/RISC_V_Simulator.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/wasp/Code/RISC-V-Simulator/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_24) "Building CXX object CMakeFiles/RISC_V_Simulator.dir/src/common/Config.cpp.o"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/RISC_V_Simulator.dir/src/common/Config.cpp.o -MF CMakeFiles/RISC_V_Simulator.dir/src/common/Config.cpp.o.d -o CMakeFiles/RISC_V_Simulator.dir/src/common/Config.cpp.o -c /home/wasp/Code/RISC-V-Simulator/src/common/Config.cpp
-
-CMakeFiles/RISC_V_Simulator.dir/src/common/Config.cpp.i: cmake_force
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing CXX source to CMakeFiles/RISC_V_Simulator.dir/src/common/Config.cpp.i"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/wasp/Code/RISC-V-Simulator/src/common/Config.cpp > CMakeFiles/RISC_V_Simulator.dir/src/common/Config.cpp.i
-
-CMakeFiles/RISC_V_Simulator.dir/src/common/Config.cpp.s: cmake_force
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling CXX source to assembly CMakeFiles/RISC_V_Simulator.dir/src/common/Config.cpp.s"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/wasp/Code/RISC-V-Simulator/src/common/Config.cpp -o CMakeFiles/RISC_V_Simulator.dir/src/common/Config.cpp.s
-
 CMakeFiles/RISC_V_Simulator.dir/src/combinational/adder/IFAdder.cpp.o: CMakeFiles/RISC_V_Simulator.dir/flags.make
 CMakeFiles/RISC_V_Simulator.dir/src/combinational/adder/IFAdder.cpp.o: ../src/combinational/adder/IFAdder.cpp
 CMakeFiles/RISC_V_Simulator.dir/src/combinational/adder/IFAdder.cpp.o: CMakeFiles/RISC_V_Simulator.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/wasp/Code/RISC-V-Simulator/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_25) "Building CXX object CMakeFiles/RISC_V_Simulator.dir/src/combinational/adder/IFAdder.cpp.o"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/wasp/Code/RISC-V-Simulator/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_24) "Building CXX object CMakeFiles/RISC_V_Simulator.dir/src/combinational/adder/IFAdder.cpp.o"
 	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/RISC_V_Simulator.dir/src/combinational/adder/IFAdder.cpp.o -MF CMakeFiles/RISC_V_Simulator.dir/src/combinational/adder/IFAdder.cpp.o.d -o CMakeFiles/RISC_V_Simulator.dir/src/combinational/adder/IFAdder.cpp.o -c /home/wasp/Code/RISC-V-Simulator/src/combinational/adder/IFAdder.cpp
 
 CMakeFiles/RISC_V_Simulator.dir/src/combinational/adder/IFAdder.cpp.i: cmake_force
@@ -422,7 +408,7 @@ CMakeFiles/RISC_V_Simulator.dir/src/combinational/adder/IFAdder.cpp.s: cmake_for
 CMakeFiles/RISC_V_Simulator.dir/src/main.cpp.o: CMakeFiles/RISC_V_Simulator.dir/flags.make
 CMakeFiles/RISC_V_Simulator.dir/src/main.cpp.o: ../src/main.cpp
 CMakeFiles/RISC_V_Simulator.dir/src/main.cpp.o: CMakeFiles/RISC_V_Simulator.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/wasp/Code/RISC-V-Simulator/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_26) "Building CXX object CMakeFiles/RISC_V_Simulator.dir/src/main.cpp.o"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/wasp/Code/RISC-V-Simulator/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_25) "Building CXX object CMakeFiles/RISC_V_Simulator.dir/src/main.cpp.o"
 	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/RISC_V_Simulator.dir/src/main.cpp.o -MF CMakeFiles/RISC_V_Simulator.dir/src/main.cpp.o.d -o CMakeFiles/RISC_V_Simulator.dir/src/main.cpp.o -c /home/wasp/Code/RISC-V-Simulator/src/main.cpp
 
 CMakeFiles/RISC_V_Simulator.dir/src/main.cpp.i: cmake_force
@@ -458,7 +444,6 @@ RISC_V_Simulator_OBJECTS = \
 "CMakeFiles/RISC_V_Simulator.dir/src/combinational/mux/IFMux.cpp.o" \
 "CMakeFiles/RISC_V_Simulator.dir/src/state/InstructionMemory.cpp.o" \
 "CMakeFiles/RISC_V_Simulator.dir/src/state/Driver.cpp.o" \
-"CMakeFiles/RISC_V_Simulator.dir/src/common/Config.cpp.o" \
 "CMakeFiles/RISC_V_Simulator.dir/src/combinational/adder/IFAdder.cpp.o" \
 "CMakeFiles/RISC_V_Simulator.dir/src/main.cpp.o"
 
@@ -488,12 +473,11 @@ RISC_V_Simulator: CMakeFiles/RISC_V_Simulator.dir/src/common/Module.cpp.o
 RISC_V_Simulator: CMakeFiles/RISC_V_Simulator.dir/src/combinational/mux/IFMux.cpp.o
 RISC_V_Simulator: CMakeFiles/RISC_V_Simulator.dir/src/state/InstructionMemory.cpp.o
 RISC_V_Simulator: CMakeFiles/RISC_V_Simulator.dir/src/state/Driver.cpp.o
-RISC_V_Simulator: CMakeFiles/RISC_V_Simulator.dir/src/common/Config.cpp.o
 RISC_V_Simulator: CMakeFiles/RISC_V_Simulator.dir/src/combinational/adder/IFAdder.cpp.o
 RISC_V_Simulator: CMakeFiles/RISC_V_Simulator.dir/src/main.cpp.o
 RISC_V_Simulator: CMakeFiles/RISC_V_Simulator.dir/build.make
 RISC_V_Simulator: CMakeFiles/RISC_V_Simulator.dir/link.txt
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --bold --progress-dir=/home/wasp/Code/RISC-V-Simulator/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_27) "Linking CXX executable RISC_V_Simulator"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --bold --progress-dir=/home/wasp/Code/RISC-V-Simulator/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_26) "Linking CXX executable RISC_V_Simulator"
 	$(CMAKE_COMMAND) -E cmake_link_script CMakeFiles/RISC_V_Simulator.dir/link.txt --verbose=$(VERBOSE)
 
 # Rule to build all files generated by this target.

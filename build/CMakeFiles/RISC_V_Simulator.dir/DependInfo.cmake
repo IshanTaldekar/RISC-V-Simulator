@@ -15,7 +15,6 @@ set(CMAKE_DEPENDS_DEPENDENCY_FILES
   "/home/wasp/Code/RISC-V-Simulator/src/combinational/mux/EXMux.cpp" "CMakeFiles/RISC_V_Simulator.dir/src/combinational/mux/EXMux.cpp.o" "gcc" "CMakeFiles/RISC_V_Simulator.dir/src/combinational/mux/EXMux.cpp.o.d"
   "/home/wasp/Code/RISC-V-Simulator/src/combinational/mux/IFMux.cpp" "CMakeFiles/RISC_V_Simulator.dir/src/combinational/mux/IFMux.cpp.o" "gcc" "CMakeFiles/RISC_V_Simulator.dir/src/combinational/mux/IFMux.cpp.o.d"
   "/home/wasp/Code/RISC-V-Simulator/src/combinational/mux/WBMux.cpp" "CMakeFiles/RISC_V_Simulator.dir/src/combinational/mux/WBMux.cpp.o" "gcc" "CMakeFiles/RISC_V_Simulator.dir/src/combinational/mux/WBMux.cpp.o.d"
-  "/home/wasp/Code/RISC-V-Simulator/src/common/Config.cpp" "CMakeFiles/RISC_V_Simulator.dir/src/common/Config.cpp.o" "gcc" "CMakeFiles/RISC_V_Simulator.dir/src/common/Config.cpp.o.d"
   "/home/wasp/Code/RISC-V-Simulator/src/common/Control.cpp" "CMakeFiles/RISC_V_Simulator.dir/src/common/Control.cpp.o" "gcc" "CMakeFiles/RISC_V_Simulator.dir/src/common/Control.cpp.o.d"
   "/home/wasp/Code/RISC-V-Simulator/src/common/Instruction.cpp" "CMakeFiles/RISC_V_Simulator.dir/src/common/Instruction.cpp.o" "gcc" "CMakeFiles/RISC_V_Simulator.dir/src/common/Instruction.cpp.o.d"
   "/home/wasp/Code/RISC-V-Simulator/src/common/Module.cpp" "CMakeFiles/RISC_V_Simulator.dir/src/common/Module.cpp.o" "gcc" "CMakeFiles/RISC_V_Simulator.dir/src/common/Module.cpp.o.d"

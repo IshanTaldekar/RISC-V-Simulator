@@ -71,6 +71,8 @@ void IDEXStageRegisters::setRegisterData(const std::bitset<WORD_BIT_COUNT> &rd1)
 
     this->read_data_1 = rd1;
     this->is_single_read_register_data_set = true;
+
+    this->notifyModuleConditionVariable();
 }
 
 void IDEXStageRegisters::setRegisterData(const std::bitset<WORD_BIT_COUNT> &rd1, const std::bitset<WORD_BIT_COUNT> &rd2) {
@@ -80,6 +82,8 @@ void IDEXStageRegisters::setRegisterData(const std::bitset<WORD_BIT_COUNT> &rd1,
     this->read_data_2 = rd2;
 
     this->is_double_read_register_data_set = true;
+
+    this->notifyModuleConditionVariable();
 }
 
 void IDEXStageRegisters::setImmediate(const std::bitset<WORD_BIT_COUNT> &imm) {
@@ -87,6 +91,8 @@ void IDEXStageRegisters::setImmediate(const std::bitset<WORD_BIT_COUNT> &imm) {
 
     this->immediate = imm;
     this->is_immediate_set = true;
+
+    this->notifyModuleConditionVariable();
 }
 
 void IDEXStageRegisters::setRegisterDestination(unsigned long rd) {
@@ -94,6 +100,8 @@ void IDEXStageRegisters::setRegisterDestination(unsigned long rd) {
 
     this->register_destination = rd;
     this->is_register_destination_set = true;
+
+    this->notifyModuleConditionVariable();
 }
 
 void IDEXStageRegisters::setProgramCounter(int pc) {
@@ -101,6 +109,8 @@ void IDEXStageRegisters::setProgramCounter(int pc) {
 
     this->program_counter = pc;
     this->is_program_counter_set = true;
+
+    this->notifyModuleConditionVariable();
 }
 
 void IDEXStageRegisters::setControlModule(Control *new_control) {
@@ -108,6 +118,8 @@ void IDEXStageRegisters::setControlModule(Control *new_control) {
 
     this->control = new_control;
     this->is_control_set = true;
+
+    this->notifyModuleConditionVariable();
 }
 
 void IDEXStageRegisters::passProgramCounterToEXAdder() {

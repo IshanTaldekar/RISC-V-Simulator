@@ -71,6 +71,8 @@ void IFMux::setInput(StageMuxInputType type, unsigned long value) {
     } else {
         std::cerr << "IFMux::setInput did not match any input type" << std::endl;
     }
+
+    this->notifyModuleConditionVariable();
 }
 
 void IFMux::assertControlSignal(bool is_asserted) {
@@ -78,6 +80,8 @@ void IFMux::assertControlSignal(bool is_asserted) {
     this->is_control_signal_set = true;
 
     this->logger->log("[IFMux] PCSrc asserted: " + std::to_string(this->is_pc_src_signal_asserted) + ".");
+
+    this->notifyModuleConditionVariable();
 }
 
 /**

@@ -13,8 +13,6 @@ file(REMOVE_RECURSE
   "CMakeFiles/RISC_V_Simulator.dir/src/combinational/mux/IFMux.cpp.o.d"
   "CMakeFiles/RISC_V_Simulator.dir/src/combinational/mux/WBMux.cpp.o"
   "CMakeFiles/RISC_V_Simulator.dir/src/combinational/mux/WBMux.cpp.o.d"
-  "CMakeFiles/RISC_V_Simulator.dir/src/common/Config.cpp.o"
-  "CMakeFiles/RISC_V_Simulator.dir/src/common/Config.cpp.o.d"
   "CMakeFiles/RISC_V_Simulator.dir/src/common/Control.cpp.o"
   "CMakeFiles/RISC_V_Simulator.dir/src/common/Control.cpp.o.d"
   "CMakeFiles/RISC_V_Simulator.dir/src/common/Instruction.cpp.o"

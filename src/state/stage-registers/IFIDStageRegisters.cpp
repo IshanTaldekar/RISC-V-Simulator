@@ -62,6 +62,8 @@ void IFIDStageRegisters::setInput(std::variant<int, std::string> input) {
     } else {
         std::cerr << "IFStageRegisters::setInput for IFIDStageRegisters passed an unsupported value" << std::endl;
     }
+
+    this->notifyModuleConditionVariable();
 }
 
 void IFIDStageRegisters::notifyModuleConditionVariable() {

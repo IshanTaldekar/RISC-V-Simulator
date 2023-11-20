@@ -20,6 +20,8 @@ void ALU::setInput1(unsigned long value) {
 
     this->input1 = value;
     this->is_input1_set = true;
+
+    this->notifyModuleConditionVariable();
 }
 
 void ALU::setInput2(unsigned long value) {
@@ -27,6 +29,8 @@ void ALU::setInput2(unsigned long value) {
 
     this->input2 = value;
     this->is_input2_set = true;
+
+    this->notifyModuleConditionVariable();
 }
 
 void ALU::setALUOp(const std::bitset<ALU_OP_BIT_COUNT> &value) {
@@ -34,6 +38,8 @@ void ALU::setALUOp(const std::bitset<ALU_OP_BIT_COUNT> &value) {
 
     this->alu_op = value;
     this->is_alu_op_set = true;
+
+    this->notifyModuleConditionVariable();
 }
 
 void ALU::notifyModuleConditionVariable() {

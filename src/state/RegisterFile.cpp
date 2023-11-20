@@ -72,6 +72,8 @@ void RegisterFile::setReadRegister(unsigned long rs1) {
     this->register_source2 = -1;
 
     this->is_single_read_register_set = true;
+
+    this->notifyModuleConditionVariable();
 }
 
 void RegisterFile::setReadRegisters(unsigned long rs1, unsigned long rs2) {
@@ -81,6 +83,8 @@ void RegisterFile::setReadRegisters(unsigned long rs1, unsigned long rs2) {
     this->register_source2 = rs2;
 
     this->is_double_read_register_set = true;
+
+    this->notifyModuleConditionVariable();
 }
 
 void RegisterFile::setWriteRegister(unsigned long rd) {
@@ -88,11 +92,15 @@ void RegisterFile::setWriteRegister(unsigned long rd) {
 
     this->register_destination = rd;
     this->is_write_register_set = true;
+
+    this->notifyModuleConditionVariable();
 }
 
 void RegisterFile::setRegWriteSignal(bool is_asserted) {
     std::lock_guard<std::mutex> register_file_lock (this->getModuleMutex());
     this->is_reg_write_signal_set = true;
+
+    this->notifyModuleConditionVariable();
 }
 
 void RegisterFile::notifyModuleConditionVariable() {
@@ -149,5 +157,7 @@ void RegisterFile::setWriteData(unsigned long value) {
 
     this->write_data = std::bitset<WORD_BIT_COUNT>(value);
     this->is_write_data_set = true;
+
+    this->notifyModuleConditionVariable();
 }
 

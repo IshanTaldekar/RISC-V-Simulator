@@ -297,30 +297,6 @@ src/combinational/mux/WBMux.cpp.s:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/RISC_V_Simulator.dir/build.make CMakeFiles/RISC_V_Simulator.dir/src/combinational/mux/WBMux.cpp.s
 .PHONY : src/combinational/mux/WBMux.cpp.s
 
-src/common/Config.o: src/common/Config.cpp.o
-.PHONY : src/common/Config.o
-
-# target to build an object file
-src/common/Config.cpp.o:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/RISC_V_Simulator.dir/build.make CMakeFiles/RISC_V_Simulator.dir/src/common/Config.cpp.o
-.PHONY : src/common/Config.cpp.o
-
-src/common/Config.i: src/common/Config.cpp.i
-.PHONY : src/common/Config.i
-
-# target to preprocess a source file
-src/common/Config.cpp.i:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/RISC_V_Simulator.dir/build.make CMakeFiles/RISC_V_Simulator.dir/src/common/Config.cpp.i
-.PHONY : src/common/Config.cpp.i
-
-src/common/Config.s: src/common/Config.cpp.s
-.PHONY : src/common/Config.s
-
-# target to generate assembly for a file
-src/common/Config.cpp.s:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/RISC_V_Simulator.dir/build.make CMakeFiles/RISC_V_Simulator.dir/src/common/Config.cpp.s
-.PHONY : src/common/Config.cpp.s
-
 src/common/Control.o: src/common/Control.cpp.o
 .PHONY : src/common/Control.o
 
@@ -783,9 +759,6 @@ help:
 	@echo "... src/combinational/mux/WBMux.o"
 	@echo "... src/combinational/mux/WBMux.i"
 	@echo "... src/combinational/mux/WBMux.s"
-	@echo "... src/common/Config.o"
-	@echo "... src/common/Config.i"
-	@echo "... src/common/Config.s"
 	@echo "... src/common/Control.o"
 	@echo "... src/common/Control.i"
 	@echo "... src/common/Control.s"

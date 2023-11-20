@@ -60,11 +60,14 @@ void WBMux::setInput(StageMuxInputType type, unsigned long value) {
         this->read_data = value;
         this->is_read_data_set = true;
     }
+
+    this->notifyModuleConditionVariable();
 }
 
 void WBMux::assertControlSignal(bool is_asserted) {
     this->is_mem_to_reg_asserted = is_asserted;
     this->is_control_signal_set = true;
+    this->notifyModuleConditionVariable();
 }
 
 void WBMux::passOutput() {

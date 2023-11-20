@@ -22,10 +22,16 @@ InstructionMemory *InstructionMemory::init() {
 }
 
 void InstructionMemory::run() {
+    std::unique_lock<std::mutex> instruction_memory_lock(this->getModuleMutex());
+    this->getModuleConditionVariable().wait(
+            instruction_memory_lock,
+            [this] { return !this->instruction_memory_file_path.empty(); }
+    );
+
+    this->readInstructionMemoryFile();
+
     while (this->isAlive()) {
         this->logger->log("[InstructionMemory] run waiting to be woken up and acquire lock.");
-
-        std::unique_lock<std::mutex> instruction_memory_lock(this->getModuleMutex());
         this->getModuleConditionVariable().wait(
                 instruction_memory_lock,
                 [this] { return this->is_instruction_file_read && this->is_new_program_counter_set; }
@@ -36,7 +42,7 @@ void InstructionMemory::run() {
         this->fetchInstructionFromMemory();
 
         this->logger->log("[InstructionMemory] run passing instruction to IFIDStageRegisters.");
-        this->passInstructionIntoIFIDStageRegisters();
+        std::thread pass_instruction_thread (&InstructionMemory::passInstructionIntoIFIDStageRegisters, this);
         this->logger->log("[InstructionMemory] run successfully passed to IFIDStageRegisters.");
 
         this->is_new_program_counter_set = false;
@@ -53,7 +59,7 @@ void InstructionMemory::setInstructionMemoryFilePath(const std::string &file_pat
     std::lock_guard<std::mutex> instruction_memory_lock(this->getModuleMutex());
 
     this->instruction_memory_file_path = file_path;
-    this->readInstructionMemoryFile();
+    this->notifyModuleConditionVariable();
 
     this->logger->log("[InstructionMemory] file path set.");
 }
@@ -65,6 +71,8 @@ void InstructionMemory::setProgramCounter(int value) {
 
     this->program_counter = value;
     this->is_new_program_counter_set = true;
+
+    this->notifyModuleConditionVariable();
 
     this->logger->log("[InstructionMemory] program counter set.");
 }
@@ -90,9 +98,7 @@ void InstructionMemory::readInstructionMemoryFile() {
         throw std::runtime_error("InstructionMemory file being read again");
     }
 
-    this->logger->log("[InstructionMemory] waiting to read instruction file.");
-
-    std::lock_guard<std::mutex> instruction_memory_lock (this->getModuleMutex());
+    this->logger->log("[InstructionMemory] reading instruction file.");
 
     std::ifstream instruction_memory_file (this->instruction_memory_file_path);
     std::string byte_instruction;
@@ -109,6 +115,8 @@ void InstructionMemory::readInstructionMemoryFile() {
 }
 
 void InstructionMemory::passInstructionIntoIFIDStageRegisters() {
+    std::lock_guard<std::mutex> instruction_memory_lock (this->getModuleMutex());
+
     this->if_id_stage_registers->setInput(this->instruction);
 }
 

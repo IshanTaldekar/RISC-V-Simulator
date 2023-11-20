@@ -54,6 +54,8 @@ void IFAdder::setInput(AdderInputType type, unsigned long value) {
 
         this->logger->log("[IFAdder] Input PCValue set.");
     }
+
+    this->notifyModuleConditionVariable();
 }
 
 void IFAdder::passProgramCounterToIFMux() {

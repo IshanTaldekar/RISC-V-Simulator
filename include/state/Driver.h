@@ -15,6 +15,8 @@ class Driver: public Module {
     int program_counter;
     bool is_new_program_counter_set;
 
+    bool is_nop_asserted;
+
     InstructionMemory *instruction_memory;
     IFIDStageRegisters *if_id_stage_registers;
     IFAdder *if_adder;

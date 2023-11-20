@@ -20,6 +20,8 @@ void Driver::setProgramCounter(int value) {
     this->program_counter = value;
     this->is_new_program_counter_set = true;
 
+    this->notifyModuleConditionVariable();
+
     this->logger->log("[Driver] PC set.");
 }
 

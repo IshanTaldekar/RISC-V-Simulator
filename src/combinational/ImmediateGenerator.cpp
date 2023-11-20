@@ -35,6 +35,7 @@ void ImmediateGenerator::setInstruction(const Instruction *current_instruction) 
     std::lock_guard immediate_generator_lock (this->getModuleMutex());
 
     this->instruction = current_instruction;
+    this->notifyModuleConditionVariable();
 }
 
 void ImmediateGenerator::loadImmediateToIDEXStageRegisters() {

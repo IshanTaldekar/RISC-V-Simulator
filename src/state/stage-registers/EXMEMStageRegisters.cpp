@@ -72,6 +72,8 @@ void EXMEMStageRegisters::setBranchedProgramCounter(unsigned long value) {
 
     this->branch_program_counter = value;
     this->is_branch_program_counter_set = true;
+
+    this->notifyModuleConditionVariable();
 }
 
 void EXMEMStageRegisters::setALUResult(unsigned long value) {
@@ -79,6 +81,8 @@ void EXMEMStageRegisters::setALUResult(unsigned long value) {
 
     this->alu_result = value;
     this->is_alu_result_set = true;
+
+    this->notifyModuleConditionVariable();
 }
 
 void EXMEMStageRegisters::setIsResultZeroFlag(bool asserted) {
@@ -86,6 +90,8 @@ void EXMEMStageRegisters::setIsResultZeroFlag(bool asserted) {
 
     this->is_alu_result_zero = asserted;
     this->is_alu_result_zero_flag_set = true;
+
+    this->notifyModuleConditionVariable();
 }
 
 void EXMEMStageRegisters::setReadData2(unsigned long value) {
@@ -93,6 +99,8 @@ void EXMEMStageRegisters::setReadData2(unsigned long value) {
 
     this->read_data_2 = value;
     this->is_read_data_2_set = true;
+
+    this->notifyModuleConditionVariable();
 }
 
 void EXMEMStageRegisters::setRegisterDestination(unsigned long value) {
@@ -100,6 +108,8 @@ void EXMEMStageRegisters::setRegisterDestination(unsigned long value) {
 
     this->register_destination = value;
     this->is_register_destination_set = true;
+
+    this->notifyModuleConditionVariable();
 }
 
 void EXMEMStageRegisters::setControl(Control *new_control) {
@@ -107,6 +117,8 @@ void EXMEMStageRegisters::setControl(Control *new_control) {
 
     this->control = new_control;
     this->is_control_set = true;
+
+    this->notifyModuleConditionVariable();
 }
 
 void EXMEMStageRegisters::passALUResultToDataMemory() {
