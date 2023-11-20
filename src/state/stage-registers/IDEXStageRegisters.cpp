@@ -20,6 +20,7 @@ IDEXStageRegisters::IDEXStageRegisters() {
     this->ex_adder = EXAdder::init();
     this->alu = ALU::init();
     this->ex_mem_stage_register = EXMEMStageRegisters::init();
+    this->stage_synchronizer = StageSynchronizer::init();
 }
 
 IDEXStageRegisters *IDEXStageRegisters::init() {
@@ -61,6 +62,8 @@ void IDEXStageRegisters::run() {
         this->is_program_counter_set = false;
         this->is_control_set = false;
         this->is_nop_asserted = false;
+
+        this->stage_synchronizer->conditionalArriveSingleStage();
     }
 }
 
@@ -69,6 +72,8 @@ void IDEXStageRegisters::notifyModuleConditionVariable() {
 }
 
 void IDEXStageRegisters::setRegisterData(const std::bitset<WORD_BIT_COUNT> &rd1) {
+    this->stage_synchronizer->conditionalArriveFiveStage();
+
     std::lock_guard<std::mutex> id_ex_stage_registers_lock (this->getModuleMutex());
 
     this->read_data_1 = rd1;
@@ -78,6 +83,8 @@ void IDEXStageRegisters::setRegisterData(const std::bitset<WORD_BIT_COUNT> &rd1)
 }
 
 void IDEXStageRegisters::setRegisterData(const std::bitset<WORD_BIT_COUNT> &rd1, const std::bitset<WORD_BIT_COUNT> &rd2) {
+    this->stage_synchronizer->conditionalArriveFiveStage();
+
     std::lock_guard<std::mutex> id_ex_stage_registers_lock (this->getModuleMutex());
 
     this->read_data_1 = rd1;
@@ -89,6 +96,8 @@ void IDEXStageRegisters::setRegisterData(const std::bitset<WORD_BIT_COUNT> &rd1,
 }
 
 void IDEXStageRegisters::setImmediate(const std::bitset<WORD_BIT_COUNT> &imm) {
+    this->stage_synchronizer->conditionalArriveFiveStage();
+
     std::lock_guard<std::mutex> id_ex_stage_registers_lock (this->getModuleMutex());
 
     this->immediate = imm;
@@ -98,6 +107,8 @@ void IDEXStageRegisters::setImmediate(const std::bitset<WORD_BIT_COUNT> &imm) {
 }
 
 void IDEXStageRegisters::setRegisterDestination(unsigned long rd) {
+    this->stage_synchronizer->conditionalArriveFiveStage();
+
     std::lock_guard<std::mutex> id_ex_stage_registers_lock (this->getModuleMutex());
 
     this->register_destination = rd;
@@ -107,6 +118,8 @@ void IDEXStageRegisters::setRegisterDestination(unsigned long rd) {
 }
 
 void IDEXStageRegisters::setProgramCounter(int pc) {
+    this->stage_synchronizer->conditionalArriveFiveStage();
+
     std::lock_guard<std::mutex> id_ex_stage_registers_lock (this->getModuleMutex());
 
     this->program_counter = pc;
@@ -116,6 +129,8 @@ void IDEXStageRegisters::setProgramCounter(int pc) {
 }
 
 void IDEXStageRegisters::setControlModule(Control *new_control) {
+    this->stage_synchronizer->conditionalArriveFiveStage();
+
     std::lock_guard<std::mutex> id_ex_stage_registers_lock (this->getModuleMutex());
 
     if (this->is_nop_asserted) {

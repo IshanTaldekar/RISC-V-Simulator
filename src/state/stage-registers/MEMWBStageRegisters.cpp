@@ -16,6 +16,7 @@ MEMWBStageRegisters::MEMWBStageRegisters() {
 
     this->register_file = RegisterFile::init();
     this->wb_mux = WBMux::init();
+    this->stage_synchronizer = StageSynchronizer::init();
 }
 
 MEMWBStageRegisters *MEMWBStageRegisters::init() {
@@ -48,6 +49,8 @@ void MEMWBStageRegisters::run() {
         this->is_alu_result_set = false;
         this->is_register_destination_set = false;
         this->is_control_set = false;
+
+        this->stage_synchronizer->conditionalArriveSingleStage();
     }
 }
 
@@ -56,6 +59,8 @@ void MEMWBStageRegisters::notifyModuleConditionVariable() {
 }
 
 void MEMWBStageRegisters::setReadData(unsigned long value) {
+    this->stage_synchronizer->conditionalArriveFiveStage();
+
     std::lock_guard<std::mutex> mem_wb_stage_registers_lock (this->getModuleMutex());
 
     this->read_data = value;
@@ -65,6 +70,8 @@ void MEMWBStageRegisters::setReadData(unsigned long value) {
 }
 
 void MEMWBStageRegisters::setALUResult(unsigned long value) {
+    this->stage_synchronizer->conditionalArriveFiveStage();
+
     std::lock_guard<std::mutex> mem_wb_stage_registers_lock (this->getModuleMutex());
 
     this->alu_result = value;
@@ -74,6 +81,8 @@ void MEMWBStageRegisters::setALUResult(unsigned long value) {
 }
 
 void MEMWBStageRegisters::setRegisterDestination(unsigned long value) {
+    this->stage_synchronizer->conditionalArriveFiveStage();
+
     std::lock_guard<std::mutex> mem_wb_stage_registers_lock (this->getModuleMutex());
 
     this->register_destination = value;

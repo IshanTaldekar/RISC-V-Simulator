@@ -10,6 +10,7 @@
 #include "../../common/Control.h"
 #include "../../state/RegisterFile.h"
 #include "../../combinational/ImmediateGenerator.h"
+#include "../../common/StageSynchronizer.h"
 
 #include <bitset>
 #include <iostream>
@@ -18,6 +19,7 @@
 class Control;
 class RegisterFile;
 class ImmediateGenerator;
+class StageSynchronizer;
 
 class IFIDStageRegisters: public Module {
     static constexpr int WORD_BIT_COUNT = 32;
@@ -35,6 +37,7 @@ class IFIDStageRegisters: public Module {
     IDEXStageRegisters *id_ex_stage_registers;
     RegisterFile *register_file;
     ImmediateGenerator *immediate_generator;
+    StageSynchronizer *stage_synchronizer;
 
     bool is_program_counter_set;
     bool is_instruction_set;

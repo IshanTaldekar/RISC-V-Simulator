@@ -11,9 +11,12 @@ Driver::Driver() {
     this->if_id_stage_registers = IFIDStageRegisters::init();
     this->if_adder = IFAdder::init();
     this->logger = IFLogger::init();
+    this->stage_synchronizer = StageSynchronizer::init();
 }
 
 void Driver::setProgramCounter(int value) {
+    this->stage_synchronizer->conditionalArriveFiveStage();
+
     this->logger->log("[Driver] setProgramCounter waiting to acquire lock.");
 
     std::unique_lock<std::mutex> driver_lock (this->getModuleMutex());
@@ -53,6 +56,8 @@ void Driver::run() {
 
         this->is_new_program_counter_set = false;
         this->is_nop_asserted = false;
+
+        this->stage_synchronizer->conditionalArriveSingleStage();
     }
 }
 

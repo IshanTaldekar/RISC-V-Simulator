@@ -59,6 +59,7 @@ add_executable(RISC_V_Simulator
         src/combinational/adder/IFAdder.cpp
         src/main.cpp
         include/common/StageSynchronizer.h
+        src/common/StageSynchronizer.cpp
 )
 
 target_sources(RISC_V_Simulator PUBLIC ${CMAKE_SOURCE_DIR}/include)

@@ -19,6 +19,7 @@ IFIDStageRegisters::IFIDStageRegisters() {
     this->register_file = RegisterFile::init();
     this->id_ex_stage_registers = IDEXStageRegisters::init();
     this->immediate_generator = ImmediateGenerator::init();
+    this->stage_synchronizer = StageSynchronizer::init();
 }
 
 IFIDStageRegisters *IFIDStageRegisters::init() {
@@ -48,10 +49,14 @@ void IFIDStageRegisters::run() {
 
         this->is_instruction_set = false;
         this->is_program_counter_set = false;
+
+        this->stage_synchronizer->conditionalArriveSingleStage();
     }
 }
 
 void IFIDStageRegisters::setInput(std::variant<int, std::string> input) {
+    this->stage_synchronizer->conditionalArriveFiveStage();
+
     std::unique_lock<std::mutex> if_id_stage_registers_lock (this->getModuleMutex());
 
     if (std::holds_alternative<int>(input)) {

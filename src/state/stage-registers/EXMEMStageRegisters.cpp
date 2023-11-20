@@ -23,6 +23,7 @@ EXMEMStageRegisters::EXMEMStageRegisters() {
     this->data_memory = DataMemory::init();
     this->mem_wb_stage_registers = MEMWBStageRegisters::init();
     this->if_mux = IFMux::init();
+    this->stage_synchronizer = StageSynchronizer::init();
 }
 
 EXMEMStageRegisters *EXMEMStageRegisters::init() {
@@ -61,6 +62,8 @@ void EXMEMStageRegisters::run() {
         this->is_register_destination_set = false;
         this->is_alu_result_zero_flag_set = false;
         this->is_control_set = false;
+
+        this->stage_synchronizer->conditionalArriveSingleStage();
     }
 }
 
@@ -69,6 +72,8 @@ void EXMEMStageRegisters::notifyModuleConditionVariable() {
 }
 
 void EXMEMStageRegisters::setBranchedProgramCounter(unsigned long value) {
+    this->stage_synchronizer->conditionalArriveFiveStage();
+
     std::lock_guard<std::mutex> ex_mem_stage_registers_lock (this->getModuleMutex());
 
     this->branch_program_counter = value;
@@ -78,6 +83,8 @@ void EXMEMStageRegisters::setBranchedProgramCounter(unsigned long value) {
 }
 
 void EXMEMStageRegisters::setALUResult(unsigned long value) {
+    this->stage_synchronizer->conditionalArriveFiveStage();
+
     std::lock_guard<std::mutex> ex_mem_stage_registers_lock (this->getModuleMutex());
 
     this->alu_result = value;
@@ -87,6 +94,8 @@ void EXMEMStageRegisters::setALUResult(unsigned long value) {
 }
 
 void EXMEMStageRegisters::setIsResultZeroFlag(bool asserted) {
+    this->stage_synchronizer->conditionalArriveSingleStage();
+
     std::lock_guard<std::mutex> ex_mem_stage_registers_lock (this->getModuleMutex());
 
     this->is_alu_result_zero = asserted;
@@ -96,6 +105,8 @@ void EXMEMStageRegisters::setIsResultZeroFlag(bool asserted) {
 }
 
 void EXMEMStageRegisters::setReadData2(unsigned long value) {
+    this->stage_synchronizer->conditionalArriveFiveStage();
+
     std::lock_guard<std::mutex> ex_mem_stage_registers_lock (this->getModuleMutex());
 
     this->read_data_2 = value;
@@ -105,6 +116,8 @@ void EXMEMStageRegisters::setReadData2(unsigned long value) {
 }
 
 void EXMEMStageRegisters::setRegisterDestination(unsigned long value) {
+    this->stage_synchronizer->conditionalArriveFiveStage();
+
     std::lock_guard<std::mutex> ex_mem_stage_registers_lock (this->getModuleMutex());
 
     this->register_destination = value;
@@ -114,6 +127,8 @@ void EXMEMStageRegisters::setRegisterDestination(unsigned long value) {
 }
 
 void EXMEMStageRegisters::setControl(Control *new_control) {
+    this->stage_synchronizer->conditionalArriveFiveStage();
+
     std::lock_guard<std::mutex> ex_mem_stage_registers_lock (this->getModuleMutex());
 
     if (this->is_nop_asserted) {

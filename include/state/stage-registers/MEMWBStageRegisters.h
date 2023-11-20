@@ -5,10 +5,12 @@
 #include "../../common/Control.h"
 #include "../../state/RegisterFile.h"
 #include "../../combinational/mux/WBMux.h"
+#include "../../common/StageSynchronizer.h"
 
 class Control;
 class RegisterFile;
 class WBMux;
+class StageSynchronizer;
 
 class MEMWBStageRegisters: public Module {
     unsigned long read_data;
@@ -26,6 +28,7 @@ class MEMWBStageRegisters: public Module {
 
     RegisterFile *register_file;
     WBMux *wb_mux;
+    StageSynchronizer *stage_synchronizer;
 
 public:
     MEMWBStageRegisters();

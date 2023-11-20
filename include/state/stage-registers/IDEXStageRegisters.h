@@ -8,6 +8,7 @@
 #include "../../combinational/mux/EXMux.h"
 #include "../../combinational/ALU.h"
 #include "EXMEMStageRegisters.h"
+#include "../../common/StageSynchronizer.h"
 
 #include <bitset>
 
@@ -17,6 +18,7 @@ class EXMux;
 class EXAdder;
 class ALU;
 class EXMEMStageRegisters;
+class StageSynchronizer;
 
 class IDEXStageRegisters: public Module {
     static constexpr int WORD_BIT_COUNT = 32;
@@ -45,6 +47,7 @@ class IDEXStageRegisters: public Module {
     EXAdder *ex_adder;
     ALU *alu;
     EXMEMStageRegisters *ex_mem_stage_register;
+    StageSynchronizer *stage_synchronizer;
 
 public:
     IDEXStageRegisters();

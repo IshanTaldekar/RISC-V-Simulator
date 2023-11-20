@@ -6,10 +6,12 @@
 #include "../combinational/adder/IFAdder.h"
 #include "../common/Module.h"
 #include "../common/logger/IFLogger.h"
+#include "../common/StageSynchronizer.h"
 
 class InstructionMemory;
 class IFIDStageRegisters;
 class IFAdder;
+class StageSynchronizer;
 
 class Driver: public Module {
     int program_counter;
@@ -21,6 +23,7 @@ class Driver: public Module {
     IFIDStageRegisters *if_id_stage_registers;
     IFAdder *if_adder;
     IFLogger *logger;
+    StageSynchronizer *stage_synchronizer;
 
 public:
     Driver();

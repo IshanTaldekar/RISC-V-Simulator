@@ -30,6 +30,11 @@ enum class WBStageMuxInputType {
     ALUResult
 };
 
+enum class StageType {
+    SingleStage = 0,
+    FiveStage
+};
+
 /**
  * StageMuxInputType can hold either the value of IFStageMuxInputType, EXStageMuxInputType,
  * WBStageMuxInputType.

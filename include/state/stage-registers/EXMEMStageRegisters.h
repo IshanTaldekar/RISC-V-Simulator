@@ -5,11 +5,13 @@
 #include "../../common/Control.h"
 #include "../../combinational/mux/IFMux.h"
 #include "MEMWBStageRegisters.h"
+#include "../../common/StageSynchronizer.h"
 
 class Control;
 class DataMemory;
 class MEMWBStageRegisters;
 class IFMux;
+class StageSynchronizer;
 
 class EXMEMStageRegisters: public Module {
     unsigned long branch_program_counter;
@@ -31,6 +33,7 @@ class EXMEMStageRegisters: public Module {
     DataMemory *data_memory;
     MEMWBStageRegisters *mem_wb_stage_registers;
     IFMux *if_mux;
+    StageSynchronizer *stage_synchronizer;
 
     static EXMEMStageRegisters *current_instance;
 
