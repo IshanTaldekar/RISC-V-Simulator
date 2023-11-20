@@ -8,6 +8,7 @@ IFIDStageRegisters::IFIDStageRegisters() {
 
     this->is_program_counter_set = true;
     this->is_instruction_set = true;
+    this->is_nop_asserted = false;
 
     this->if_logger = IFLogger::init();
     this->id_logger = IDLogger::init();
@@ -57,7 +58,12 @@ void IFIDStageRegisters::setInput(std::variant<int, std::string> input) {
         this->program_counter = std::get<int>(input);
         this->is_program_counter_set = true;
     } else if (std::holds_alternative<std::string>(input)) {
-        this->instruction_bits = std::get<std::string>(input);
+        if (this->is_nop_asserted) {
+            this->instruction_bits = std::string(32, '0');
+        } else {
+            this->instruction_bits = std::string(std::get<std::string>(input));
+        }
+
         this->is_instruction_set = true;
     } else {
         std::cerr << "IFStageRegisters::setInput for IFIDStageRegisters passed an unsupported value" << std::endl;
@@ -94,4 +100,8 @@ void IFIDStageRegisters::passInstructionToImmediateGenerator() {
 
 void IFIDStageRegisters::passRegisterDestinationToIDEXStageRegisters() {
     this->id_ex_stage_registers->setRegisterDestination(this->instruction->getRd().to_ulong());
+}
+
+void IFIDStageRegisters::setNop() {
+    this->is_nop_asserted = true;
 }

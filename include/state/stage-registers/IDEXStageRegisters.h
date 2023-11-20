@@ -39,6 +39,8 @@ class IDEXStageRegisters: public Module {
     bool is_program_counter_set;
     bool is_control_set;
 
+    bool is_nop_asserted;
+
     EXMux *ex_mux;
     EXAdder *ex_adder;
     ALU *alu;
@@ -58,6 +60,7 @@ public:
     void setRegisterDestination(unsigned long rd);
     void setProgramCounter(int pc);
     void setControlModule(Control *new_control);
+    void setNop();
 
 private:
     void passProgramCounterToEXAdder();

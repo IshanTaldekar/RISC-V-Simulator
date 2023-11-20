@@ -16,6 +16,7 @@ EXMEMStageRegisters::EXMEMStageRegisters() {
     this->is_register_destination_set = true;
     this->is_alu_result_zero_flag_set = true;
     this->is_control_set = true;
+    this->is_nop_asserted = false;
 
     this->control = new Control(new Instruction(std::string(32, '0')));
 
@@ -115,9 +116,13 @@ void EXMEMStageRegisters::setRegisterDestination(unsigned long value) {
 void EXMEMStageRegisters::setControl(Control *new_control) {
     std::lock_guard<std::mutex> ex_mem_stage_registers_lock (this->getModuleMutex());
 
-    this->control = new_control;
-    this->is_control_set = true;
+    if (this->is_nop_asserted) {
+        this->control = new Control(new Instruction(std::string(32, '0')));
+    } else {
+        this->control = new_control;
+    }
 
+    this->is_control_set = true;
     this->notifyModuleConditionVariable();
 }
 
@@ -139,4 +144,8 @@ void EXMEMStageRegisters::passRegisterDestinationToMEMWBStageRegisters() {
 
 void EXMEMStageRegisters::passBranchedAddressToIFMux() {
     this->if_mux->setInput(IFStageMuxInputType::BranchedPc, this->branch_program_counter);
+}
+
+void EXMEMStageRegisters::setNop() {
+    this->is_nop_asserted = true;
 }

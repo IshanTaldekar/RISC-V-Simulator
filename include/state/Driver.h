@@ -31,6 +31,7 @@ public:
 
     void run() override;
     void notifyModuleConditionVariable() override;
+    void setNop();
 
 private:
     void passProgramCounterToInstructionMemory();

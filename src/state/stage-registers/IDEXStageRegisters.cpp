@@ -14,6 +14,7 @@ IDEXStageRegisters::IDEXStageRegisters() {
     this->is_register_destination_set = true;
     this->is_program_counter_set = true;
     this->is_control_set = true;
+    this->is_nop_asserted = false;
 
     this->ex_mux = EXMux::init();
     this->ex_adder = EXAdder::init();
@@ -59,6 +60,7 @@ void IDEXStageRegisters::run() {
         this->is_register_destination_set = false;
         this->is_program_counter_set = false;
         this->is_control_set = false;
+        this->is_nop_asserted = false;
     }
 }
 
@@ -116,7 +118,12 @@ void IDEXStageRegisters::setProgramCounter(int pc) {
 void IDEXStageRegisters::setControlModule(Control *new_control) {
     std::lock_guard<std::mutex> id_ex_stage_registers_lock (this->getModuleMutex());
 
-    this->control = new_control;
+    if (this->is_nop_asserted) {
+        this->control = new Control(new Instruction(std::string(32, '0')));
+    } else {
+        this->control = new_control;
+    }
+
     this->is_control_set = true;
 
     this->notifyModuleConditionVariable();
@@ -152,4 +159,8 @@ void IDEXStageRegisters::passReadData2ToEXMEMStageRegisters() {
 
 void IDEXStageRegisters::passControlToEXMEMStageRegisters() {
     this->ex_mem_stage_register->setControl(this->control);
+}
+
+void IDEXStageRegisters::setNop() {
+    this->is_nop_asserted = true;
 }

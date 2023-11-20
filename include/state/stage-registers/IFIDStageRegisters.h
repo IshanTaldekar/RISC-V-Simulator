@@ -39,6 +39,8 @@ class IFIDStageRegisters: public Module {
     bool is_program_counter_set;
     bool is_instruction_set;
 
+    bool is_nop_asserted;
+
 public:
     IFIDStageRegisters();
 
@@ -49,6 +51,7 @@ public:
     void notifyModuleConditionVariable() override;
 
     void setInput(std::variant<int, std::string> input);
+    void setNop();
 
 private:
     void passProgramCounterToIDEXStageRegisters();

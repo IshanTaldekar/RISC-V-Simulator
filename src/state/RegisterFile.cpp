@@ -10,10 +10,10 @@ RegisterFile::RegisterFile() {
     this->is_write_thread_finished = false;
     this->is_write_data_set = false;
 
-    this->register_source1 = -1;
-    this->register_source2 = -1;
+    this->register_source1 = 0UL;
+    this->register_source2 = 0UL;
 
-    this->register_destination = -1;
+    this->register_destination = 0UL;
 
     std::string empty_word = std::string(32, '0');
 
@@ -136,7 +136,7 @@ void RegisterFile::passReadRegisterDataToIDEXStageRegister() {
 }
 
 void RegisterFile::writeDataToRegisterFile() {
-    if (this->is_reg_write_signal_set) {
+    if (this->is_reg_write_signal_set && this->register_destination != 0) {
         this->registers.at(this->register_destination) = this->write_data;
     }
 

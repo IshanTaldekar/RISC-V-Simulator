@@ -25,6 +25,7 @@ class EXMEMStageRegisters: public Module {
     bool is_register_destination_set;
     bool is_alu_result_zero_flag_set;
     bool is_control_set;
+    bool is_nop_asserted;
 
     Control *control;
     DataMemory *data_memory;
@@ -47,6 +48,7 @@ public:
     void setReadData2(unsigned long value);
     void setRegisterDestination(unsigned long value);
     void setControl(Control *new_control);
+    void setNop();
 
 private:
     void passALUResultToDataMemory();

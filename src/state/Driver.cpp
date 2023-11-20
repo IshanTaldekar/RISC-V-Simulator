@@ -5,6 +5,7 @@ Driver *Driver::current_instance = nullptr;
 Driver::Driver() {
     this->program_counter = -1;
     this->is_new_program_counter_set = false;
+    this->is_nop_asserted = false;
 
     this->instruction_memory = InstructionMemory::init();
     this->if_id_stage_registers = IFIDStageRegisters::init();
@@ -48,15 +49,10 @@ void Driver::run() {
         this->passProgramCounterToAdder();
         this->passProgramCounterToInstructionMemory();
 
+        std::thread pass_program_counter_thread (&Driver::passProgramCounterToIFIDStageRegisters, this);
+
         this->is_new_program_counter_set = false;
-
-        this->logger->log("[Driver] program counter passed to adder and instruction_bits data_memory.");
-
-
-        this->logger->log("[Driver] run waiting at barrier.");
-
-        // TODO: Add barrier
-        this->passProgramCounterToIFIDStageRegisters();
+        this->is_nop_asserted = false;
     }
 }
 
@@ -90,4 +86,8 @@ void Driver::passProgramCounterToIFIDStageRegisters() {
 
 void Driver::notifyModuleConditionVariable() {
     this->getModuleConditionVariable().notify_one();
+}
+
+void Driver::setNop() {
+    this->is_nop_asserted = true;
 }
