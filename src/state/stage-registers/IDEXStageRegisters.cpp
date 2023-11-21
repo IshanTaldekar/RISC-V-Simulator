@@ -16,6 +16,7 @@ IDEXStageRegisters::IDEXStageRegisters() {
     this->is_control_set = true;
     this->is_nop_asserted = false;
     this->is_reset_flag_set = false;
+    this->is_pause_flag_set = false;
 
     this->ex_mux = EXMux::init();
     this->ex_adder = EXAdder::init();
@@ -54,6 +55,19 @@ void IDEXStageRegisters::resetStage() {
     this->control = new Control(new Instruction(std::string(32, '0')));
 }
 
+void IDEXStageRegisters::pauseStage() {
+    this->is_single_read_register_data_set = false;
+    this->is_double_read_register_data_set = false;
+    this->is_immediate_set = false;
+    this->is_register_destination_set = false;
+    this->is_program_counter_set = false;
+    this->is_control_set = false;
+}
+
+void IDEXStageRegisters::pause() {
+    this->is_pause_flag_set = true;
+}
+
 IDEXStageRegisters *IDEXStageRegisters::init() {
     if (IDEXStageRegisters::current_instance == nullptr) {
         IDEXStageRegisters::current_instance = new IDEXStageRegisters();
@@ -76,6 +90,13 @@ void IDEXStageRegisters::run() {
 
         if (this->isKilled()) {
             break;
+        }
+
+        if (this->is_pause_flag_set) {
+            this->pauseStage();
+            this->is_pause_flag_set = false;
+
+            continue;
         }
 
         if (this->is_reset_flag_set) {

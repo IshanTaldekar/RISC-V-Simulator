@@ -8,6 +8,7 @@ Driver::Driver() {
     this->is_new_program_counter_set = false;
     this->is_nop_asserted = false;
     this->is_reset_flag_set = false;
+    this->is_pause_flag_set = false;
 
     this->instruction_memory = InstructionMemory::init();
     this->if_id_stage_registers = IFIDStageRegisters::init();
@@ -25,6 +26,14 @@ void Driver::resetStage() {
 
     this->program_counter = true;
     this->is_nop_asserted = false;
+}
+
+void Driver::pauseStage() {
+    this->is_new_program_counter_set = false;
+}
+
+void Driver::pause() {
+    this->is_pause_flag_set = true;
 }
 
 void Driver::setProgramCounter(int value) {
@@ -64,6 +73,13 @@ void Driver::run() {
 
         if (this->isKilled()) {
             break;
+        }
+
+        if (this->is_pause_flag_set) {
+            this->pauseStage();
+            this->is_pause_flag_set = false;
+
+            continue;
         }
 
         if (this->is_reset_flag_set) {

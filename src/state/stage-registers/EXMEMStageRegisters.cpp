@@ -18,6 +18,7 @@ EXMEMStageRegisters::EXMEMStageRegisters() {
     this->is_control_set = true;
     this->is_nop_asserted = false;
     this->is_reset_flag_set = false;
+    this->is_pause_flag_set = true;
 
     this->control = new Control(new Instruction(std::string(32, '0')));
 
@@ -61,6 +62,20 @@ void EXMEMStageRegisters::resetStage() {
     this->control = new Control(new Instruction(std::string(32, '0')));
 }
 
+void EXMEMStageRegisters::pauseStage() {
+    this->is_alu_result_zero = false;
+    this->is_branch_program_counter_set = false;
+    this->is_alu_result_set = false;
+    this->is_read_data_2_set = false;
+    this->is_register_destination_set = false;
+    this->is_alu_result_zero_flag_set = false;
+    this->is_control_set = false;
+}
+
+void EXMEMStageRegisters::pause() {
+    this->is_pause_flag_set = true;
+}
+
 EXMEMStageRegisters *EXMEMStageRegisters::init() {
     if (EXMEMStageRegisters::current_instance == nullptr) {
         EXMEMStageRegisters::current_instance = new EXMEMStageRegisters();
@@ -83,6 +98,13 @@ void EXMEMStageRegisters::run() {
 
         if (this->isKilled()) {
             break;
+        }
+
+        if (this->is_pause_flag_set) {
+            this->pauseStage();
+            this->is_pause_flag_set = false;
+
+            continue;
         }
 
         if (this->is_reset_flag_set) {

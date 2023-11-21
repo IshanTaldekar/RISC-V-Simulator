@@ -44,6 +44,7 @@ class IFIDStageRegisters: public Module {
 
     bool is_nop_asserted;
     bool is_reset_flag_set;
+    bool is_pause_flag_set;
 
 public:
     IFIDStageRegisters();
@@ -58,6 +59,7 @@ public:
 
     void setNop();
     void reset();
+    void pause();
 
 private:
     void passProgramCounterToIDEXStageRegisters();
@@ -67,6 +69,7 @@ private:
     void passRegisterDestinationToIDEXStageRegisters();
 
     void resetStage();
+    void pauseStage();
 };
 
 #endif //RISC_V_SIMULATOR_IFIDSTAGEREGISTERS_H

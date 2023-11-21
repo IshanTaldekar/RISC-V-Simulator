@@ -22,6 +22,7 @@ class MEMWBStageRegisters: public Module {
     bool is_register_destination_set;
     bool is_control_set;
     bool is_reset_flag_set;
+    bool is_pause_flag_set;
 
     static MEMWBStageRegisters *current_instance;
 
@@ -44,6 +45,7 @@ public:
     void setRegisterDestination(unsigned long value);
 
     void reset();
+    void pause();
 
 private:
     void passReadDataToWBMux();
@@ -51,6 +53,7 @@ private:
     void passRegisterDestinationToRegisterFile();
 
     void resetStage();
+    void pauseStage();
 };
 
 #endif //RISC_V_SIMULATOR_MEMWBSTAGEREGISTERS_H

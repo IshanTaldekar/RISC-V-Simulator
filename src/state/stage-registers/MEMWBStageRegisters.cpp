@@ -12,6 +12,7 @@ MEMWBStageRegisters::MEMWBStageRegisters() {
     this->is_register_destination_set = true;
     this->is_control_set = true;
     this->is_reset_flag_set = false;
+    this->is_pause_flag_set = false;
 
     this->control = new Control(new Instruction(std::string(32, '0')));
 
@@ -44,6 +45,16 @@ void MEMWBStageRegisters::resetStage() {
     this->control = new Control(new Instruction(std::string(32, '0')));
 }
 
+void MEMWBStageRegisters::pauseStage() {
+    this->is_read_data_set = false;
+    this->is_alu_result_set = false;
+    this->is_register_destination_set = false;
+    this->is_control_set = false;
+}
+
+void MEMWBStageRegisters::pause() {
+    this->is_pause_flag_set = true;
+}
 
 MEMWBStageRegisters *MEMWBStageRegisters::init() {
     if (MEMWBStageRegisters::current_instance == nullptr) {

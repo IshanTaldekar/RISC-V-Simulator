@@ -29,6 +29,7 @@ class EXMEMStageRegisters: public Module {
     bool is_control_set;
     bool is_nop_asserted;
     bool is_reset_flag_set;
+    bool is_pause_flag_set;
 
     Control *control;
     DataMemory *data_memory;
@@ -54,6 +55,7 @@ public:
     void setControl(Control *new_control);
     void setNop();
     void reset();
+    void pause();
 
 private:
     void passALUResultToDataMemory();
@@ -63,6 +65,7 @@ private:
     void passBranchedAddressToIFMux();
 
     void resetStage();
+    void pauseStage();
 };
 
 #endif //RISC_V_SIMULATOR_EXMEMSTAGEREGISTERS_H
