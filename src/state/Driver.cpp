@@ -3,7 +3,7 @@
 Driver *Driver::current_instance = nullptr;
 
 Driver::Driver() {
-    this->program_counter = -1;
+    this->program_counter = 0UL;
     this->is_new_program_counter_set = false;
     this->is_nop_asserted = false;
 

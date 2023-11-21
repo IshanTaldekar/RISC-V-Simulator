@@ -54,13 +54,13 @@ void IFIDStageRegisters::run() {
     }
 }
 
-void IFIDStageRegisters::setInput(std::variant<int, std::string> input) {
+void IFIDStageRegisters::setInput(std::variant<unsigned long, std::string> input) {
     this->stage_synchronizer->conditionalArriveFiveStage();
 
     std::unique_lock<std::mutex> if_id_stage_registers_lock (this->getModuleMutex());
 
-    if (std::holds_alternative<int>(input)) {
-        this->program_counter = std::get<int>(input);
+    if (std::holds_alternative<unsigned long>(input)) {
+        this->program_counter = std::get<unsigned long>(input);
         this->is_program_counter_set = true;
     } else if (std::holds_alternative<std::string>(input)) {
         if (this->is_nop_asserted) {

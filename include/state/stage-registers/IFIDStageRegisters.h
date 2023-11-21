@@ -24,7 +24,7 @@ class StageSynchronizer;
 class IFIDStageRegisters: public Module {
     static constexpr int WORD_BIT_COUNT = 32;
 
-    int program_counter;
+    unsigned long program_counter;
 
     std::string instruction_bits;
     Instruction *instruction;
@@ -53,7 +53,7 @@ public:
     void run() override;
     void notifyModuleConditionVariable() override;
 
-    void setInput(std::variant<int, std::string> input);
+    void setInput(std::variant<unsigned long, std::string> input);
     void setNop();
 
 private:
