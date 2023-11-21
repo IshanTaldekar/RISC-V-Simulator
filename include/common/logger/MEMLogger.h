@@ -6,6 +6,7 @@
 
 class MEMLogger: protected Logger {
     static MEMLogger *current_instance;
+
 public:
     MEMLogger();
     static MEMLogger *init();

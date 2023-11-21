@@ -6,6 +6,7 @@
 
 class IFLogger: protected Logger {
     static IFLogger *current_instance;
+
 public:
     IFLogger();
     static IFLogger *init();

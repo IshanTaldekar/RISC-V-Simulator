@@ -1,7 +1,3 @@
-//
-// Created by wasp on 10/31/23.
-//
-
 #ifndef RISC_V_SIMULATOR_IDLOGGER_H
 #define RISC_V_SIMULATOR_IDLOGGER_H
 

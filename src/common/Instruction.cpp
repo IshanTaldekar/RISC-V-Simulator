@@ -82,5 +82,3 @@ InstructionType Instruction::getType() const {
 
     return element_iterator->second;
 }
-
-

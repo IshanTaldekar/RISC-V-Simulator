@@ -1,7 +1,3 @@
-//
-// Created by wasp on 10/31/23.
-//
-
 #ifndef RISC_V_SIMULATOR_WBLOGGER_H
 #define RISC_V_SIMULATOR_WBLOGGER_H
 
@@ -10,6 +6,7 @@
 
 class WBLogger: protected Logger {
     static WBLogger *current_instance;
+
 public:
     WBLogger();
     static WBLogger *init();

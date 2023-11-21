@@ -1,7 +1,3 @@
-//
-// Created by wasp on 10/31/23.
-//
-
 #ifndef RISC_V_SIMULATOR_EXLOGGER_H
 #define RISC_V_SIMULATOR_EXLOGGER_H
 
@@ -10,6 +6,7 @@
 
 class EXLogger: protected Logger {
     static EXLogger *current_instance;
+
 public:
     EXLogger();
     static EXLogger *init();
