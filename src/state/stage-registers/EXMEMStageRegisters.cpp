@@ -17,6 +17,7 @@ EXMEMStageRegisters::EXMEMStageRegisters() {
     this->is_alu_result_zero_flag_set = true;
     this->is_control_set = true;
     this->is_nop_asserted = false;
+    this->is_reset_flag_set = false;
 
     this->control = new Control(new Instruction(std::string(32, '0')));
 
@@ -24,6 +25,40 @@ EXMEMStageRegisters::EXMEMStageRegisters() {
     this->mem_wb_stage_registers = MEMWBStageRegisters::init();
     this->if_mux = IFMux::init();
     this->stage_synchronizer = StageSynchronizer::init();
+}
+
+void EXMEMStageRegisters::reset() {
+    this->is_reset_flag_set = true;
+}
+
+void EXMEMStageRegisters::resetStage() {
+    if (this->getStage() == Stage::Single) {
+        this->is_alu_result_zero = false;
+        this->is_branch_program_counter_set = false;
+        this->is_alu_result_set = false;
+        this->is_read_data_2_set = false;
+        this->is_register_destination_set = false;
+        this->is_alu_result_zero_flag_set = false;
+        this->is_control_set = false;
+    } else {
+        this->is_alu_result_zero = false;
+        this->is_branch_program_counter_set = true;
+        this->is_alu_result_set = true;
+        this->is_read_data_2_set = true;
+        this->is_register_destination_set = true;
+        this->is_alu_result_zero_flag_set = true;
+        this->is_control_set = true;
+    }
+
+    this->branch_program_counter = 0UL;
+    this->alu_result = 0UL;
+    this->read_data_2 = 0UL;
+    this->register_destination = 0UL;
+
+    this->is_nop_asserted = false;
+    this->is_reset_flag_set = false;
+
+    this->control = new Control(new Instruction(std::string(32, '0')));
 }
 
 EXMEMStageRegisters *EXMEMStageRegisters::init() {

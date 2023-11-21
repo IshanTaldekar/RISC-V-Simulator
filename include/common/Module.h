@@ -5,10 +5,15 @@
 #include <condition_variable>
 #include <thread>
 
+#include "Config.h"
+
 class Module {
     bool is_alive;
+
     std::mutex module_mutex;
     std::condition_variable module_condition_variable;
+
+    Stage stage;
 
 public:
     Module();
@@ -21,6 +26,9 @@ public:
 
     std::mutex &getModuleMutex();
     std::condition_variable &getModuleConditionVariable();
+
+    void setStage(Stage current_stage);
+    Stage getStage();
 };
 
 #endif //RISC_V_SIMULATOR_MODULE_H

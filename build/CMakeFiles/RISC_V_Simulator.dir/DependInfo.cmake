@@ -18,6 +18,7 @@ set(CMAKE_DEPENDS_DEPENDENCY_FILES
   "/home/wasp/Code/RISC-V-Simulator/src/common/Control.cpp" "CMakeFiles/RISC_V_Simulator.dir/src/common/Control.cpp.o" "gcc" "CMakeFiles/RISC_V_Simulator.dir/src/common/Control.cpp.o.d"
   "/home/wasp/Code/RISC-V-Simulator/src/common/Instruction.cpp" "CMakeFiles/RISC_V_Simulator.dir/src/common/Instruction.cpp.o" "gcc" "CMakeFiles/RISC_V_Simulator.dir/src/common/Instruction.cpp.o.d"
   "/home/wasp/Code/RISC-V-Simulator/src/common/Module.cpp" "CMakeFiles/RISC_V_Simulator.dir/src/common/Module.cpp.o" "gcc" "CMakeFiles/RISC_V_Simulator.dir/src/common/Module.cpp.o.d"
+  "/home/wasp/Code/RISC-V-Simulator/src/common/StageSynchronizer.cpp" "CMakeFiles/RISC_V_Simulator.dir/src/common/StageSynchronizer.cpp.o" "gcc" "CMakeFiles/RISC_V_Simulator.dir/src/common/StageSynchronizer.cpp.o.d"
   "/home/wasp/Code/RISC-V-Simulator/src/common/logger/EXLogger.cpp" "CMakeFiles/RISC_V_Simulator.dir/src/common/logger/EXLogger.cpp.o" "gcc" "CMakeFiles/RISC_V_Simulator.dir/src/common/logger/EXLogger.cpp.o.d"
   "/home/wasp/Code/RISC-V-Simulator/src/common/logger/IDLogger.cpp" "CMakeFiles/RISC_V_Simulator.dir/src/common/logger/IDLogger.cpp.o" "gcc" "CMakeFiles/RISC_V_Simulator.dir/src/common/logger/IDLogger.cpp.o.d"
   "/home/wasp/Code/RISC-V-Simulator/src/common/logger/IFLogger.cpp" "CMakeFiles/RISC_V_Simulator.dir/src/common/logger/IFLogger.cpp.o" "gcc" "CMakeFiles/RISC_V_Simulator.dir/src/common/logger/IFLogger.cpp.o.d"

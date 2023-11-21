@@ -9,6 +9,7 @@ IFIDStageRegisters::IFIDStageRegisters() {
     this->is_program_counter_set = true;
     this->is_instruction_set = true;
     this->is_nop_asserted = false;
+    this->is_reset_flag_set = false;
 
     this->if_logger = IFLogger::init();
     this->id_logger = IDLogger::init();
@@ -20,6 +21,27 @@ IFIDStageRegisters::IFIDStageRegisters() {
     this->id_ex_stage_registers = IDEXStageRegisters::init();
     this->immediate_generator = ImmediateGenerator::init();
     this->stage_synchronizer = StageSynchronizer::init();
+}
+
+void IFIDStageRegisters::reset() {
+    this->is_reset_flag_set = true;
+}
+
+void IFIDStageRegisters::resetStage() {
+    if (this->getStage() == Stage::Single) {
+        this->is_program_counter_set = false;
+        this->is_instruction_set = false;
+    } else {
+        this->is_program_counter_set = true;
+        this->is_instruction_set = true;
+    }
+
+    this->is_nop_asserted = false;
+    this->is_reset_flag_set = false;
+
+    this->program_counter = 0UL;
+    this->instruction = new Instruction(std::string(32, '0'));
+    this->control = new Control(this->instruction);
 }
 
 IFIDStageRegisters *IFIDStageRegisters::init() {
@@ -38,6 +60,13 @@ void IFIDStageRegisters::run() {
                 [this] { return this->is_instruction_set && this->is_program_counter_set; }
         );
 
+        if (this->is_reset_flag_set) {
+            this->resetStage();
+            this->is_reset_flag_set = false;
+
+            continue;
+        }
+
         this->instruction = new Instruction(this->instruction_bits);
         this->control = new Control(this->instruction);
 
@@ -54,7 +83,7 @@ void IFIDStageRegisters::run() {
     }
 }
 
-void IFIDStageRegisters::setInput(std::variant<unsigned long, std::string> input) {
+void IFIDStageRegisters::setInput(const std::variant<unsigned long, std::string> &input) {
     this->stage_synchronizer->conditionalArriveFiveStage();
 
     std::unique_lock<std::mutex> if_id_stage_registers_lock (this->getModuleMutex());
@@ -66,7 +95,7 @@ void IFIDStageRegisters::setInput(std::variant<unsigned long, std::string> input
         if (this->is_nop_asserted) {
             this->instruction_bits = std::string(32, '0');
         } else {
-            this->instruction_bits = std::string(std::get<std::string>(input));
+            this->instruction_bits = std::get<std::string>(input);
         }
 
         this->is_instruction_set = true;

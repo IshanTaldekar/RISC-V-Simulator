@@ -40,6 +40,6 @@ void StageSynchronizer::onCompletionSingleStage() {
     // TODO
 }
 
-void StageSynchronizer::setStage(StageType current_stage) {
-    this->is_single_stage_mode = current_stage == StageType::SingleStage;
+void StageSynchronizer::setStage(Stage current_stage) {
+    this->is_single_stage_mode = current_stage == Stage::Single;
 }

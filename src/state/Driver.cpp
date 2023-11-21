@@ -4,14 +4,27 @@ Driver *Driver::current_instance = nullptr;
 
 Driver::Driver() {
     this->program_counter = 0UL;
+
     this->is_new_program_counter_set = false;
     this->is_nop_asserted = false;
+    this->is_reset_flag_set = false;
 
     this->instruction_memory = InstructionMemory::init();
     this->if_id_stage_registers = IFIDStageRegisters::init();
     this->if_adder = IFAdder::init();
     this->logger = IFLogger::init();
     this->stage_synchronizer = StageSynchronizer::init();
+}
+
+void Driver::reset() {
+    this->is_reset_flag_set = true;
+}
+
+void Driver::resetStage() {
+    this->program_counter = 0UL;
+
+    this->program_counter = true;
+    this->is_nop_asserted = false;
 }
 
 void Driver::setProgramCounter(int value) {
@@ -48,6 +61,13 @@ void Driver::run() {
         );
 
         this->logger->log("[Driver] run woken up and acquired lock.");
+
+        if (this->is_reset_flag_set) {
+            this->resetStage();
+            this->is_reset_flag_set = false;
+
+            continue;
+        }
 
         this->passProgramCounterToAdder();
         this->passProgramCounterToInstructionMemory();

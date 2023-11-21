@@ -11,6 +11,7 @@ MEMWBStageRegisters::MEMWBStageRegisters() {
     this->is_alu_result_set = true;
     this->is_register_destination_set = true;
     this->is_control_set = true;
+    this->is_reset_flag_set = false;
 
     this->control = new Control(new Instruction(std::string(32, '0')));
 
@@ -18,6 +19,31 @@ MEMWBStageRegisters::MEMWBStageRegisters() {
     this->wb_mux = WBMux::init();
     this->stage_synchronizer = StageSynchronizer::init();
 }
+
+void MEMWBStageRegisters::reset() {
+    this->is_reset_flag_set = true;
+}
+
+void MEMWBStageRegisters::resetStage() {
+    if (this->getStage() == Stage::Single) {
+        this->is_read_data_set = false;
+        this->is_alu_result_set = false;
+        this->is_register_destination_set = false;
+        this->is_control_set = false;
+    } else {
+        this->is_read_data_set = true;
+        this->is_alu_result_set = true;
+        this->is_register_destination_set = true;
+        this->is_control_set = true;
+    }
+
+    this->read_data = 0UL;
+    this->alu_result = 0UL;
+    this->register_destination = 0L;
+
+    this->control = new Control(new Instruction(std::string(32, '0')));
+}
+
 
 MEMWBStageRegisters *MEMWBStageRegisters::init() {
     if (MEMWBStageRegisters::current_instance == nullptr) {
@@ -37,6 +63,13 @@ void MEMWBStageRegisters::run() {
                             this->is_control_set;
                 }
         );
+
+        if (this->is_reset_flag_set) {
+            this->resetStage();
+            this->is_reset_flag_set = false;
+
+            continue;
+        }
 
         this->control->toggleWBStageControlSignals();
 

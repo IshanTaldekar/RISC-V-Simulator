@@ -21,6 +21,7 @@ class MEMWBStageRegisters: public Module {
     bool is_alu_result_set;
     bool is_register_destination_set;
     bool is_control_set;
+    bool is_reset_flag_set;
 
     static MEMWBStageRegisters *current_instance;
 
@@ -42,10 +43,14 @@ public:
     void setALUResult(unsigned long value);
     void setRegisterDestination(unsigned long value);
 
+    void reset();
+
 private:
     void passReadDataToWBMux();
     void passALUResultToWBMux();
     void passRegisterDestinationToRegisterFile();
+
+    void resetStage();
 };
 
 #endif //RISC_V_SIMULATOR_MEMWBSTAGEREGISTERS_H

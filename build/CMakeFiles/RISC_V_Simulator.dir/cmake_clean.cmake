@@ -19,6 +19,8 @@ file(REMOVE_RECURSE
   "CMakeFiles/RISC_V_Simulator.dir/src/common/Instruction.cpp.o.d"
   "CMakeFiles/RISC_V_Simulator.dir/src/common/Module.cpp.o"
   "CMakeFiles/RISC_V_Simulator.dir/src/common/Module.cpp.o.d"
+  "CMakeFiles/RISC_V_Simulator.dir/src/common/StageSynchronizer.cpp.o"
+  "CMakeFiles/RISC_V_Simulator.dir/src/common/StageSynchronizer.cpp.o.d"
   "CMakeFiles/RISC_V_Simulator.dir/src/common/logger/EXLogger.cpp.o"
   "CMakeFiles/RISC_V_Simulator.dir/src/common/logger/EXLogger.cpp.o.d"
   "CMakeFiles/RISC_V_Simulator.dir/src/common/logger/IDLogger.cpp.o"

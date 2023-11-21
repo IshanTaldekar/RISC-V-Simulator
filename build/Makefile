@@ -369,6 +369,30 @@ src/common/Module.cpp.s:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/RISC_V_Simulator.dir/build.make CMakeFiles/RISC_V_Simulator.dir/src/common/Module.cpp.s
 .PHONY : src/common/Module.cpp.s
 
+src/common/StageSynchronizer.o: src/common/StageSynchronizer.cpp.o
+.PHONY : src/common/StageSynchronizer.o
+
+# target to build an object file
+src/common/StageSynchronizer.cpp.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/RISC_V_Simulator.dir/build.make CMakeFiles/RISC_V_Simulator.dir/src/common/StageSynchronizer.cpp.o
+.PHONY : src/common/StageSynchronizer.cpp.o
+
+src/common/StageSynchronizer.i: src/common/StageSynchronizer.cpp.i
+.PHONY : src/common/StageSynchronizer.i
+
+# target to preprocess a source file
+src/common/StageSynchronizer.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/RISC_V_Simulator.dir/build.make CMakeFiles/RISC_V_Simulator.dir/src/common/StageSynchronizer.cpp.i
+.PHONY : src/common/StageSynchronizer.cpp.i
+
+src/common/StageSynchronizer.s: src/common/StageSynchronizer.cpp.s
+.PHONY : src/common/StageSynchronizer.s
+
+# target to generate assembly for a file
+src/common/StageSynchronizer.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/RISC_V_Simulator.dir/build.make CMakeFiles/RISC_V_Simulator.dir/src/common/StageSynchronizer.cpp.s
+.PHONY : src/common/StageSynchronizer.cpp.s
+
 src/common/logger/EXLogger.o: src/common/logger/EXLogger.cpp.o
 .PHONY : src/common/logger/EXLogger.o
 
@@ -768,6 +792,9 @@ help:
 	@echo "... src/common/Module.o"
 	@echo "... src/common/Module.i"
 	@echo "... src/common/Module.s"
+	@echo "... src/common/StageSynchronizer.o"
+	@echo "... src/common/StageSynchronizer.i"
+	@echo "... src/common/StageSynchronizer.s"
 	@echo "... src/common/logger/EXLogger.o"
 	@echo "... src/common/logger/EXLogger.i"
 	@echo "... src/common/logger/EXLogger.s"

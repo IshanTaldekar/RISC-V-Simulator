@@ -15,12 +15,43 @@ IDEXStageRegisters::IDEXStageRegisters() {
     this->is_program_counter_set = true;
     this->is_control_set = true;
     this->is_nop_asserted = false;
+    this->is_reset_flag_set = false;
 
     this->ex_mux = EXMux::init();
     this->ex_adder = EXAdder::init();
     this->alu = ALU::init();
     this->ex_mem_stage_register = EXMEMStageRegisters::init();
     this->stage_synchronizer = StageSynchronizer::init();
+}
+
+void IDEXStageRegisters::reset() {
+    this->is_reset_flag_set = true;
+}
+
+void IDEXStageRegisters::resetStage() {
+    if (this->getStage() == Stage::Single) {
+        this->is_single_read_register_data_set = false;
+        this->is_double_read_register_data_set = false;
+        this->is_immediate_set = false;
+        this->is_register_destination_set = false;
+        this->is_program_counter_set = false;
+        this->is_control_set = false;
+    } else {
+        this->is_single_read_register_data_set = true;
+        this->is_double_read_register_data_set = true;
+        this->is_immediate_set = true;
+        this->is_register_destination_set = true;
+        this->is_program_counter_set = true;
+        this->is_control_set = true;
+    }
+
+    this->program_counter = 0UL;
+    this->register_destination = 0UL;
+
+    this->is_nop_asserted = false;
+    this->is_reset_flag_set = false;
+
+    this->control = new Control(new Instruction(std::string(32, '0')));
 }
 
 IDEXStageRegisters *IDEXStageRegisters::init() {
@@ -42,6 +73,13 @@ void IDEXStageRegisters::run() {
                            this->is_immediate_set && this->is_control_set;
                 }
         );
+
+        if (this->is_reset_flag_set) {
+            this->resetStage();
+            this->is_reset_flag_set = false;
+
+            continue;
+        }
 
         this->control->toggleEXStageControlSignals();
 

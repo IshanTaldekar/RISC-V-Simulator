@@ -43,6 +43,7 @@ class IFIDStageRegisters: public Module {
     bool is_instruction_set;
 
     bool is_nop_asserted;
+    bool is_reset_flag_set;
 
 public:
     IFIDStageRegisters();
@@ -53,8 +54,10 @@ public:
     void run() override;
     void notifyModuleConditionVariable() override;
 
-    void setInput(std::variant<unsigned long, std::string> input);
+    void setInput(const std::variant<unsigned long, std::string> &input);
+
     void setNop();
+    void reset();
 
 private:
     void passProgramCounterToIDEXStageRegisters();
@@ -62,6 +65,8 @@ private:
     void passReadRegistersToRegisterFile();
     void passInstructionToImmediateGenerator();
     void passRegisterDestinationToIDEXStageRegisters();
+
+    void resetStage();
 };
 
 #endif //RISC_V_SIMULATOR_IFIDSTAGEREGISTERS_H

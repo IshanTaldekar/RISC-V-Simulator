@@ -13,7 +13,6 @@
 class IFIDStageRegisters;
 
 class InstructionMemory: public Module {
-private:
     std::string instruction_memory_file_path;
     bool is_instruction_file_read;
 

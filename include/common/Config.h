@@ -30,9 +30,9 @@ enum class WBStageMuxInputType {
     ALUResult
 };
 
-enum class StageType {
-    SingleStage = 0,
-    FiveStage
+enum class Stage {
+    Single = 0,
+    Five
 };
 
 /**

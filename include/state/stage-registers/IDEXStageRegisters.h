@@ -42,6 +42,7 @@ class IDEXStageRegisters: public Module {
     bool is_control_set;
 
     bool is_nop_asserted;
+    bool is_reset_flag_set;
 
     EXMux *ex_mux;
     EXAdder *ex_adder;
@@ -64,6 +65,7 @@ public:
     void setProgramCounter(int pc);
     void setControlModule(Control *new_control);
     void setNop();
+    void reset();
 
 private:
     void passProgramCounterToEXAdder();
@@ -74,6 +76,8 @@ private:
     void passRegisterDestinationToEXMEMStageRegisters();
     void passReadData2ToEXMEMStageRegisters();
     void passControlToEXMEMStageRegisters();
+
+    void resetStage();
 };
 
 #endif //RISC_V_SIMULATOR_IDEXSTAGEREGISTERS_H

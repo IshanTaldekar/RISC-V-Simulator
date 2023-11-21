@@ -18,6 +18,7 @@ class Driver: public Module {
     bool is_new_program_counter_set;
 
     bool is_nop_asserted;
+    bool is_reset_flag_set;
 
     InstructionMemory *instruction_memory;
     IFIDStageRegisters *if_id_stage_registers;
@@ -35,11 +36,14 @@ public:
     void run() override;
     void notifyModuleConditionVariable() override;
     void setNop();
+    void reset();
 
 private:
     void passProgramCounterToInstructionMemory();
     void passProgramCounterToAdder();
     void passProgramCounterToIFIDStageRegisters();
+
+    void resetStage();
 };
 
 #endif //RISC_V_SIMULATOR_DRIVER_H

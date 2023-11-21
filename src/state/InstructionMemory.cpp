@@ -51,7 +51,7 @@ void InstructionMemory::run() {
 
 void InstructionMemory::setInstructionMemoryFilePath(const std::string &file_path) {
     if (!this->instruction_memory_file_path.empty()) {
-        throw std::runtime_error("instruction_memory_file_path being reset in InstructionMemory");
+        throw std::runtime_error("instruction_memory_file_path being resetStage in InstructionMemory");
     }
 
     this->logger->log("[InstructionMemory] waiting to set file path.");

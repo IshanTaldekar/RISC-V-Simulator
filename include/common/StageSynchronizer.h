@@ -25,7 +25,7 @@ public:
     void conditionalArriveSingleStage();
     void conditionalArriveFiveStage();
 
-    void setStage(StageType current_stage);
+    void setStage(Stage current_stage);
 
 private:
     void onCompletionSingleStage();
