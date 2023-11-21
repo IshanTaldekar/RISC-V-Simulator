@@ -26,6 +26,7 @@ IFIDStageRegisters::IFIDStageRegisters() {
 
 void IFIDStageRegisters::reset() {
     this->is_reset_flag_set = true;
+    this->notifyModuleConditionVariable();
 }
 
 void IFIDStageRegisters::resetStage() {
@@ -52,6 +53,7 @@ void IFIDStageRegisters::pauseStage() {
 
 void IFIDStageRegisters::pause() {
     this->is_pause_flag_set = true;
+    this->notifyModuleConditionVariable();
 }
 
 IFIDStageRegisters *IFIDStageRegisters::init() {
@@ -67,7 +69,10 @@ void IFIDStageRegisters::run() {
         std::unique_lock<std::mutex> if_id_stage_registers_lock (this->getModuleMutex());
         this->getModuleConditionVariable().wait(
                 if_id_stage_registers_lock,
-                [this] { return this->is_instruction_set && this->is_program_counter_set; }
+                [this] {
+                    return (this->is_instruction_set && this->is_program_counter_set) ||
+                            this->is_reset_flag_set || this->is_pause_flag_set;
+                }
         );
 
         if (this->isKilled()) {

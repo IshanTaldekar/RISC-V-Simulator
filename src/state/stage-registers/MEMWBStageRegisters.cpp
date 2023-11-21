@@ -23,6 +23,7 @@ MEMWBStageRegisters::MEMWBStageRegisters() {
 
 void MEMWBStageRegisters::reset() {
     this->is_reset_flag_set = true;
+    this->notifyModuleConditionVariable();
 }
 
 void MEMWBStageRegisters::resetStage() {
@@ -54,6 +55,7 @@ void MEMWBStageRegisters::pauseStage() {
 
 void MEMWBStageRegisters::pause() {
     this->is_pause_flag_set = true;
+    this->notifyModuleConditionVariable();
 }
 
 MEMWBStageRegisters *MEMWBStageRegisters::init() {
@@ -70,8 +72,8 @@ void MEMWBStageRegisters::run() {
         this->getModuleConditionVariable().wait(
                 mem_wb_stage_registers_lock,
                 [this] {
-                    return this->is_read_data_set && this->is_alu_result_set && this->is_register_destination_set &&
-                            this->is_control_set;
+                    return (this->is_read_data_set && this->is_alu_result_set && this->is_register_destination_set &&
+                            this->is_control_set) || this->is_pause_flag_set || this->is_reset_flag_set;
                 }
         );
 

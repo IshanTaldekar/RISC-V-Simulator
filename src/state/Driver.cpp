@@ -19,6 +19,7 @@ Driver::Driver() {
 
 void Driver::reset() {
     this->is_reset_flag_set = true;
+    this->notifyModuleConditionVariable();
 }
 
 void Driver::resetStage() {
@@ -34,6 +35,7 @@ void Driver::pauseStage() {
 
 void Driver::pause() {
     this->is_pause_flag_set = true;
+    this->notifyModuleConditionVariable();
 }
 
 void Driver::setProgramCounter(int value) {
@@ -66,7 +68,9 @@ void Driver::run() {
         std::unique_lock<std::mutex> driver_lock (this->getModuleMutex());
         this->getModuleConditionVariable().wait(
                 driver_lock,
-                [this] { return this->is_new_program_counter_set; }
+                [this] {
+                    return this->is_new_program_counter_set || this->is_pause_flag_set || this->is_reset_flag_set;
+                }
         );
 
         this->logger->log("[Driver] run woken up and acquired lock.");

@@ -27,6 +27,7 @@ IDEXStageRegisters::IDEXStageRegisters() {
 
 void IDEXStageRegisters::reset() {
     this->is_reset_flag_set = true;
+    this->notifyModuleConditionVariable();
 }
 
 void IDEXStageRegisters::resetStage() {
@@ -66,6 +67,7 @@ void IDEXStageRegisters::pauseStage() {
 
 void IDEXStageRegisters::pause() {
     this->is_pause_flag_set = true;
+    this->notifyModuleConditionVariable();
 }
 
 IDEXStageRegisters *IDEXStageRegisters::init() {
@@ -82,9 +84,10 @@ void IDEXStageRegisters::run() {
         this->getModuleConditionVariable().wait(
                 id_ex_stage_registers_lock,
                 [this] {
-                    return (this->is_single_read_register_data_set || this->is_double_read_register_data_set) &&
+                    return ((this->is_single_read_register_data_set || this->is_double_read_register_data_set) &&
                            this->is_program_counter_set && this->is_register_destination_set &&
-                           this->is_immediate_set && this->is_control_set;
+                           this->is_immediate_set && this->is_control_set) || this->is_reset_flag_set ||
+                           this->is_pause_flag_set;
                 }
         );
 

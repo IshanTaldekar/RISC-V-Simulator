@@ -30,6 +30,7 @@ EXMEMStageRegisters::EXMEMStageRegisters() {
 
 void EXMEMStageRegisters::reset() {
     this->is_reset_flag_set = true;
+    this->notifyModuleConditionVariable();
 }
 
 void EXMEMStageRegisters::resetStage() {
@@ -74,6 +75,7 @@ void EXMEMStageRegisters::pauseStage() {
 
 void EXMEMStageRegisters::pause() {
     this->is_pause_flag_set = true;
+    this->notifyModuleConditionVariable();
 }
 
 EXMEMStageRegisters *EXMEMStageRegisters::init() {
@@ -90,9 +92,10 @@ void EXMEMStageRegisters::run() {
         this->getModuleConditionVariable().wait(
                 ex_mem_stage_registers_lock,
                 [this] {
-                    return this->is_branch_program_counter_set && this->is_alu_result_set &&
+                    return (this->is_branch_program_counter_set && this->is_alu_result_set &&
                             this->is_read_data_2_set && this->is_register_destination_set &&
-                            this->is_alu_result_zero_flag_set && this->is_control_set;
+                            this->is_alu_result_zero_flag_set && this->is_control_set) ||
+                            this->is_reset_flag_set || this->is_pause_flag_set;
                 }
         );
 
