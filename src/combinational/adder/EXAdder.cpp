@@ -29,6 +29,10 @@ void EXAdder::run() {
                 [this] { return this->is_program_counter_set && this->is_immediate_set; }
         );
 
+        if (this->isKilled()) {
+            break;
+        }
+
         this->computeResult();
         this->passBranchAddressToEXMEMStageRegisters();
 

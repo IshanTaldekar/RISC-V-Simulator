@@ -28,6 +28,10 @@ void IFAdder::run() {
                 [this] { return this->is_program_counter_set; }
         );
 
+        if (this->isKilled()) {
+            break;
+        }
+
         this->logger->log("[IFAdder] Woken up and acquired lock. Loading PC to IFMux.");
 
         this->passProgramCounterToIFMux();

@@ -56,6 +56,10 @@ void ALU::run() {
                 }
         );
 
+        if (this->isKilled()) {
+            break;
+        }
+
         this->computeResult();
 
         std::thread pass_result_thread(&ALU::passResultToEXMEMStageRegisters, this);

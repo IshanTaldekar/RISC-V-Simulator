@@ -23,6 +23,7 @@ public:
 
     void kill();
     [[nodiscard]] bool isAlive() const;
+    [[nodiscard]] bool isKilled() const;
 
     std::mutex &getModuleMutex();
     std::condition_variable &getModuleConditionVariable();

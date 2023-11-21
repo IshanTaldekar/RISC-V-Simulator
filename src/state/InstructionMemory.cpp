@@ -37,6 +37,10 @@ void InstructionMemory::run() {
                 [this] { return this->is_instruction_file_read && this->is_new_program_counter_set; }
         );
 
+        if (this->isKilled()) {
+            break;
+        }
+
         this->logger->log("[InstructionMemory] run woken up and acquired lock.");
 
         this->fetchInstructionFromMemory();

@@ -81,6 +81,17 @@ void EXMEMStageRegisters::run() {
                 }
         );
 
+        if (this->isKilled()) {
+            break;
+        }
+
+        if (this->is_reset_flag_set) {
+            this->resetStage();
+            this->is_reset_flag_set = false;
+
+            continue;
+        }
+
         this->control->setIsALUResultZero(this->is_alu_result_zero);
         this->control->toggleMEMStageControlSignals();
 

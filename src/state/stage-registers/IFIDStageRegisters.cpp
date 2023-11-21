@@ -60,6 +60,10 @@ void IFIDStageRegisters::run() {
                 [this] { return this->is_instruction_set && this->is_program_counter_set; }
         );
 
+        if (this->isKilled()) {
+            break;
+        }
+
         if (this->is_reset_flag_set) {
             this->resetStage();
             this->is_reset_flag_set = false;

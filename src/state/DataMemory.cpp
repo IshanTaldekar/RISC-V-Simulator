@@ -46,6 +46,10 @@ void DataMemory::run() {
                 }
         );
 
+        if (this->isKilled()) {
+            break;
+        }
+
         this->readData();
         this->writeData();
         this->passReadData();

@@ -36,6 +36,10 @@ void IFMux::run() {
                 }
         );
 
+        if (this->isKilled()) {
+            break;
+        }
+
         this->logger->log("[IFMux] Woken up and acquired lock. Loading output");
 
         this->passOutput();

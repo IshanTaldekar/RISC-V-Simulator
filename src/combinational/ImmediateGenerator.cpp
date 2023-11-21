@@ -25,6 +25,10 @@ void ImmediateGenerator::run() {
                 [this] { return this->is_instruction_set; }
         );
 
+        if (this->isKilled()) {
+            break;
+        }
+
         this->loadImmediateToIDEXStageRegisters();
 
         this->is_instruction_set = false;

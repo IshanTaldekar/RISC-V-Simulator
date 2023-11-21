@@ -64,6 +64,10 @@ void MEMWBStageRegisters::run() {
                 }
         );
 
+        if (this->isKilled()) {
+            break;
+        }
+
         if (this->is_reset_flag_set) {
             this->resetStage();
             this->is_reset_flag_set = false;

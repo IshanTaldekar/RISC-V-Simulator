@@ -46,6 +46,10 @@ void RegisterFile::run() {
                 }
         );
 
+        if (this->isKilled()) {
+            break;
+        }
+
         std::thread write_register_thread (&RegisterFile::writeDataToRegisterFile, this);
         std::thread pass_data_thread (&RegisterFile::passReadRegisterDataToIDEXStageRegister, this);
 

@@ -32,6 +32,10 @@ void EXMux::run() {
                 }
         );
 
+        if (this->isKilled()) {
+            break;
+        }
+
         this->passOutput();
 
         this->is_read_data_2_set = false;

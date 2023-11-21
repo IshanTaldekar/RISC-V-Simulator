@@ -13,6 +13,10 @@ bool Module::isAlive() const {
     return this->is_alive;
 }
 
+bool Module::isKilled() const {
+    return !this->is_alive;
+}
+
 std::mutex &Module::getModuleMutex() {
     return this->module_mutex;
 }
