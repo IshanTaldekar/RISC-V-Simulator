@@ -18,7 +18,7 @@ class InstructionMemory: public Module {
 
     std::vector<std::string> data;
 
-    int program_counter;
+    unsigned long program_counter;
     bool is_new_program_counter_set;
 
     std::string instruction;
@@ -36,7 +36,7 @@ public:
     void notifyModuleConditionVariable() override;
 
     void setInstructionMemoryFilePath(const std::string &file_path);
-    void setProgramCounter(int value);
+    void setProgramCounter(unsigned long value);
 
 private:
     void fetchInstructionFromMemory();

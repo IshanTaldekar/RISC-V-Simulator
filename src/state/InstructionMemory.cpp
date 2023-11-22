@@ -68,7 +68,7 @@ void InstructionMemory::setInstructionMemoryFilePath(const std::string &file_pat
     this->logger->log("[InstructionMemory] file path set.");
 }
 
-void InstructionMemory::setProgramCounter(int value) {
+void InstructionMemory::setProgramCounter(unsigned long value) {
     this->logger->log("[InstructionMemory] waiting to set program counter.");
 
     std::lock_guard<std::mutex> instruction_memory_lock(this->getModuleMutex());

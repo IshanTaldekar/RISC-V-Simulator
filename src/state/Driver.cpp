@@ -38,7 +38,7 @@ void Driver::pause() {
     this->notifyModuleConditionVariable();
 }
 
-void Driver::setProgramCounter(int value) {
+void Driver::setProgramCounter(unsigned long value) {
     this->stage_synchronizer->conditionalArriveFiveStage();
 
     this->logger->log("[Driver] setProgramCounter waiting to acquire lock.");

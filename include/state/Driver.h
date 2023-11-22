@@ -29,7 +29,7 @@ class Driver: public Module {
 
 public:
     Driver();
-    void setProgramCounter(int value);
+    void setProgramCounter(unsigned long value);
 
     static Driver *current_instance;
     static Driver *init();
