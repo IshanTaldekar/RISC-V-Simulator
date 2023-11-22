@@ -5,7 +5,7 @@ Driver *Driver::current_instance = nullptr;
 Driver::Driver() {
     this->program_counter = 0UL;
 
-    this->is_new_program_counter_set = false;
+    this->is_new_program_counter_set = true;
     this->is_nop_asserted = false;
     this->is_reset_flag_set = false;
     this->is_pause_flag_set = false;

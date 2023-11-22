@@ -1,7 +1,7 @@
 #include "../../include/common/Module.h"
 
 Module::Module() {
-    this->stage = Stage::Five;
+    this->stage = Stage::Single;
     this->is_alive = true;
 }
 

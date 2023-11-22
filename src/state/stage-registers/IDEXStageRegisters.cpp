@@ -8,12 +8,12 @@ IDEXStageRegisters::IDEXStageRegisters() {
     this->register_destination = 0UL;
     this->program_counter = 0UL;
 
-    this->is_single_read_register_data_set = true;
-    this->is_double_read_register_data_set = true;
-    this->is_immediate_set = true;
-    this->is_register_destination_set = true;
-    this->is_program_counter_set = true;
-    this->is_control_set = true;
+    this->is_single_read_register_data_set = false;
+    this->is_double_read_register_data_set = false;
+    this->is_immediate_set = false;
+    this->is_register_destination_set = false;
+    this->is_program_counter_set = false;
+    this->is_control_set = false;
     this->is_nop_asserted = false;
     this->is_reset_flag_set = false;
     this->is_pause_flag_set = false;

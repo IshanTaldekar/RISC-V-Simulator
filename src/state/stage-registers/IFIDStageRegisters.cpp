@@ -6,8 +6,8 @@ IFIDStageRegisters::IFIDStageRegisters() {
     this->program_counter = 0UL;
     this->instruction_bits = std::string(32, '0');
 
-    this->is_program_counter_set = true;
-    this->is_instruction_set = true;
+    this->is_program_counter_set = false;
+    this->is_instruction_set = false;
     this->is_nop_asserted = false;
     this->is_reset_flag_set = false;
     this->is_pause_flag_set = false;

@@ -5,6 +5,17 @@
 #include <functional>
 
 #include "Config.h"
+#include "../state/stage-registers/IFIDStageRegisters.h"
+#include "../state/stage-registers/IDEXStageRegisters.h"
+#include "../state/stage-registers/EXMEMStageRegisters.h"
+#include "../state/stage-registers/MEMWBStageRegisters.h"
+#include "../state/Driver.h"
+
+class Driver;
+class IFIDStageRegisters;
+class IDEXStageRegisters;
+class EXMEMStageRegisters;
+class MEMWBStageRegisters;
 
 class StageSynchronizer {
     std::barrier<std::function<void()>> *single_stage_barrier;
@@ -16,6 +27,12 @@ class StageSynchronizer {
     static constexpr int FIVE_STAGE_THREAD_COUNT = 17;
 
     static StageSynchronizer *current_instance;
+
+    Driver *driver;
+    IFIDStageRegisters *if_id_stage_registers;
+    IDEXStageRegisters *id_ex_stage_registers;
+    EXMEMStageRegisters *ex_mem_stage_registers;
+    MEMWBStageRegisters *mem_wb_stage_registers;
 
 public:
     StageSynchronizer();
