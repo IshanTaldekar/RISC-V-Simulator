@@ -235,3 +235,12 @@ void EXMEMStageRegisters::passBranchedAddressToIFMux() {
 void EXMEMStageRegisters::setNop() {
     this->is_nop_asserted = true;
 }
+
+unsigned long EXMEMStageRegisters::getRegisterDestination() {
+    std::lock_guard<std::mutex> ex_mem_stage_registers_lock (this->getModuleMutex());
+    return this->register_destination;
+}
+
+unsigned long EXMEMStageRegisters::getRegisterDestinationData() {
+    std::lock_guard<std::mutex> ex_mem_stage_registers_lock (this->getModuleMutex());
+}

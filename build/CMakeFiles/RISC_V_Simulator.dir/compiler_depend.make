@@ -252,6 +252,9 @@ CMakeFiles/RISC_V_Simulator.dir/src/combinational/ALU.cpp.o: ../src/combinationa
   /usr/include/semaphore.h \
   /usr/include/x86_64-linux-gnu/bits/semaphore.h \
   /usr/include/c++/11/thread \
+  ../include/common/Config.h \
+  /usr/include/c++/11/variant \
+  /usr/include/c++/11/bits/enable_special_members.h \
   ../include/common/Control.h \
   ../include/common/Module.h \
   ../include/common/Instruction.h \
@@ -260,8 +263,6 @@ CMakeFiles/RISC_V_Simulator.dir/src/combinational/ALU.cpp.o: ../src/combinationa
   /usr/include/c++/11/bits/stl_vector.h \
   /usr/include/c++/11/bits/stl_bvector.h \
   /usr/include/c++/11/bits/vector.tcc \
-  /usr/include/c++/11/variant \
-  /usr/include/c++/11/bits/enable_special_members.h \
   /usr/include/c++/11/unordered_map \
   /usr/include/c++/11/bits/hashtable.h \
   /usr/include/c++/11/bits/hashtable_policy.h \
@@ -271,7 +272,6 @@ CMakeFiles/RISC_V_Simulator.dir/src/combinational/ALU.cpp.o: ../src/combinationa
   /usr/include/c++/11/iostream \
   /usr/include/c++/11/istream \
   /usr/include/c++/11/bits/istream.tcc \
-  ../include/common/Config.h \
   ../include/state/RegisterFile.h \
   ../include/common/Module.h \
   ../include/common/logger/IDLogger.h \
@@ -606,6 +606,9 @@ CMakeFiles/RISC_V_Simulator.dir/src/combinational/ImmediateGenerator.cpp.o: ../s
   /usr/include/semaphore.h \
   /usr/include/x86_64-linux-gnu/bits/semaphore.h \
   /usr/include/c++/11/thread \
+  ../include/common/Config.h \
+  /usr/include/c++/11/variant \
+  /usr/include/c++/11/bits/enable_special_members.h \
   ../include/common/Instruction.h \
   /usr/include/c++/11/bitset \
   /usr/include/c++/11/vector \
@@ -613,8 +616,6 @@ CMakeFiles/RISC_V_Simulator.dir/src/combinational/ImmediateGenerator.cpp.o: ../s
   /usr/include/c++/11/bits/stl_vector.h \
   /usr/include/c++/11/bits/stl_bvector.h \
   /usr/include/c++/11/bits/vector.tcc \
-  /usr/include/c++/11/variant \
-  /usr/include/c++/11/bits/enable_special_members.h \
   /usr/include/c++/11/unordered_map \
   /usr/include/c++/11/bits/hashtable.h \
   /usr/include/c++/11/bits/hashtable_policy.h \
@@ -624,7 +625,6 @@ CMakeFiles/RISC_V_Simulator.dir/src/combinational/ImmediateGenerator.cpp.o: ../s
   /usr/include/c++/11/iostream \
   /usr/include/c++/11/istream \
   /usr/include/c++/11/bits/istream.tcc \
-  ../include/common/Config.h \
   ../include/common/Config.h \
   ../include/state/stage-registers/IDEXStageRegisters.h \
   ../include/common/Module.h \
@@ -966,6 +966,7 @@ CMakeFiles/RISC_V_Simulator.dir/src/combinational/adder/EXAdder.cpp.o: ../src/co
   /usr/include/semaphore.h \
   /usr/include/x86_64-linux-gnu/bits/semaphore.h \
   /usr/include/c++/11/thread \
+  ../include/common/Config.h \
   ../include/state/stage-registers/EXMEMStageRegisters.h \
   ../include/common/Module.h \
   ../include/common/Control.h \
@@ -1321,6 +1322,7 @@ CMakeFiles/RISC_V_Simulator.dir/src/combinational/adder/IFAdder.cpp.o: ../src/co
   /usr/include/semaphore.h \
   /usr/include/x86_64-linux-gnu/bits/semaphore.h \
   /usr/include/c++/11/thread \
+  ../include/common/Config.h \
   ../include/combinational/mux/IFMux.h \
   ../include/combinational/mux/Mux.h \
   ../include/common/Module.h \
@@ -1677,6 +1679,7 @@ CMakeFiles/RISC_V_Simulator.dir/src/combinational/mux/EXMux.cpp.o: ../src/combin
   ../include/common/Config.h \
   /usr/include/c++/11/variant \
   /usr/include/c++/11/bits/enable_special_members.h \
+  ../include/common/Config.h \
   ../include/combinational/ALU.h \
   /usr/include/c++/11/bitset \
   ../include/common/Module.h \
@@ -1697,7 +1700,6 @@ CMakeFiles/RISC_V_Simulator.dir/src/combinational/mux/EXMux.cpp.o: ../src/combin
   /usr/include/c++/11/iostream \
   /usr/include/c++/11/istream \
   /usr/include/c++/11/bits/istream.tcc \
-  ../include/common/Config.h \
   ../include/state/RegisterFile.h \
   ../include/common/Module.h \
   ../include/common/logger/IDLogger.h \
@@ -2032,6 +2034,7 @@ CMakeFiles/RISC_V_Simulator.dir/src/combinational/mux/IFMux.cpp.o: ../src/combin
   ../include/common/Config.h \
   /usr/include/c++/11/variant \
   /usr/include/c++/11/bits/enable_special_members.h \
+  ../include/common/Config.h \
   ../include/state/Driver.h \
   ../include/state/InstructionMemory.h \
   /usr/include/c++/11/vector \
@@ -2388,6 +2391,7 @@ CMakeFiles/RISC_V_Simulator.dir/src/combinational/mux/WBMux.cpp.o: ../src/combin
   ../include/common/Config.h \
   /usr/include/c++/11/variant \
   /usr/include/c++/11/bits/enable_special_members.h \
+  ../include/common/Config.h \
   ../include/state/RegisterFile.h \
   /usr/include/c++/11/vector \
   /usr/include/c++/11/bits/stl_uninitialized.h \
@@ -2743,6 +2747,9 @@ CMakeFiles/RISC_V_Simulator.dir/src/common/Control.cpp.o: ../src/common/Control.
   /usr/include/semaphore.h \
   /usr/include/x86_64-linux-gnu/bits/semaphore.h \
   /usr/include/c++/11/thread \
+  ../include/common/Config.h \
+  /usr/include/c++/11/variant \
+  /usr/include/c++/11/bits/enable_special_members.h \
   ../include/common/Instruction.h \
   /usr/include/c++/11/bitset \
   /usr/include/c++/11/vector \
@@ -2750,8 +2757,6 @@ CMakeFiles/RISC_V_Simulator.dir/src/common/Control.cpp.o: ../src/common/Control.
   /usr/include/c++/11/bits/stl_vector.h \
   /usr/include/c++/11/bits/stl_bvector.h \
   /usr/include/c++/11/bits/vector.tcc \
-  /usr/include/c++/11/variant \
-  /usr/include/c++/11/bits/enable_special_members.h \
   /usr/include/c++/11/unordered_map \
   /usr/include/c++/11/bits/hashtable.h \
   /usr/include/c++/11/bits/hashtable_policy.h \
@@ -2761,7 +2766,6 @@ CMakeFiles/RISC_V_Simulator.dir/src/common/Control.cpp.o: ../src/common/Control.
   /usr/include/c++/11/iostream \
   /usr/include/c++/11/istream \
   /usr/include/c++/11/bits/istream.tcc \
-  ../include/common/Config.h \
   ../include/state/RegisterFile.h \
   ../include/common/Module.h \
   ../include/common/logger/IDLogger.h \
@@ -3313,7 +3317,10 @@ CMakeFiles/RISC_V_Simulator.dir/src/common/Module.cpp.o: ../src/common/Module.cp
   /usr/include/x86_64-linux-gnu/sys/time.h \
   /usr/include/semaphore.h \
   /usr/include/x86_64-linux-gnu/bits/semaphore.h \
-  /usr/include/c++/11/thread
+  /usr/include/c++/11/thread \
+  ../include/common/Config.h \
+  /usr/include/c++/11/variant \
+  /usr/include/c++/11/bits/enable_special_members.h
 
 CMakeFiles/RISC_V_Simulator.dir/src/common/StageSynchronizer.cpp.o: ../src/common/StageSynchronizer.cpp \
   /usr/include/stdc-predef.h \
@@ -5131,13 +5138,14 @@ CMakeFiles/RISC_V_Simulator.dir/src/state/DataMemory.cpp.o: ../src/state/DataMem
   /usr/include/semaphore.h \
   /usr/include/x86_64-linux-gnu/bits/semaphore.h \
   /usr/include/c++/11/thread \
+  ../include/common/Config.h \
+  /usr/include/c++/11/variant \
+  /usr/include/c++/11/bits/enable_special_members.h \
   ../include/state/stage-registers/MEMWBStageRegisters.h \
   ../include/common/Module.h \
   ../include/common/Control.h \
   ../include/common/Module.h \
   ../include/common/Instruction.h \
-  /usr/include/c++/11/variant \
-  /usr/include/c++/11/bits/enable_special_members.h \
   /usr/include/c++/11/unordered_map \
   /usr/include/c++/11/bits/hashtable.h \
   /usr/include/c++/11/bits/hashtable_policy.h \
@@ -5494,6 +5502,7 @@ CMakeFiles/RISC_V_Simulator.dir/src/state/Driver.cpp.o: ../src/state/Driver.cpp 
   /usr/include/semaphore.h \
   /usr/include/x86_64-linux-gnu/bits/semaphore.h \
   /usr/include/c++/11/thread \
+  ../include/common/Config.h \
   ../include/common/logger/IFLogger.h \
   ../include/common/logger/Logger.h \
   /usr/include/c++/11/iostream \
@@ -5847,6 +5856,7 @@ CMakeFiles/RISC_V_Simulator.dir/src/state/InstructionMemory.cpp.o: ../src/state/
   /usr/include/semaphore.h \
   /usr/include/x86_64-linux-gnu/bits/semaphore.h \
   /usr/include/c++/11/thread \
+  ../include/common/Config.h \
   ../include/common/logger/IFLogger.h \
   ../include/common/logger/Logger.h \
   /usr/include/c++/11/iostream \
@@ -6197,6 +6207,9 @@ CMakeFiles/RISC_V_Simulator.dir/src/state/RegisterFile.cpp.o: ../src/state/Regis
   /usr/include/semaphore.h \
   /usr/include/x86_64-linux-gnu/bits/semaphore.h \
   /usr/include/c++/11/thread \
+  ../include/common/Config.h \
+  /usr/include/c++/11/variant \
+  /usr/include/c++/11/bits/enable_special_members.h \
   ../include/common/logger/IDLogger.h \
   ../include/common/logger/Logger.h \
   /usr/include/c++/11/fstream \
@@ -6205,8 +6218,6 @@ CMakeFiles/RISC_V_Simulator.dir/src/state/RegisterFile.cpp.o: ../src/state/Regis
   /usr/include/x86_64-linux-gnu/c++/11/bits/c++io.h \
   /usr/include/c++/11/bits/fstream.tcc \
   ../include/common/Config.h \
-  /usr/include/c++/11/variant \
-  /usr/include/c++/11/bits/enable_special_members.h \
   ../include/state/stage-registers/IDEXStageRegisters.h \
   ../include/common/Module.h \
   ../include/common/Instruction.h \
@@ -6545,6 +6556,9 @@ CMakeFiles/RISC_V_Simulator.dir/src/state/stage-registers/EXMEMStageRegisters.cp
   /usr/include/semaphore.h \
   /usr/include/x86_64-linux-gnu/bits/semaphore.h \
   /usr/include/c++/11/thread \
+  ../include/common/Config.h \
+  /usr/include/c++/11/variant \
+  /usr/include/c++/11/bits/enable_special_members.h \
   ../include/common/Control.h \
   ../include/common/Module.h \
   ../include/common/Instruction.h \
@@ -6554,8 +6568,6 @@ CMakeFiles/RISC_V_Simulator.dir/src/state/stage-registers/EXMEMStageRegisters.cp
   /usr/include/c++/11/bits/stl_vector.h \
   /usr/include/c++/11/bits/stl_bvector.h \
   /usr/include/c++/11/bits/vector.tcc \
-  /usr/include/c++/11/variant \
-  /usr/include/c++/11/bits/enable_special_members.h \
   /usr/include/c++/11/unordered_map \
   /usr/include/c++/11/bits/hashtable.h \
   /usr/include/c++/11/bits/hashtable_policy.h \
@@ -6565,7 +6577,6 @@ CMakeFiles/RISC_V_Simulator.dir/src/state/stage-registers/EXMEMStageRegisters.cp
   /usr/include/c++/11/iostream \
   /usr/include/c++/11/istream \
   /usr/include/c++/11/bits/istream.tcc \
-  ../include/common/Config.h \
   ../include/state/RegisterFile.h \
   ../include/common/Module.h \
   ../include/common/logger/IDLogger.h \
@@ -6900,6 +6911,9 @@ CMakeFiles/RISC_V_Simulator.dir/src/state/stage-registers/IDEXStageRegisters.cpp
   /usr/include/semaphore.h \
   /usr/include/x86_64-linux-gnu/bits/semaphore.h \
   /usr/include/c++/11/thread \
+  ../include/common/Config.h \
+  /usr/include/c++/11/variant \
+  /usr/include/c++/11/bits/enable_special_members.h \
   ../include/common/Instruction.h \
   /usr/include/c++/11/bitset \
   /usr/include/c++/11/vector \
@@ -6907,8 +6921,6 @@ CMakeFiles/RISC_V_Simulator.dir/src/state/stage-registers/IDEXStageRegisters.cpp
   /usr/include/c++/11/bits/stl_vector.h \
   /usr/include/c++/11/bits/stl_bvector.h \
   /usr/include/c++/11/bits/vector.tcc \
-  /usr/include/c++/11/variant \
-  /usr/include/c++/11/bits/enable_special_members.h \
   /usr/include/c++/11/unordered_map \
   /usr/include/c++/11/bits/hashtable.h \
   /usr/include/c++/11/bits/hashtable_policy.h \
@@ -6918,7 +6930,6 @@ CMakeFiles/RISC_V_Simulator.dir/src/state/stage-registers/IDEXStageRegisters.cpp
   /usr/include/c++/11/iostream \
   /usr/include/c++/11/istream \
   /usr/include/c++/11/bits/istream.tcc \
-  ../include/common/Config.h \
   ../include/common/Control.h \
   ../include/common/Module.h \
   ../include/common/Instruction.h \
@@ -7259,6 +7270,7 @@ CMakeFiles/RISC_V_Simulator.dir/src/state/stage-registers/IFIDStageRegisters.cpp
   /usr/include/semaphore.h \
   /usr/include/x86_64-linux-gnu/bits/semaphore.h \
   /usr/include/c++/11/thread \
+  ../include/common/Config.h \
   ../include/common/logger/IFLogger.h \
   ../include/common/logger/Logger.h \
   /usr/include/c++/11/fstream \
@@ -7610,6 +7622,9 @@ CMakeFiles/RISC_V_Simulator.dir/src/state/stage-registers/MEMWBStageRegisters.cp
   /usr/include/semaphore.h \
   /usr/include/x86_64-linux-gnu/bits/semaphore.h \
   /usr/include/c++/11/thread \
+  ../include/common/Config.h \
+  /usr/include/c++/11/variant \
+  /usr/include/c++/11/bits/enable_special_members.h \
   ../include/common/Control.h \
   ../include/common/Module.h \
   ../include/common/Instruction.h \
@@ -7619,8 +7634,6 @@ CMakeFiles/RISC_V_Simulator.dir/src/state/stage-registers/MEMWBStageRegisters.cp
   /usr/include/c++/11/bits/stl_vector.h \
   /usr/include/c++/11/bits/stl_bvector.h \
   /usr/include/c++/11/bits/vector.tcc \
-  /usr/include/c++/11/variant \
-  /usr/include/c++/11/bits/enable_special_members.h \
   /usr/include/c++/11/unordered_map \
   /usr/include/c++/11/bits/hashtable.h \
   /usr/include/c++/11/bits/hashtable_policy.h \
@@ -7630,7 +7643,6 @@ CMakeFiles/RISC_V_Simulator.dir/src/state/stage-registers/MEMWBStageRegisters.cp
   /usr/include/c++/11/iostream \
   /usr/include/c++/11/istream \
   /usr/include/c++/11/bits/istream.tcc \
-  ../include/common/Config.h \
   ../include/state/RegisterFile.h \
   ../include/common/Module.h \
   ../include/common/logger/IDLogger.h \
@@ -7820,9 +7832,13 @@ CMakeFiles/RISC_V_Simulator.dir/src/state/stage-registers/MEMWBStageRegisters.cp
 
 /usr/include/c++/11/unordered_map:
 
-/usr/include/c++/11/variant:
-
 /usr/include/c++/11/bits/vector.tcc:
+
+../src/common/logger/Logger.cpp:
+
+/usr/include/c++/11/bits/stl_vector.h:
+
+/usr/include/c++/11/bits/stl_uninitialized.h:
 
 /usr/include/pthread.h:
 
@@ -7882,12 +7898,6 @@ CMakeFiles/RISC_V_Simulator.dir/src/state/stage-registers/MEMWBStageRegisters.cp
 
 /usr/include/c++/11/bits/cxxabi_forced.h:
 
-../include/combinational/adder/Adder.h:
-
-../include/common/Config.h:
-
-/usr/include/x86_64-linux-gnu/bits/endianness.h:
-
 /usr/include/x86_64-linux-gnu/bits/locale.h:
 
 /usr/include/locale.h:
@@ -7909,6 +7919,12 @@ CMakeFiles/RISC_V_Simulator.dir/src/state/stage-registers/MEMWBStageRegisters.cp
 /usr/include/c++/11/bits/functexcept.h:
 
 /usr/include/c++/11/streambuf:
+
+../include/combinational/adder/Adder.h:
+
+/usr/include/x86_64-linux-gnu/bits/endianness.h:
+
+../include/common/Config.h:
 
 /usr/include/x86_64-linux-gnu/bits/time64.h:
 
@@ -8148,6 +8164,12 @@ CMakeFiles/RISC_V_Simulator.dir/src/state/stage-registers/MEMWBStageRegisters.cp
 
 /usr/include/x86_64-linux-gnu/bits/types/__fpos64_t.h:
 
+/usr/include/c++/11/bits/stl_bvector.h:
+
+/usr/include/x86_64-linux-gnu/bits/types/clockid_t.h:
+
+/usr/include/x86_64-linux-gnu/bits/types/struct___jmp_buf_tag.h:
+
 /usr/include/c++/11/mutex:
 
 /usr/include/x86_64-linux-gnu/c++/11/bits/atomic_word.h:
@@ -8258,10 +8280,6 @@ CMakeFiles/RISC_V_Simulator.dir/src/state/stage-registers/MEMWBStageRegisters.cp
 
 /usr/include/c++/11/system_error:
 
-../src/common/logger/Logger.cpp:
-
-/usr/include/c++/11/bits/stl_vector.h:
-
 /usr/include/c++/11/ios:
 
 /usr/include/c++/11/utility:
@@ -8318,12 +8336,6 @@ CMakeFiles/RISC_V_Simulator.dir/src/state/stage-registers/MEMWBStageRegisters.cp
 
 /usr/include/c++/11/bits/locale_facets.tcc:
 
-/usr/include/c++/11/bits/codecvt.h:
-
-/usr/include/c++/11/bits/enable_special_members.h:
-
-/usr/include/c++/11/bits/basic_ios.tcc:
-
 /usr/lib/gcc/x86_64-linux-gnu/11/include/limits.h:
 
 ../include/combinational/mux/Mux.h:
@@ -8370,14 +8382,14 @@ CMakeFiles/RISC_V_Simulator.dir/src/state/stage-registers/MEMWBStageRegisters.cp
 
 /usr/include/x86_64-linux-gnu/sys/time.h:
 
+/usr/include/c++/11/variant:
+
+/usr/include/c++/11/bits/codecvt.h:
+
+/usr/include/c++/11/bits/basic_ios.tcc:
+
+/usr/include/c++/11/bits/enable_special_members.h:
+
 /usr/include/c++/11/bits/std_mutex.h:
 
 ../include/common/Control.h:
-
-/usr/include/c++/11/bits/stl_uninitialized.h:
-
-/usr/include/x86_64-linux-gnu/bits/types/clockid_t.h:
-
-/usr/include/x86_64-linux-gnu/bits/types/struct___jmp_buf_tag.h:
-
-/usr/include/c++/11/bits/stl_bvector.h:

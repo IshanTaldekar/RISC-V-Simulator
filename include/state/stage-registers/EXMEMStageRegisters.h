@@ -54,6 +54,10 @@ public:
     void setRegisterDestination(unsigned long value);
     void setControl(Control *new_control);
     void setNop();
+
+    unsigned long getRegisterDestination();
+    unsigned long getRegisterDestinationData();
+
     void reset();
     void pause();
 

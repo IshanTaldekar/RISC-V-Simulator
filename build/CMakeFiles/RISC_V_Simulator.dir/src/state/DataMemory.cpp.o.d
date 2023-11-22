@@ -214,13 +214,14 @@ CMakeFiles/RISC_V_Simulator.dir/src/state/DataMemory.cpp.o: \
  /usr/include/x86_64-linux-gnu/sys/time.h /usr/include/semaphore.h \
  /usr/include/x86_64-linux-gnu/bits/semaphore.h \
  /usr/include/c++/11/thread \
+ /home/wasp/Code/RISC-V-Simulator/src/state/../../include/state/../common/Config.h \
+ /usr/include/c++/11/variant \
+ /usr/include/c++/11/bits/enable_special_members.h \
  /home/wasp/Code/RISC-V-Simulator/src/state/../../include/state/../state/stage-registers/MEMWBStageRegisters.h \
  /home/wasp/Code/RISC-V-Simulator/src/state/../../include/state/../state/stage-registers/../../common/Module.h \
  /home/wasp/Code/RISC-V-Simulator/src/state/../../include/state/../state/stage-registers/../../common/Control.h \
  /home/wasp/Code/RISC-V-Simulator/src/state/../../include/state/../state/stage-registers/../../common/Module.h \
  /home/wasp/Code/RISC-V-Simulator/src/state/../../include/state/../state/stage-registers/../../common/Instruction.h \
- /usr/include/c++/11/variant \
- /usr/include/c++/11/bits/enable_special_members.h \
  /usr/include/c++/11/unordered_map /usr/include/c++/11/bits/hashtable.h \
  /usr/include/c++/11/bits/hashtable_policy.h \
  /usr/include/c++/11/bits/node_handle.h \
@@ -269,6 +270,11 @@ CMakeFiles/RISC_V_Simulator.dir/src/state/DataMemory.cpp.o: \
  /usr/include/c++/11/barrier /usr/include/c++/11/functional \
  /usr/include/c++/11/bits/std_function.h \
  /home/wasp/Code/RISC-V-Simulator/src/state/../../include/state/../state/stage-registers/../../common/../state/../state/stage-registers/../../combinational/adder/../../state/stage-registers/../../combinational/mux/../../state/stage-registers/../../common/Config.h \
+ /home/wasp/Code/RISC-V-Simulator/src/state/../../include/state/../state/stage-registers/../../common/../state/../state/stage-registers/../../combinational/adder/../../state/stage-registers/../../combinational/mux/../../state/stage-registers/../../common/../state/stage-registers/IFIDStageRegisters.h \
+ /home/wasp/Code/RISC-V-Simulator/src/state/../../include/state/../state/stage-registers/../../common/../state/../state/stage-registers/../../combinational/adder/../../state/stage-registers/../../combinational/mux/../../state/stage-registers/../../common/../state/stage-registers/IDEXStageRegisters.h \
+ /home/wasp/Code/RISC-V-Simulator/src/state/../../include/state/../state/stage-registers/../../common/../state/../state/stage-registers/../../combinational/adder/../../state/stage-registers/../../combinational/mux/../../state/stage-registers/../../common/../state/stage-registers/EXMEMStageRegisters.h \
+ /home/wasp/Code/RISC-V-Simulator/src/state/../../include/state/../state/stage-registers/../../common/../state/../state/stage-registers/../../combinational/adder/../../state/stage-registers/../../combinational/mux/../../state/stage-registers/../../common/../state/stage-registers/MEMWBStageRegisters.h \
+ /home/wasp/Code/RISC-V-Simulator/src/state/../../include/state/../state/stage-registers/../../common/../state/../state/stage-registers/../../combinational/adder/../../state/stage-registers/../../combinational/mux/../../state/stage-registers/../../common/../state/Driver.h \
  /usr/include/c++/11/queue /usr/include/c++/11/deque \
  /usr/include/c++/11/bits/stl_deque.h /usr/include/c++/11/bits/deque.tcc \
  /usr/include/c++/11/bits/stl_queue.h \

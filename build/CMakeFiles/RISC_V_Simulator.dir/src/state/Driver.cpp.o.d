@@ -217,6 +217,7 @@ CMakeFiles/RISC_V_Simulator.dir/src/state/Driver.cpp.o: \
  /usr/include/x86_64-linux-gnu/sys/time.h /usr/include/semaphore.h \
  /usr/include/x86_64-linux-gnu/bits/semaphore.h \
  /usr/include/c++/11/thread \
+ /home/wasp/Code/RISC-V-Simulator/src/state/../../include/state/stage-registers/../../common/Config.h \
  /home/wasp/Code/RISC-V-Simulator/src/state/../../include/state/stage-registers/../../common/logger/IFLogger.h \
  /home/wasp/Code/RISC-V-Simulator/src/state/../../include/state/stage-registers/../../common/logger/Logger.h \
  /usr/include/c++/11/iostream \
@@ -265,16 +266,21 @@ CMakeFiles/RISC_V_Simulator.dir/src/state/Driver.cpp.o: \
  /usr/include/c++/11/barrier /usr/include/c++/11/functional \
  /usr/include/c++/11/bits/std_function.h \
  /home/wasp/Code/RISC-V-Simulator/src/state/../../include/state/stage-registers/../../state/stage-registers/../../common/../state/../state/stage-registers/../../common/Config.h \
+ /home/wasp/Code/RISC-V-Simulator/src/state/../../include/state/stage-registers/../../state/stage-registers/../../common/../state/../state/stage-registers/../../common/../state/stage-registers/IFIDStageRegisters.h \
+ /home/wasp/Code/RISC-V-Simulator/src/state/../../include/state/stage-registers/../../state/stage-registers/../../common/../state/../state/stage-registers/../../common/../state/stage-registers/IDEXStageRegisters.h \
+ /home/wasp/Code/RISC-V-Simulator/src/state/../../include/state/stage-registers/../../state/stage-registers/../../common/../state/../state/stage-registers/../../common/../state/stage-registers/EXMEMStageRegisters.h \
+ /home/wasp/Code/RISC-V-Simulator/src/state/../../include/state/stage-registers/../../state/stage-registers/../../common/../state/../state/stage-registers/../../common/../state/stage-registers/../../common/Module.h \
+ /home/wasp/Code/RISC-V-Simulator/src/state/../../include/state/stage-registers/../../state/stage-registers/../../common/../state/../state/stage-registers/../../common/../state/stage-registers/../../common/Control.h \
+ /home/wasp/Code/RISC-V-Simulator/src/state/../../include/state/stage-registers/../../state/stage-registers/../../common/../state/../state/stage-registers/../../common/../state/stage-registers/../../combinational/mux/IFMux.h \
+ /home/wasp/Code/RISC-V-Simulator/src/state/../../include/state/stage-registers/../../state/stage-registers/../../common/../state/../state/stage-registers/../../common/../state/stage-registers/MEMWBStageRegisters.h \
+ /home/wasp/Code/RISC-V-Simulator/src/state/../../include/state/stage-registers/../../state/stage-registers/../../common/../state/../state/stage-registers/../../common/../state/stage-registers/../../common/StageSynchronizer.h \
+ /home/wasp/Code/RISC-V-Simulator/src/state/../../include/state/stage-registers/../../state/stage-registers/../../common/../state/../state/stage-registers/../../common/../state/stage-registers/MEMWBStageRegisters.h \
+ /home/wasp/Code/RISC-V-Simulator/src/state/../../include/state/stage-registers/../../state/stage-registers/../../common/../state/../state/stage-registers/../../common/../state/Driver.h \
  /home/wasp/Code/RISC-V-Simulator/src/state/../../include/state/stage-registers/../../state/stage-registers/../../combinational/adder/EXAdder.h \
  /home/wasp/Code/RISC-V-Simulator/src/state/../../include/state/stage-registers/../../state/stage-registers/../../combinational/adder/Adder.h \
  /home/wasp/Code/RISC-V-Simulator/src/state/../../include/state/stage-registers/../../state/stage-registers/../../combinational/adder/../../common/Config.h \
  /home/wasp/Code/RISC-V-Simulator/src/state/../../include/state/stage-registers/../../state/stage-registers/../../combinational/adder/../../common/Module.h \
  /home/wasp/Code/RISC-V-Simulator/src/state/../../include/state/stage-registers/../../state/stage-registers/../../combinational/adder/../../state/stage-registers/EXMEMStageRegisters.h \
- /home/wasp/Code/RISC-V-Simulator/src/state/../../include/state/stage-registers/../../state/stage-registers/../../combinational/adder/../../state/stage-registers/../../common/Module.h \
- /home/wasp/Code/RISC-V-Simulator/src/state/../../include/state/stage-registers/../../state/stage-registers/../../combinational/adder/../../state/stage-registers/../../common/Control.h \
- /home/wasp/Code/RISC-V-Simulator/src/state/../../include/state/stage-registers/../../state/stage-registers/../../combinational/adder/../../state/stage-registers/../../combinational/mux/IFMux.h \
- /home/wasp/Code/RISC-V-Simulator/src/state/../../include/state/stage-registers/../../state/stage-registers/../../combinational/adder/../../state/stage-registers/MEMWBStageRegisters.h \
- /home/wasp/Code/RISC-V-Simulator/src/state/../../include/state/stage-registers/../../state/stage-registers/../../combinational/adder/../../state/stage-registers/../../common/StageSynchronizer.h \
  /home/wasp/Code/RISC-V-Simulator/src/state/../../include/state/stage-registers/../../state/stage-registers/../../combinational/mux/EXMux.h \
  /home/wasp/Code/RISC-V-Simulator/src/state/../../include/state/stage-registers/../../state/stage-registers/../../combinational/ALU.h \
  /home/wasp/Code/RISC-V-Simulator/src/state/../../include/state/stage-registers/../../state/stage-registers/EXMEMStageRegisters.h \

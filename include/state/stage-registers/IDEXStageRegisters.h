@@ -24,6 +24,7 @@ class IDEXStageRegisters: public Module {
     static constexpr int WORD_BIT_COUNT = 32;
 
     Control *control;
+    Instruction *instruction;
 
     std::bitset<WORD_BIT_COUNT> read_data_1;
     std::bitset<WORD_BIT_COUNT> read_data_2;
@@ -49,6 +50,7 @@ class IDEXStageRegisters: public Module {
     EXAdder *ex_adder;
     ALU *alu;
     EXMEMStageRegisters *ex_mem_stage_register;
+    MEMWBStageRegisters *mem_wb_stage_register;
     StageSynchronizer *stage_synchronizer;
 
 public:
@@ -65,7 +67,9 @@ public:
     void setRegisterDestination(unsigned long rd);
     void setProgramCounter(int pc);
     void setControlModule(Control *new_control);
+    void setInstruction(Instruction *current_instruction);
     void setNop();
+
     void reset();
     void pause();
 
@@ -78,6 +82,8 @@ private:
     void passRegisterDestinationToEXMEMStageRegisters();
     void passReadData2ToEXMEMStageRegisters();
     void passControlToEXMEMStageRegisters();
+
+    void attemptForwarding();
 
     void resetStage();
     void pauseStage();

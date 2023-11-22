@@ -3,7 +3,8 @@
 IDEXStageRegisters *IDEXStageRegisters::current_instance = nullptr;
 
 IDEXStageRegisters::IDEXStageRegisters() {
-    this->control = new Control(new Instruction(std::string(32, '0')));
+    this->instruction = new Instruction(std::string(32, '0'));
+    this->control = new Control(this->instruction);
 
     this->register_destination = 0UL;
     this->program_counter = 0UL;
@@ -53,7 +54,8 @@ void IDEXStageRegisters::resetStage() {
     this->is_nop_asserted = false;
     this->is_reset_flag_set = false;
 
-    this->control = new Control(new Instruction(std::string(32, '0')));
+    this->instruction = new Instruction(std::string(32, '0'));
+    this->control = new Control(this->instruction);
 }
 
 void IDEXStageRegisters::pauseStage() {
@@ -110,6 +112,10 @@ void IDEXStageRegisters::run() {
         }
 
         this->control->toggleEXStageControlSignals();
+
+        if (this->getStage() == Stage::Five) {
+            this->attemptForwarding();
+        }
 
         this->passProgramCounterToEXAdder();
         this->passReadData1ToALU();
@@ -208,6 +214,14 @@ void IDEXStageRegisters::setControlModule(Control *new_control) {
     this->is_control_set = true;
 
     this->notifyModuleConditionVariable();
+}
+
+void IDEXStageRegisters::setInstruction(Instruction *current_instruction) {
+    this->stage_synchronizer->conditionalArriveFiveStage();
+
+    std::lock_guard<std::mutex> id_ex_stage_registers_lock (this->getModuleMutex());
+
+    this->instruction = current_instruction;
 }
 
 void IDEXStageRegisters::passProgramCounterToEXAdder() {
