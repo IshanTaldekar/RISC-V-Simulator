@@ -73,7 +73,7 @@ void IFMux::setInput(StageMuxInputType type, unsigned long value) {
 
         this->logger->log("[IFMux] branched PC value set");
     } else {
-        std::cerr << "IFMux::setInput did not match any input type" << std::endl;
+        throw std::runtime_error("IFMux::setInput did not match any input type");
     }
 
     this->notifyModuleConditionVariable();
@@ -89,7 +89,7 @@ void IFMux::assertControlSignal(bool is_asserted) {
 }
 
 /**
- * Loading output to the driver
+ * Loading output to the Driver.
  */
 void IFMux::passOutput() {
     this->logger->log("[IFMux] Loading output to Driver.");

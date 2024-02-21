@@ -10,7 +10,7 @@ class IFMux;
 class IFLogger;
 
 class IFAdder: protected Adder {
-    int program_counter;
+    unsigned long program_counter;
     bool is_program_counter_set;
 
     static IFAdder *current_instance;

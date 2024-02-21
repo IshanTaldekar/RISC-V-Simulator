@@ -35,7 +35,7 @@ public:
     void run() override;
     void notifyModuleConditionVariable() override;
 
-    void setInstructionMemoryFilePath(const std::string &file_path);
+    void loadInstructionMemoryFromFilePath(const std::string &file_path);
     void setProgramCounter(unsigned long value);
 
 private:

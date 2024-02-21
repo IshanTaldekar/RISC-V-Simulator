@@ -63,9 +63,12 @@ void IFAdder::setInput(AdderInputType type, unsigned long value) {
 }
 
 void IFAdder::passProgramCounterToIFMux() {
+    this->logger->log("[IFAdder] Waiting to pass PCValue to IFMux.");
     this->if_mux->setInput(IFStageMuxInputType::IncrementedPc, this->program_counter);
+    this->logger->log("[IFAdder] PCValue passed to IFMux.");
 }
 
 void IFAdder::notifyModuleConditionVariable() {
+    this->logger->log("[IFAdder] Notifying condition variable.");
     this->getModuleConditionVariable().notify_one();
 }

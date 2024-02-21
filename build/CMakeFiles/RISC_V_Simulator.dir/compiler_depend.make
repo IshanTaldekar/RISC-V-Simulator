@@ -320,6 +320,21 @@ CMakeFiles/RISC_V_Simulator.dir/src/combinational/ALU.cpp.o: ../src/combinationa
   /usr/include/c++/11/functional \
   /usr/include/c++/11/bits/std_function.h \
   ../include/common/Config.h \
+  ../include/state/stage-registers/IFIDStageRegisters.h \
+  ../include/state/stage-registers/IDEXStageRegisters.h \
+  ../include/state/stage-registers/EXMEMStageRegisters.h \
+  ../include/state/stage-registers/MEMWBStageRegisters.h \
+  ../include/common/Module.h \
+  ../include/common/Control.h \
+  ../include/state/RegisterFile.h \
+  ../include/combinational/mux/WBMux.h \
+  ../include/combinational/mux/Mux.h \
+  ../include/state/RegisterFile.h \
+  ../include/common/logger/WBLogger.h \
+  ../include/common/logger/Logger.h \
+  ../include/common/Config.h \
+  ../include/common/StageSynchronizer.h \
+  ../include/state/Driver.h \
   /usr/include/c++/11/queue \
   /usr/include/c++/11/deque \
   /usr/include/c++/11/bits/stl_deque.h \
@@ -335,12 +350,6 @@ CMakeFiles/RISC_V_Simulator.dir/src/combinational/ALU.cpp.o: ../src/combinationa
   ../include/common/StageSynchronizer.h \
   ../include/common/logger/IFLogger.h \
   ../include/state/stage-registers/MEMWBStageRegisters.h \
-  ../include/state/RegisterFile.h \
-  ../include/combinational/mux/WBMux.h \
-  ../include/state/RegisterFile.h \
-  ../include/common/logger/WBLogger.h \
-  ../include/common/logger/Logger.h \
-  ../include/common/Config.h \
   ../include/common/StageSynchronizer.h \
   ../include/combinational/mux/EXMux.h \
   ../include/combinational/mux/Mux.h \
@@ -666,6 +675,23 @@ CMakeFiles/RISC_V_Simulator.dir/src/combinational/ImmediateGenerator.cpp.o: ../s
   /usr/include/c++/11/functional \
   /usr/include/c++/11/bits/std_function.h \
   ../include/common/Config.h \
+  ../include/state/stage-registers/IFIDStageRegisters.h \
+  ../include/state/stage-registers/IDEXStageRegisters.h \
+  ../include/state/stage-registers/EXMEMStageRegisters.h \
+  ../include/common/Module.h \
+  ../include/common/Control.h \
+  ../include/combinational/mux/IFMux.h \
+  ../include/state/stage-registers/MEMWBStageRegisters.h \
+  ../include/state/RegisterFile.h \
+  ../include/combinational/mux/WBMux.h \
+  ../include/combinational/mux/Mux.h \
+  ../include/state/RegisterFile.h \
+  ../include/common/logger/WBLogger.h \
+  ../include/common/logger/Logger.h \
+  ../include/common/Config.h \
+  ../include/common/StageSynchronizer.h \
+  ../include/state/stage-registers/MEMWBStageRegisters.h \
+  ../include/state/Driver.h \
   /usr/include/c++/11/queue \
   /usr/include/c++/11/deque \
   /usr/include/c++/11/bits/stl_deque.h \
@@ -682,10 +708,6 @@ CMakeFiles/RISC_V_Simulator.dir/src/combinational/ImmediateGenerator.cpp.o: ../s
   ../include/common/StageSynchronizer.h \
   ../include/common/logger/IFLogger.h \
   ../include/combinational/mux/WBMux.h \
-  ../include/state/RegisterFile.h \
-  ../include/common/logger/WBLogger.h \
-  ../include/common/logger/Logger.h \
-  ../include/common/Config.h \
   ../include/combinational/mux/EXMux.h \
   ../include/combinational/ALU.h \
   ../include/common/Module.h \
@@ -693,20 +715,10 @@ CMakeFiles/RISC_V_Simulator.dir/src/combinational/ImmediateGenerator.cpp.o: ../s
   ../include/combinational/ALU.h \
   ../include/state/DataMemory.h \
   ../include/state/stage-registers/MEMWBStageRegisters.h \
-  ../include/common/Module.h \
-  ../include/common/Control.h \
-  ../include/state/RegisterFile.h \
-  ../include/combinational/mux/WBMux.h \
-  ../include/common/StageSynchronizer.h \
   ../include/combinational/adder/EXAdder.h \
   ../include/combinational/adder/Adder.h \
   ../include/common/Config.h \
   ../include/state/stage-registers/EXMEMStageRegisters.h \
-  ../include/common/Module.h \
-  ../include/common/Control.h \
-  ../include/combinational/mux/IFMux.h \
-  ../include/state/stage-registers/MEMWBStageRegisters.h \
-  ../include/common/StageSynchronizer.h \
   ../include/combinational/mux/EXMux.h \
   ../include/combinational/ALU.h \
   ../include/state/stage-registers/EXMEMStageRegisters.h \
@@ -1017,10 +1029,6 @@ CMakeFiles/RISC_V_Simulator.dir/src/combinational/adder/EXAdder.cpp.o: ../src/co
   /usr/include/c++/11/functional \
   /usr/include/c++/11/bits/std_function.h \
   ../include/common/Config.h \
-  ../include/combinational/mux/IFMux.h \
-  ../include/combinational/mux/Mux.h \
-  ../include/state/Driver.h \
-  ../include/state/InstructionMemory.h \
   ../include/state/stage-registers/IFIDStageRegisters.h \
   ../include/common/Config.h \
   ../include/common/Module.h \
@@ -1043,27 +1051,36 @@ CMakeFiles/RISC_V_Simulator.dir/src/combinational/adder/EXAdder.cpp.o: ../src/co
   /usr/include/c++/11/bits/stl_deque.h \
   /usr/include/c++/11/bits/deque.tcc \
   /usr/include/c++/11/bits/stl_queue.h \
+  ../include/state/stage-registers/IDEXStageRegisters.h \
+  ../include/state/stage-registers/EXMEMStageRegisters.h \
+  ../include/state/stage-registers/MEMWBStageRegisters.h \
+  ../include/combinational/mux/WBMux.h \
+  ../include/combinational/mux/Mux.h \
+  ../include/state/RegisterFile.h \
+  ../include/common/logger/WBLogger.h \
+  ../include/common/logger/Logger.h \
+  ../include/common/Config.h \
+  ../include/state/Driver.h \
+  ../include/state/InstructionMemory.h \
+  ../include/state/stage-registers/IFIDStageRegisters.h \
   ../include/common/Module.h \
   ../include/common/logger/IFLogger.h \
   ../include/combinational/adder/IFAdder.h \
   ../include/combinational/adder/Adder.h \
   ../include/common/Config.h \
   ../include/combinational/mux/IFMux.h \
+  ../include/combinational/mux/Mux.h \
+  ../include/state/Driver.h \
+  ../include/common/Config.h \
+  ../include/common/logger/IFLogger.h \
   ../include/common/logger/IFLogger.h \
   ../include/common/StageSynchronizer.h \
-  ../include/common/Config.h \
-  ../include/common/logger/IFLogger.h \
+  ../include/combinational/mux/IFMux.h \
   ../include/combinational/mux/WBMux.h \
-  ../include/state/RegisterFile.h \
-  ../include/common/logger/WBLogger.h \
-  ../include/common/logger/Logger.h \
-  ../include/common/Config.h \
   ../include/combinational/mux/EXMux.h \
   ../include/combinational/ALU.h \
   ../include/state/DataMemory.h \
   ../include/state/stage-registers/MEMWBStageRegisters.h \
-  ../include/state/RegisterFile.h \
-  ../include/combinational/mux/WBMux.h \
   ../include/combinational/mux/IFMux.h \
   ../include/state/stage-registers/MEMWBStageRegisters.h \
   ../include/common/StageSynchronizer.h
@@ -1391,15 +1408,20 @@ CMakeFiles/RISC_V_Simulator.dir/src/combinational/adder/IFAdder.cpp.o: ../src/co
   /usr/include/c++/11/functional \
   /usr/include/c++/11/bits/std_function.h \
   ../include/common/Config.h \
-  ../include/combinational/adder/EXAdder.h \
-  ../include/combinational/adder/Adder.h \
-  ../include/common/Config.h \
+  ../include/state/stage-registers/IFIDStageRegisters.h \
+  ../include/state/stage-registers/IDEXStageRegisters.h \
   ../include/state/stage-registers/EXMEMStageRegisters.h \
   ../include/common/Module.h \
   ../include/common/Control.h \
   ../include/combinational/mux/IFMux.h \
   ../include/state/stage-registers/MEMWBStageRegisters.h \
   ../include/common/StageSynchronizer.h \
+  ../include/state/stage-registers/MEMWBStageRegisters.h \
+  ../include/state/Driver.h \
+  ../include/combinational/adder/EXAdder.h \
+  ../include/combinational/adder/Adder.h \
+  ../include/common/Config.h \
+  ../include/state/stage-registers/EXMEMStageRegisters.h \
   ../include/combinational/mux/EXMux.h \
   ../include/combinational/ALU.h \
   ../include/state/stage-registers/EXMEMStageRegisters.h \
@@ -1746,6 +1768,21 @@ CMakeFiles/RISC_V_Simulator.dir/src/combinational/mux/EXMux.cpp.o: ../src/combin
   /usr/include/c++/11/functional \
   /usr/include/c++/11/bits/std_function.h \
   ../include/common/Config.h \
+  ../include/state/stage-registers/IFIDStageRegisters.h \
+  ../include/state/stage-registers/IDEXStageRegisters.h \
+  ../include/state/stage-registers/EXMEMStageRegisters.h \
+  ../include/state/stage-registers/MEMWBStageRegisters.h \
+  ../include/common/Module.h \
+  ../include/common/Control.h \
+  ../include/state/RegisterFile.h \
+  ../include/combinational/mux/WBMux.h \
+  ../include/combinational/mux/Mux.h \
+  ../include/state/RegisterFile.h \
+  ../include/common/logger/WBLogger.h \
+  ../include/common/logger/Logger.h \
+  ../include/common/Config.h \
+  ../include/common/StageSynchronizer.h \
+  ../include/state/Driver.h \
   /usr/include/c++/11/queue \
   /usr/include/c++/11/deque \
   /usr/include/c++/11/bits/stl_deque.h \
@@ -1762,12 +1799,6 @@ CMakeFiles/RISC_V_Simulator.dir/src/combinational/mux/EXMux.cpp.o: ../src/combin
   ../include/common/Config.h \
   ../include/common/logger/IFLogger.h \
   ../include/state/stage-registers/MEMWBStageRegisters.h \
-  ../include/state/RegisterFile.h \
-  ../include/combinational/mux/WBMux.h \
-  ../include/state/RegisterFile.h \
-  ../include/common/logger/WBLogger.h \
-  ../include/common/logger/Logger.h \
-  ../include/common/Config.h \
   ../include/common/StageSynchronizer.h \
   ../include/combinational/mux/EXMux.h \
   ../include/combinational/ALU.h \
@@ -2099,16 +2130,21 @@ CMakeFiles/RISC_V_Simulator.dir/src/combinational/mux/IFMux.cpp.o: ../src/combin
   /usr/include/c++/11/functional \
   /usr/include/c++/11/bits/std_function.h \
   ../include/common/Config.h \
-  ../include/combinational/adder/EXAdder.h \
-  ../include/combinational/adder/Adder.h \
-  ../include/common/Config.h \
-  ../include/common/Module.h \
+  ../include/state/stage-registers/IFIDStageRegisters.h \
+  ../include/state/stage-registers/IDEXStageRegisters.h \
   ../include/state/stage-registers/EXMEMStageRegisters.h \
   ../include/common/Module.h \
   ../include/common/Control.h \
   ../include/combinational/mux/IFMux.h \
   ../include/state/stage-registers/MEMWBStageRegisters.h \
   ../include/common/StageSynchronizer.h \
+  ../include/state/stage-registers/MEMWBStageRegisters.h \
+  ../include/state/Driver.h \
+  ../include/combinational/adder/EXAdder.h \
+  ../include/combinational/adder/Adder.h \
+  ../include/common/Config.h \
+  ../include/common/Module.h \
+  ../include/state/stage-registers/EXMEMStageRegisters.h \
   ../include/combinational/mux/EXMux.h \
   ../include/combinational/ALU.h \
   ../include/state/stage-registers/EXMEMStageRegisters.h \
@@ -2450,6 +2486,18 @@ CMakeFiles/RISC_V_Simulator.dir/src/combinational/mux/WBMux.cpp.o: ../src/combin
   /usr/include/c++/11/functional \
   /usr/include/c++/11/bits/std_function.h \
   ../include/common/Config.h \
+  ../include/state/stage-registers/IFIDStageRegisters.h \
+  ../include/state/stage-registers/IDEXStageRegisters.h \
+  ../include/state/stage-registers/EXMEMStageRegisters.h \
+  ../include/common/Module.h \
+  ../include/common/Control.h \
+  ../include/combinational/mux/IFMux.h \
+  ../include/state/stage-registers/MEMWBStageRegisters.h \
+  ../include/state/RegisterFile.h \
+  ../include/combinational/mux/WBMux.h \
+  ../include/common/StageSynchronizer.h \
+  ../include/state/stage-registers/MEMWBStageRegisters.h \
+  ../include/state/Driver.h \
   /usr/include/c++/11/queue \
   /usr/include/c++/11/deque \
   /usr/include/c++/11/bits/stl_deque.h \
@@ -2475,20 +2523,10 @@ CMakeFiles/RISC_V_Simulator.dir/src/combinational/mux/WBMux.cpp.o: ../src/combin
   ../include/state/DataMemory.h \
   ../include/common/Module.h \
   ../include/state/stage-registers/MEMWBStageRegisters.h \
-  ../include/common/Module.h \
-  ../include/common/Control.h \
-  ../include/state/RegisterFile.h \
-  ../include/combinational/mux/WBMux.h \
-  ../include/common/StageSynchronizer.h \
   ../include/combinational/adder/EXAdder.h \
   ../include/combinational/adder/Adder.h \
   ../include/common/Config.h \
   ../include/state/stage-registers/EXMEMStageRegisters.h \
-  ../include/common/Module.h \
-  ../include/common/Control.h \
-  ../include/combinational/mux/IFMux.h \
-  ../include/state/stage-registers/MEMWBStageRegisters.h \
-  ../include/common/StageSynchronizer.h \
   ../include/combinational/mux/EXMux.h \
   ../include/combinational/ALU.h \
   ../include/state/stage-registers/EXMEMStageRegisters.h \
@@ -2814,6 +2852,21 @@ CMakeFiles/RISC_V_Simulator.dir/src/common/Control.cpp.o: ../src/common/Control.
   /usr/include/c++/11/functional \
   /usr/include/c++/11/bits/std_function.h \
   ../include/common/Config.h \
+  ../include/state/stage-registers/IFIDStageRegisters.h \
+  ../include/state/stage-registers/IDEXStageRegisters.h \
+  ../include/state/stage-registers/EXMEMStageRegisters.h \
+  ../include/state/stage-registers/MEMWBStageRegisters.h \
+  ../include/common/Module.h \
+  ../include/common/Control.h \
+  ../include/state/RegisterFile.h \
+  ../include/combinational/mux/WBMux.h \
+  ../include/combinational/mux/Mux.h \
+  ../include/state/RegisterFile.h \
+  ../include/common/logger/WBLogger.h \
+  ../include/common/logger/Logger.h \
+  ../include/common/Config.h \
+  ../include/common/StageSynchronizer.h \
+  ../include/state/Driver.h \
   /usr/include/c++/11/queue \
   /usr/include/c++/11/deque \
   /usr/include/c++/11/bits/stl_deque.h \
@@ -2829,12 +2882,6 @@ CMakeFiles/RISC_V_Simulator.dir/src/common/Control.cpp.o: ../src/common/Control.
   ../include/common/StageSynchronizer.h \
   ../include/common/logger/IFLogger.h \
   ../include/state/stage-registers/MEMWBStageRegisters.h \
-  ../include/state/RegisterFile.h \
-  ../include/combinational/mux/WBMux.h \
-  ../include/state/RegisterFile.h \
-  ../include/common/logger/WBLogger.h \
-  ../include/common/logger/Logger.h \
-  ../include/common/Config.h \
   ../include/common/StageSynchronizer.h \
   ../include/combinational/mux/EXMux.h \
   ../include/combinational/mux/Mux.h \
@@ -3566,7 +3613,121 @@ CMakeFiles/RISC_V_Simulator.dir/src/common/StageSynchronizer.cpp.o: ../src/commo
   /usr/include/c++/11/bits/vector.tcc \
   ../include/common/Config.h \
   /usr/include/c++/11/variant \
-  /usr/include/c++/11/bits/parse_numbers.h
+  /usr/include/c++/11/bits/parse_numbers.h \
+  ../include/state/stage-registers/IFIDStageRegisters.h \
+  ../include/common/Config.h \
+  ../include/common/Module.h \
+  /usr/include/c++/11/mutex \
+  /usr/include/c++/11/chrono \
+  /usr/include/c++/11/ratio \
+  /usr/include/c++/11/limits \
+  /usr/include/c++/11/ctime \
+  /usr/include/c++/11/bits/unique_lock.h \
+  /usr/include/c++/11/condition_variable \
+  /usr/include/c++/11/bits/shared_ptr.h \
+  /usr/include/c++/11/bits/shared_ptr_base.h \
+  /usr/include/c++/11/bits/allocated_ptr.h \
+  /usr/include/c++/11/ext/concurrence.h \
+  /usr/include/c++/11/stop_token \
+  /usr/include/c++/11/atomic \
+  /usr/include/c++/11/semaphore \
+  /usr/include/c++/11/bits/semaphore_base.h \
+  /usr/include/c++/11/bits/atomic_timed_wait.h \
+  /usr/include/c++/11/bits/this_thread_sleep.h \
+  /usr/include/x86_64-linux-gnu/sys/time.h \
+  /usr/include/semaphore.h \
+  /usr/include/x86_64-linux-gnu/bits/semaphore.h \
+  /usr/include/c++/11/thread \
+  ../include/common/Config.h \
+  ../include/common/logger/IFLogger.h \
+  ../include/common/logger/Logger.h \
+  /usr/include/c++/11/fstream \
+  /usr/include/c++/11/istream \
+  /usr/include/c++/11/bits/istream.tcc \
+  /usr/include/c++/11/bits/codecvt.h \
+  /usr/include/x86_64-linux-gnu/c++/11/bits/basic_file.h \
+  /usr/include/x86_64-linux-gnu/c++/11/bits/c++io.h \
+  /usr/include/c++/11/bits/fstream.tcc \
+  /usr/include/c++/11/iostream \
+  ../include/common/Config.h \
+  ../include/common/logger/IDLogger.h \
+  ../include/state/stage-registers/IDEXStageRegisters.h \
+  ../include/common/Module.h \
+  ../include/common/Instruction.h \
+  /usr/include/c++/11/bitset \
+  ../include/common/Config.h \
+  ../include/common/Control.h \
+  ../include/common/Module.h \
+  ../include/common/Instruction.h \
+  ../include/state/RegisterFile.h \
+  ../include/common/Module.h \
+  ../include/common/logger/IDLogger.h \
+  ../include/state/stage-registers/IDEXStageRegisters.h \
+  ../include/combinational/mux/IFMux.h \
+  ../include/combinational/mux/Mux.h \
+  ../include/common/Module.h \
+  ../include/common/Config.h \
+  ../include/state/Driver.h \
+  ../include/state/InstructionMemory.h \
+  ../include/state/stage-registers/IFIDStageRegisters.h \
+  ../include/common/Module.h \
+  ../include/common/logger/IFLogger.h \
+  ../include/combinational/adder/IFAdder.h \
+  ../include/combinational/adder/Adder.h \
+  ../include/common/Config.h \
+  ../include/common/Module.h \
+  ../include/combinational/mux/IFMux.h \
+  ../include/common/logger/IFLogger.h \
+  ../include/common/StageSynchronizer.h \
+  ../include/common/logger/IFLogger.h \
+  ../include/combinational/mux/WBMux.h \
+  ../include/state/RegisterFile.h \
+  ../include/common/logger/WBLogger.h \
+  ../include/common/logger/Logger.h \
+  ../include/common/Config.h \
+  ../include/combinational/mux/EXMux.h \
+  ../include/combinational/ALU.h \
+  ../include/common/Module.h \
+  ../include/common/Control.h \
+  ../include/combinational/ALU.h \
+  ../include/state/DataMemory.h \
+  ../include/state/stage-registers/MEMWBStageRegisters.h \
+  ../include/common/Module.h \
+  ../include/common/Control.h \
+  ../include/state/RegisterFile.h \
+  ../include/combinational/mux/WBMux.h \
+  ../include/common/StageSynchronizer.h \
+  ../include/combinational/adder/EXAdder.h \
+  ../include/combinational/adder/Adder.h \
+  ../include/common/Config.h \
+  ../include/state/stage-registers/EXMEMStageRegisters.h \
+  ../include/common/Module.h \
+  ../include/common/Control.h \
+  ../include/combinational/mux/IFMux.h \
+  ../include/state/stage-registers/MEMWBStageRegisters.h \
+  ../include/common/StageSynchronizer.h \
+  ../include/combinational/mux/EXMux.h \
+  ../include/combinational/ALU.h \
+  ../include/state/stage-registers/EXMEMStageRegisters.h \
+  ../include/common/StageSynchronizer.h \
+  ../include/common/Instruction.h \
+  ../include/common/Control.h \
+  ../include/state/RegisterFile.h \
+  ../include/combinational/ImmediateGenerator.h \
+  ../include/common/Module.h \
+  ../include/common/Instruction.h \
+  ../include/common/Config.h \
+  ../include/state/stage-registers/IDEXStageRegisters.h \
+  ../include/common/StageSynchronizer.h \
+  /usr/include/c++/11/queue \
+  /usr/include/c++/11/deque \
+  /usr/include/c++/11/bits/stl_deque.h \
+  /usr/include/c++/11/bits/deque.tcc \
+  /usr/include/c++/11/bits/stl_queue.h \
+  ../include/state/stage-registers/IDEXStageRegisters.h \
+  ../include/state/stage-registers/EXMEMStageRegisters.h \
+  ../include/state/stage-registers/MEMWBStageRegisters.h \
+  ../include/state/Driver.h
 
 CMakeFiles/RISC_V_Simulator.dir/src/common/logger/EXLogger.cpp.o: ../src/common/logger/EXLogger.cpp \
   /usr/include/stdc-predef.h \
@@ -5196,6 +5357,11 @@ CMakeFiles/RISC_V_Simulator.dir/src/state/DataMemory.cpp.o: ../src/state/DataMem
   /usr/include/c++/11/functional \
   /usr/include/c++/11/bits/std_function.h \
   ../include/common/Config.h \
+  ../include/state/stage-registers/IFIDStageRegisters.h \
+  ../include/state/stage-registers/IDEXStageRegisters.h \
+  ../include/state/stage-registers/EXMEMStageRegisters.h \
+  ../include/state/stage-registers/MEMWBStageRegisters.h \
+  ../include/state/Driver.h \
   /usr/include/c++/11/queue \
   /usr/include/c++/11/deque \
   /usr/include/c++/11/bits/stl_deque.h \
@@ -5553,16 +5719,21 @@ CMakeFiles/RISC_V_Simulator.dir/src/state/Driver.cpp.o: ../src/state/Driver.cpp 
   /usr/include/c++/11/functional \
   /usr/include/c++/11/bits/std_function.h \
   ../include/common/Config.h \
-  ../include/combinational/adder/EXAdder.h \
-  ../include/combinational/adder/Adder.h \
-  ../include/common/Config.h \
-  ../include/common/Module.h \
+  ../include/state/stage-registers/IFIDStageRegisters.h \
+  ../include/state/stage-registers/IDEXStageRegisters.h \
   ../include/state/stage-registers/EXMEMStageRegisters.h \
   ../include/common/Module.h \
   ../include/common/Control.h \
   ../include/combinational/mux/IFMux.h \
   ../include/state/stage-registers/MEMWBStageRegisters.h \
   ../include/common/StageSynchronizer.h \
+  ../include/state/stage-registers/MEMWBStageRegisters.h \
+  ../include/state/Driver.h \
+  ../include/combinational/adder/EXAdder.h \
+  ../include/combinational/adder/Adder.h \
+  ../include/common/Config.h \
+  ../include/common/Module.h \
+  ../include/state/stage-registers/EXMEMStageRegisters.h \
   ../include/combinational/mux/EXMux.h \
   ../include/combinational/ALU.h \
   ../include/state/stage-registers/EXMEMStageRegisters.h \
@@ -5900,12 +6071,25 @@ CMakeFiles/RISC_V_Simulator.dir/src/state/InstructionMemory.cpp.o: ../src/state/
   /usr/include/c++/11/functional \
   /usr/include/c++/11/bits/std_function.h \
   ../include/common/Config.h \
-  ../include/common/logger/IFLogger.h \
+  ../include/state/stage-registers/IFIDStageRegisters.h \
+  ../include/state/stage-registers/IDEXStageRegisters.h \
+  ../include/state/stage-registers/EXMEMStageRegisters.h \
+  ../include/common/Module.h \
+  ../include/common/Control.h \
+  ../include/combinational/mux/IFMux.h \
+  ../include/state/stage-registers/MEMWBStageRegisters.h \
+  ../include/state/RegisterFile.h \
   ../include/combinational/mux/WBMux.h \
+  ../include/combinational/mux/Mux.h \
   ../include/state/RegisterFile.h \
   ../include/common/logger/WBLogger.h \
   ../include/common/logger/Logger.h \
   ../include/common/Config.h \
+  ../include/common/StageSynchronizer.h \
+  ../include/state/stage-registers/MEMWBStageRegisters.h \
+  ../include/state/Driver.h \
+  ../include/common/logger/IFLogger.h \
+  ../include/combinational/mux/WBMux.h \
   ../include/combinational/mux/EXMux.h \
   ../include/combinational/ALU.h \
   ../include/common/Module.h \
@@ -5913,20 +6097,10 @@ CMakeFiles/RISC_V_Simulator.dir/src/state/InstructionMemory.cpp.o: ../src/state/
   ../include/combinational/ALU.h \
   ../include/state/DataMemory.h \
   ../include/state/stage-registers/MEMWBStageRegisters.h \
-  ../include/common/Module.h \
-  ../include/common/Control.h \
-  ../include/state/RegisterFile.h \
-  ../include/combinational/mux/WBMux.h \
-  ../include/common/StageSynchronizer.h \
   ../include/combinational/adder/EXAdder.h \
   ../include/combinational/adder/Adder.h \
   ../include/common/Config.h \
   ../include/state/stage-registers/EXMEMStageRegisters.h \
-  ../include/common/Module.h \
-  ../include/common/Control.h \
-  ../include/combinational/mux/IFMux.h \
-  ../include/state/stage-registers/MEMWBStageRegisters.h \
-  ../include/common/StageSynchronizer.h \
   ../include/combinational/mux/EXMux.h \
   ../include/combinational/ALU.h \
   ../include/state/stage-registers/EXMEMStageRegisters.h \
@@ -6259,6 +6433,23 @@ CMakeFiles/RISC_V_Simulator.dir/src/state/RegisterFile.cpp.o: ../src/state/Regis
   /usr/include/c++/11/functional \
   /usr/include/c++/11/bits/std_function.h \
   ../include/common/Config.h \
+  ../include/state/stage-registers/IFIDStageRegisters.h \
+  ../include/state/stage-registers/IDEXStageRegisters.h \
+  ../include/state/stage-registers/EXMEMStageRegisters.h \
+  ../include/common/Module.h \
+  ../include/common/Control.h \
+  ../include/combinational/mux/IFMux.h \
+  ../include/state/stage-registers/MEMWBStageRegisters.h \
+  ../include/state/RegisterFile.h \
+  ../include/combinational/mux/WBMux.h \
+  ../include/combinational/mux/Mux.h \
+  ../include/state/RegisterFile.h \
+  ../include/common/logger/WBLogger.h \
+  ../include/common/logger/Logger.h \
+  ../include/common/Config.h \
+  ../include/common/StageSynchronizer.h \
+  ../include/state/stage-registers/MEMWBStageRegisters.h \
+  ../include/state/Driver.h \
   /usr/include/c++/11/queue \
   /usr/include/c++/11/deque \
   /usr/include/c++/11/bits/stl_deque.h \
@@ -6275,10 +6466,6 @@ CMakeFiles/RISC_V_Simulator.dir/src/state/RegisterFile.cpp.o: ../src/state/Regis
   ../include/common/StageSynchronizer.h \
   ../include/common/logger/IFLogger.h \
   ../include/combinational/mux/WBMux.h \
-  ../include/state/RegisterFile.h \
-  ../include/common/logger/WBLogger.h \
-  ../include/common/logger/Logger.h \
-  ../include/common/Config.h \
   ../include/combinational/mux/EXMux.h \
   ../include/combinational/ALU.h \
   ../include/common/Module.h \
@@ -6287,20 +6474,10 @@ CMakeFiles/RISC_V_Simulator.dir/src/state/RegisterFile.cpp.o: ../src/state/Regis
   ../include/state/DataMemory.h \
   ../include/common/Module.h \
   ../include/state/stage-registers/MEMWBStageRegisters.h \
-  ../include/common/Module.h \
-  ../include/common/Control.h \
-  ../include/state/RegisterFile.h \
-  ../include/combinational/mux/WBMux.h \
-  ../include/common/StageSynchronizer.h \
   ../include/combinational/adder/EXAdder.h \
   ../include/combinational/adder/Adder.h \
   ../include/common/Config.h \
   ../include/state/stage-registers/EXMEMStageRegisters.h \
-  ../include/common/Module.h \
-  ../include/common/Control.h \
-  ../include/combinational/mux/IFMux.h \
-  ../include/state/stage-registers/MEMWBStageRegisters.h \
-  ../include/common/StageSynchronizer.h \
   ../include/combinational/mux/EXMux.h \
   ../include/combinational/ALU.h \
   ../include/state/stage-registers/EXMEMStageRegisters.h \
@@ -6610,10 +6787,6 @@ CMakeFiles/RISC_V_Simulator.dir/src/state/stage-registers/EXMEMStageRegisters.cp
   /usr/include/c++/11/functional \
   /usr/include/c++/11/bits/std_function.h \
   ../include/common/Config.h \
-  ../include/combinational/mux/IFMux.h \
-  ../include/combinational/mux/Mux.h \
-  ../include/state/Driver.h \
-  ../include/state/InstructionMemory.h \
   ../include/state/stage-registers/IFIDStageRegisters.h \
   ../include/common/Config.h \
   ../include/common/Module.h \
@@ -6636,27 +6809,36 @@ CMakeFiles/RISC_V_Simulator.dir/src/state/stage-registers/EXMEMStageRegisters.cp
   /usr/include/c++/11/bits/stl_deque.h \
   /usr/include/c++/11/bits/deque.tcc \
   /usr/include/c++/11/bits/stl_queue.h \
+  ../include/state/stage-registers/IDEXStageRegisters.h \
+  ../include/state/stage-registers/EXMEMStageRegisters.h \
+  ../include/state/stage-registers/MEMWBStageRegisters.h \
+  ../include/combinational/mux/WBMux.h \
+  ../include/combinational/mux/Mux.h \
+  ../include/state/RegisterFile.h \
+  ../include/common/logger/WBLogger.h \
+  ../include/common/logger/Logger.h \
+  ../include/common/Config.h \
+  ../include/state/Driver.h \
+  ../include/state/InstructionMemory.h \
+  ../include/state/stage-registers/IFIDStageRegisters.h \
   ../include/common/Module.h \
   ../include/common/logger/IFLogger.h \
   ../include/combinational/adder/IFAdder.h \
   ../include/combinational/adder/Adder.h \
   ../include/common/Config.h \
   ../include/combinational/mux/IFMux.h \
+  ../include/combinational/mux/Mux.h \
+  ../include/state/Driver.h \
+  ../include/common/Config.h \
+  ../include/common/logger/IFLogger.h \
   ../include/common/logger/IFLogger.h \
   ../include/common/StageSynchronizer.h \
-  ../include/common/Config.h \
-  ../include/common/logger/IFLogger.h \
+  ../include/combinational/mux/IFMux.h \
   ../include/combinational/mux/WBMux.h \
-  ../include/state/RegisterFile.h \
-  ../include/common/logger/WBLogger.h \
-  ../include/common/logger/Logger.h \
-  ../include/common/Config.h \
   ../include/combinational/mux/EXMux.h \
   ../include/combinational/ALU.h \
   ../include/state/DataMemory.h \
   ../include/state/stage-registers/MEMWBStageRegisters.h \
-  ../include/state/RegisterFile.h \
-  ../include/combinational/mux/WBMux.h \
   ../include/combinational/mux/IFMux.h \
   ../include/state/stage-registers/MEMWBStageRegisters.h \
   ../include/common/StageSynchronizer.h
@@ -6971,6 +7153,23 @@ CMakeFiles/RISC_V_Simulator.dir/src/state/stage-registers/IDEXStageRegisters.cpp
   /usr/include/c++/11/functional \
   /usr/include/c++/11/bits/std_function.h \
   ../include/common/Config.h \
+  ../include/state/stage-registers/IFIDStageRegisters.h \
+  ../include/state/stage-registers/IDEXStageRegisters.h \
+  ../include/state/stage-registers/EXMEMStageRegisters.h \
+  ../include/common/Module.h \
+  ../include/common/Control.h \
+  ../include/combinational/mux/IFMux.h \
+  ../include/state/stage-registers/MEMWBStageRegisters.h \
+  ../include/state/RegisterFile.h \
+  ../include/combinational/mux/WBMux.h \
+  ../include/combinational/mux/Mux.h \
+  ../include/state/RegisterFile.h \
+  ../include/common/logger/WBLogger.h \
+  ../include/common/logger/Logger.h \
+  ../include/common/Config.h \
+  ../include/common/StageSynchronizer.h \
+  ../include/state/stage-registers/MEMWBStageRegisters.h \
+  ../include/state/Driver.h \
   /usr/include/c++/11/queue \
   /usr/include/c++/11/deque \
   /usr/include/c++/11/bits/stl_deque.h \
@@ -6987,10 +7186,6 @@ CMakeFiles/RISC_V_Simulator.dir/src/state/stage-registers/IDEXStageRegisters.cpp
   ../include/common/StageSynchronizer.h \
   ../include/common/logger/IFLogger.h \
   ../include/combinational/mux/WBMux.h \
-  ../include/state/RegisterFile.h \
-  ../include/common/logger/WBLogger.h \
-  ../include/common/logger/Logger.h \
-  ../include/common/Config.h \
   ../include/combinational/mux/EXMux.h \
   ../include/combinational/ALU.h \
   ../include/common/Module.h \
@@ -6998,20 +7193,10 @@ CMakeFiles/RISC_V_Simulator.dir/src/state/stage-registers/IDEXStageRegisters.cpp
   ../include/combinational/ALU.h \
   ../include/state/DataMemory.h \
   ../include/state/stage-registers/MEMWBStageRegisters.h \
-  ../include/common/Module.h \
-  ../include/common/Control.h \
-  ../include/state/RegisterFile.h \
-  ../include/combinational/mux/WBMux.h \
-  ../include/common/StageSynchronizer.h \
   ../include/combinational/adder/EXAdder.h \
   ../include/combinational/adder/Adder.h \
   ../include/common/Config.h \
   ../include/state/stage-registers/EXMEMStageRegisters.h \
-  ../include/common/Module.h \
-  ../include/common/Control.h \
-  ../include/combinational/mux/IFMux.h \
-  ../include/state/stage-registers/MEMWBStageRegisters.h \
-  ../include/common/StageSynchronizer.h \
   ../include/combinational/mux/EXMux.h \
   ../include/combinational/ALU.h \
   ../include/state/stage-registers/EXMEMStageRegisters.h \
@@ -7326,12 +7511,25 @@ CMakeFiles/RISC_V_Simulator.dir/src/state/stage-registers/IFIDStageRegisters.cpp
   /usr/include/c++/11/functional \
   /usr/include/c++/11/bits/std_function.h \
   ../include/common/Config.h \
-  ../include/common/logger/IFLogger.h \
+  ../include/state/stage-registers/IFIDStageRegisters.h \
+  ../include/state/stage-registers/IDEXStageRegisters.h \
+  ../include/state/stage-registers/EXMEMStageRegisters.h \
+  ../include/common/Module.h \
+  ../include/common/Control.h \
+  ../include/combinational/mux/IFMux.h \
+  ../include/state/stage-registers/MEMWBStageRegisters.h \
+  ../include/state/RegisterFile.h \
   ../include/combinational/mux/WBMux.h \
+  ../include/combinational/mux/Mux.h \
   ../include/state/RegisterFile.h \
   ../include/common/logger/WBLogger.h \
   ../include/common/logger/Logger.h \
   ../include/common/Config.h \
+  ../include/common/StageSynchronizer.h \
+  ../include/state/stage-registers/MEMWBStageRegisters.h \
+  ../include/state/Driver.h \
+  ../include/common/logger/IFLogger.h \
+  ../include/combinational/mux/WBMux.h \
   ../include/combinational/mux/EXMux.h \
   ../include/combinational/ALU.h \
   ../include/common/Module.h \
@@ -7339,20 +7537,10 @@ CMakeFiles/RISC_V_Simulator.dir/src/state/stage-registers/IFIDStageRegisters.cpp
   ../include/combinational/ALU.h \
   ../include/state/DataMemory.h \
   ../include/state/stage-registers/MEMWBStageRegisters.h \
-  ../include/common/Module.h \
-  ../include/common/Control.h \
-  ../include/state/RegisterFile.h \
-  ../include/combinational/mux/WBMux.h \
-  ../include/common/StageSynchronizer.h \
   ../include/combinational/adder/EXAdder.h \
   ../include/combinational/adder/Adder.h \
   ../include/common/Config.h \
   ../include/state/stage-registers/EXMEMStageRegisters.h \
-  ../include/common/Module.h \
-  ../include/common/Control.h \
-  ../include/combinational/mux/IFMux.h \
-  ../include/state/stage-registers/MEMWBStageRegisters.h \
-  ../include/common/StageSynchronizer.h \
   ../include/combinational/mux/EXMux.h \
   ../include/combinational/ALU.h \
   ../include/state/stage-registers/EXMEMStageRegisters.h \
@@ -7691,6 +7879,11 @@ CMakeFiles/RISC_V_Simulator.dir/src/state/stage-registers/MEMWBStageRegisters.cp
   /usr/include/c++/11/functional \
   /usr/include/c++/11/bits/std_function.h \
   ../include/common/Config.h \
+  ../include/state/stage-registers/IFIDStageRegisters.h \
+  ../include/state/stage-registers/IDEXStageRegisters.h \
+  ../include/state/stage-registers/EXMEMStageRegisters.h \
+  ../include/state/stage-registers/MEMWBStageRegisters.h \
+  ../include/state/Driver.h \
   /usr/include/c++/11/queue \
   /usr/include/c++/11/deque \
   /usr/include/c++/11/bits/stl_deque.h \
@@ -7776,13 +7969,13 @@ CMakeFiles/RISC_V_Simulator.dir/src/state/stage-registers/MEMWBStageRegisters.cp
 
 ../include/combinational/mux/EXMux.h:
 
-../include/common/logger/WBLogger.h:
-
 /usr/include/c++/11/bits/deque.tcc:
 
 /usr/include/c++/11/deque:
 
 /usr/include/c++/11/queue:
+
+../include/common/logger/WBLogger.h:
 
 /usr/include/c++/11/barrier:
 
