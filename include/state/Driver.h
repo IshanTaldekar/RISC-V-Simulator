@@ -36,9 +36,11 @@ public:
 
     void run() override;
     void notifyModuleConditionVariable() override;
-    void setNop();
+    void assertNop();
     void reset();
+    void changeStageAndReset(Stage new_stage);
     void pause();
+    void resume();
 
 private:
     void passProgramCounterToInstructionMemory();
@@ -46,7 +48,6 @@ private:
     void passProgramCounterToIFIDStageRegisters();
 
     void resetStage();
-    void pauseStage();
 };
 
 #endif //RISC_V_SIMULATOR_DRIVER_H
