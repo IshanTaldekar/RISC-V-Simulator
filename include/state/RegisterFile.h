@@ -24,13 +24,14 @@ class RegisterFile: public Module {
     unsigned long register_source1;  // corresponds to the RISC-V rs1 register
 
     unsigned long register_destination;  // corresponds to the RISC-V rd register
-    std::bitset<WORD_BIT_COUNT> write_data;
+    std::bitset<WORD_BIT_COUNT> write_data;  // data to be written to rd
 
     bool is_single_read_register_set;
     bool is_double_read_register_set;
     bool is_write_register_set;
     bool is_reg_write_signal_set;
     bool is_write_data_set;
+    bool is_reset_flag_set;
 
     std::mutex write_load_mutex;
     std::condition_variable load_condition_variable;
@@ -56,9 +57,12 @@ public:
 
     void setRegWriteSignal(bool is_asserted);
 
+    void reset();
+
 private:
     void passReadRegisterDataToIDEXStageRegister();
     void writeDataToRegisterFile();
+    void resetRegisterFileContents();
 };
 
 #endif //RISC_V_SIMULATOR_REGISTERFILE_H

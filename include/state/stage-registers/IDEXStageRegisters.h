@@ -65,7 +65,7 @@ public:
     void setRegisterData(const std::bitset<WORD_BIT_COUNT> &rd1, const std::bitset<WORD_BIT_COUNT> &rd2);
     void setImmediate(const std::bitset<WORD_BIT_COUNT> &imm);
     void setRegisterDestination(unsigned long rd);
-    void setProgramCounter(int pc);
+    void setProgramCounter(unsigned long pc);
     void setControlModule(Control *new_control);
     void setInstruction(Instruction *current_instruction);
     void setNop();
@@ -82,8 +82,6 @@ private:
     void passRegisterDestinationToEXMEMStageRegisters();
     void passReadData2ToEXMEMStageRegisters();
     void passControlToEXMEMStageRegisters();
-
-    void attemptForwarding();
 
     void resetStage();
     void pauseStage();
