@@ -18,13 +18,19 @@ Driver::Driver() {
 }
 
 void Driver::changeStageAndReset(Stage new_stage) {
-    this->logger->log("[Driver] Stage change." );
+    {  // Limit lock guard scope to avoid deadlock
+        std::lock_guard<std::mutex> driver_lock_guard (this->getModuleMutex());
 
-    this->setStage(new_stage);
+        this->logger->log("[Driver] Stage change." );
+        this->setStage(new_stage);
+    }
+
     this->reset();
 }
 
 void Driver::reset() {
+    std::lock_guard<std::mutex> driver_lock_guard (this->getModuleMutex());
+
     this->logger->log("[Driver] Reset flag set.");
 
     this->is_reset_flag_set = true;
@@ -155,7 +161,7 @@ void Driver::notifyModuleConditionVariable() {
     this->getModuleConditionVariable().notify_one();
 }
 
-void Driver::setNop() {
+void Driver::assertNop() {
     std::lock_guard<std::mutex> driver_lock (this->getModuleMutex());
     this->is_nop_asserted = true;
 }

@@ -56,10 +56,12 @@ public:
     void notifyModuleConditionVariable() override;
 
     void setInput(const std::variant<unsigned long, std::string> &input);
-
-    void setNop();
+    void assertNop();
     void reset();
     void pause();
+    void resume();
+    void changeStageAndReset(Stage new_stage);
+
 
 private:
     void passProgramCounterToIDEXStageRegisters();
@@ -67,9 +69,9 @@ private:
     void passReadRegistersToRegisterFile();
     void passInstructionToImmediateGenerator();
     void passRegisterDestinationToIDEXStageRegisters();
+    void log(const std::string &message);
 
     void resetStage();
-    void pauseStage();
 };
 
 #endif //RISC_V_SIMULATOR_IFIDSTAGEREGISTERS_H

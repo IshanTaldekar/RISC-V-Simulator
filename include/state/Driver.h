@@ -36,7 +36,7 @@ public:
 
     void run() override;
     void notifyModuleConditionVariable() override;
-    void setNop();
+    void assertNop();
     void reset();
     void changeStageAndReset(Stage new_stage);
     void pause();
