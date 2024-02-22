@@ -8,14 +8,16 @@
 
 class Instruction;
 class IDEXStageRegisters;
+class IDLogger;
 
 class ImmediateGenerator: public Module {
     static constexpr int WORD_BIT_COUNT = 32;
 
     static ImmediateGenerator *current_instance;
-
     const Instruction *instruction;
+
     IDEXStageRegisters *id_ex_stage_registers;
+    IDLogger *logger;
 
     bool is_instruction_set;
 

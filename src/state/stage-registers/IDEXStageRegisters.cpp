@@ -113,10 +113,6 @@ void IDEXStageRegisters::run() {
 
         this->control->toggleEXStageControlSignals();
 
-        if (this->getStage() == Stage::Five) {
-            this->attemptForwarding();
-        }
-
         this->passProgramCounterToEXAdder();
         this->passReadData1ToALU();
         this->passReadData2ToExMux();
@@ -189,7 +185,7 @@ void IDEXStageRegisters::setRegisterDestination(unsigned long rd) {
     this->notifyModuleConditionVariable();
 }
 
-void IDEXStageRegisters::setProgramCounter(int pc) {
+void IDEXStageRegisters::setProgramCounter(unsigned long pc) {
     this->stage_synchronizer->conditionalArriveFiveStage();
 
     std::lock_guard<std::mutex> id_ex_stage_registers_lock (this->getModuleMutex());
