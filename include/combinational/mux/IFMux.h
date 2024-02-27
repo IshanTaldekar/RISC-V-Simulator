@@ -1,7 +1,7 @@
 #ifndef RISC_V_SIMULATOR_IFMUX_H
 #define RISC_V_SIMULATOR_IFMUX_H
 
-#include "Mux.h"
+#include "MuxBase.h"
 #include "../../state/Driver.h"
 #include "../../common/Config.h"
 #include "../../common/logger/IFLogger.h"
@@ -11,7 +11,7 @@
 class Driver;
 class IFLogger;
 
-class IFMux: protected Mux {
+class IFMux: protected MuxBase {
     unsigned long incremented_pc;
     unsigned long branched_pc;
 
@@ -32,7 +32,7 @@ public:
 
     void run() override;
     void notifyModuleConditionVariable() override;
-    void setInput(StageMuxInputType type, unsigned long value) override;
+    void setInput(MuxInputType type, unsigned long value) override;
     void assertControlSignal(bool is_asserted) override;
 
 protected:

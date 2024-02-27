@@ -26,6 +26,9 @@ EXMEMStageRegisters::EXMEMStageRegisters() {
     this->mem_wb_stage_registers = MEMWBStageRegisters::init();
     this->if_mux = IFMux::init();
     this->stage_synchronizer = StageSynchronizer::init();
+    this->alu_input_1_forwarding_mux = ALUInput1ForwardingMux::init();
+    this->alu_input_2_forwarding_mux = ALUInput2ForwardingMux::init();
+    this->forwarding_unit = ForwardingUnit::init();
 }
 
 void EXMEMStageRegisters::reset() {
@@ -123,6 +126,9 @@ void EXMEMStageRegisters::run() {
         this->passWriteDataToDataMemory();
         this->passALUResultToDataMemory();
         this->passBranchedAddressToIFMux();
+        this->passALUResultToALUInput1ForwardingMux();
+        this->passALUResultToALUInput2ForwardingMux();
+        this->passRegisterDestinationToForwardingUnit();
 
         std::thread pass_alu_result_thread (&EXMEMStageRegisters::passALUResultToMEMWBStageRegisters, this);
         std::thread pass_register_destination_thread (&EXMEMStageRegisters::passRegisterDestinationToMEMWBStageRegisters, this);
@@ -236,11 +242,14 @@ void EXMEMStageRegisters::setNop() {
     this->is_nop_asserted = true;
 }
 
-unsigned long EXMEMStageRegisters::getRegisterDestination() {
-    std::lock_guard<std::mutex> ex_mem_stage_registers_lock (this->getModuleMutex());
-    return this->register_destination;
+void EXMEMStageRegisters::passALUResultToALUInput1ForwardingMux() {
+    this->alu_input_1_forwarding_mux->setInput(ALUInputMuxInputTypes::EXMEMStageRegisters, this->alu_result);
 }
 
-unsigned long EXMEMStageRegisters::getRegisterDestinationData() {
-    std::lock_guard<std::mutex> ex_mem_stage_registers_lock (this->getModuleMutex());
+void EXMEMStageRegisters::passALUResultToALUInput2ForwardingMux() {
+    this->alu_input_2_forwarding_mux->setInput(ALUInputMuxInputTypes::EXMEMStageRegisters, this->alu_result);
+}
+
+void EXMEMStageRegisters::passRegisterDestinationToForwardingUnit() {
+    this->forwarding_unit->setEXMEMStageRegisterDestination(this->register_destination);
 }

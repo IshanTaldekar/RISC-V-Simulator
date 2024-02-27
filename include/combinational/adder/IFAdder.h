@@ -1,7 +1,7 @@
 #ifndef RISC_V_SIMULATOR_IFADDER_H
 #define RISC_V_SIMULATOR_IFADDER_H
 
-#include "Adder.h"
+#include "AdderBase.h"
 #include "../../common/Config.h"
 #include "../mux/IFMux.h"
 #include "../../common/logger/IFLogger.h"
@@ -9,7 +9,7 @@
 class IFMux;
 class IFLogger;
 
-class IFAdder: protected Adder {
+class IFAdder: protected AdderBase {
     unsigned long program_counter;
     bool is_program_counter_set;
 

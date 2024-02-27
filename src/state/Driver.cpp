@@ -115,7 +115,7 @@ void Driver::run() {
             continue;
         }
 
-        this->logger->log("[Driver] Woken up and acquired lock. Passing values to Adder and InstructionMemory.");
+        this->logger->log("[Driver] Woken up and acquired lock. Passing values to AdderBase and InstructionMemory.");
 
         this->passProgramCounterToAdder();
         this->passProgramCounterToInstructionMemory();

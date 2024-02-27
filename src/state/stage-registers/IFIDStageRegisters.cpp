@@ -122,11 +122,14 @@ void IFIDStageRegisters::run() {
         this->instruction = new Instruction(this->instruction_bits);
         this->control = new Control(this->instruction);
 
+        // Popup threads to pass data because barrier will have them sleep until synchronization condition is met
         std::thread pass_control_thread (&IFIDStageRegisters::passControlToIDEXStageRegisters, this);
         std::thread pass_program_counter_thread (&IFIDStageRegisters::passProgramCounterToIDEXStageRegisters, this);
         std::thread pass_read_registers_thread (&IFIDStageRegisters::passReadRegistersToRegisterFile, this);
         std::thread pass_instruction_thread (&IFIDStageRegisters::passInstructionToImmediateGenerator, this);
         std::thread pass_register_destination_thread (&IFIDStageRegisters::passRegisterDestinationToIDEXStageRegisters, this);
+        std::thread pass_register_source1_thread (&IFIDStageRegisters::passRegisterSource1ToIDEXStageRegisters, this);
+        std::thread pass_register_source2_thread (&IFIDStageRegisters::passRegisterSource2ToIDEXStageRegisters, this);
 
         // Join to avoid the values being overridden before the threads have a chance to execute.
         pass_control_thread.join();
@@ -134,6 +137,8 @@ void IFIDStageRegisters::run() {
         pass_read_registers_thread.join();
         pass_instruction_thread.join();
         pass_register_destination_thread.join();
+        pass_register_source1_thread.join();
+        pass_register_source2_thread.join();
 
         this->is_instruction_set = false;
         this->is_program_counter_set = false;
@@ -213,4 +218,12 @@ void IFIDStageRegisters::assertNop() {
 void IFIDStageRegisters::log(const std::string &message) {
     this->id_logger->log(message);
     this->if_logger->log(message);
+}
+
+void IFIDStageRegisters::passRegisterSource1ToIDEXStageRegisters() {
+    this->id_ex_stage_registers->setRegisterSource1(this->instruction->getRs1().to_ulong());
+}
+
+void IFIDStageRegisters::passRegisterSource2ToIDEXStageRegisters() {
+    this->id_ex_stage_registers->setRegisterSource2(this->instruction->getRs2().to_ulong());
 }

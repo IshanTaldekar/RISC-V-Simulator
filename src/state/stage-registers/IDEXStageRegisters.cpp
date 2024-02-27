@@ -6,6 +6,8 @@ IDEXStageRegisters::IDEXStageRegisters() {
     this->instruction = new Instruction(std::string(32, '0'));
     this->control = new Control(this->instruction);
 
+    this->register_source1 = 0UL;
+    this->register_source2 = 0UL;
     this->register_destination = 0UL;
     this->program_counter = 0UL;
 
@@ -18,10 +20,13 @@ IDEXStageRegisters::IDEXStageRegisters() {
     this->is_nop_asserted = false;
     this->is_reset_flag_set = false;
     this->is_pause_flag_set = false;
+    this->is_register_source1_set = false;
+    this->is_register_source2_set = false;
 
-    this->ex_mux = EXMux::init();
+    this->ex_mux_alu_input_1 = EXMuxALUInput1::init();
+    this->ex_mux_alu_input_2 = EXMuxALUInput2::init();
     this->ex_adder = EXAdder::init();
-    this->alu = ALU::init();
+    this->forwarding_unit = ForwardingUnit::init();
     this->ex_mem_stage_register = EXMEMStageRegisters::init();
     this->stage_synchronizer = StageSynchronizer::init();
 }
@@ -39,6 +44,8 @@ void IDEXStageRegisters::resetStage() {
         this->is_register_destination_set = false;
         this->is_program_counter_set = false;
         this->is_control_set = false;
+        this->is_register_source1_set = false;
+        this->is_register_source2_set = false;
     } else {
         this->is_single_read_register_data_set = true;
         this->is_double_read_register_data_set = true;
@@ -46,10 +53,14 @@ void IDEXStageRegisters::resetStage() {
         this->is_register_destination_set = true;
         this->is_program_counter_set = true;
         this->is_control_set = true;
+        this->is_register_source1_set = true;
+        this->is_register_source2_set = true;
     }
 
     this->program_counter = 0UL;
     this->register_destination = 0UL;
+    this->register_source1 = 0UL;
+    this->register_source2 = 0UL;
 
     this->is_nop_asserted = false;
     this->is_reset_flag_set = false;
@@ -88,8 +99,8 @@ void IDEXStageRegisters::run() {
                 [this] {
                     return ((this->is_single_read_register_data_set || this->is_double_read_register_data_set) &&
                            this->is_program_counter_set && this->is_register_destination_set &&
-                           this->is_immediate_set && this->is_control_set) || this->is_reset_flag_set ||
-                           this->is_pause_flag_set;
+                           this->is_immediate_set && this->is_control_set && this->is_register_source1_set &&
+                           this->is_register_source2_set) || this->is_reset_flag_set || this->is_pause_flag_set;
                 }
         );
 
@@ -114,14 +125,21 @@ void IDEXStageRegisters::run() {
         this->control->toggleEXStageControlSignals();
 
         this->passProgramCounterToEXAdder();
-        this->passReadData1ToALU();
-        this->passReadData2ToExMux();
-        this->passImmediateToEXMux();
+        this->passProgramCounterToEXMuxALUInput1();
+        this->passReadData1ToExMuxALUInput1();
+        this->passReadData2ToExMuxALUInput2();
+        this->passImmediateToEXMuxALUInput2();
         this->passImmediateToEXAdder();
 
         std::thread pass_register_destination_thread (&IDEXStageRegisters::passRegisterDestinationToEXMEMStageRegisters, this);
         std::thread pass_read_data2_thread (&IDEXStageRegisters::passReadData2ToEXMEMStageRegisters, this);
         std::thread pass_control_thread (&IDEXStageRegisters::passControlToEXMEMStageRegisters, this);
+        std::thread pass_register_sources_thread (&IDEXStageRegisters::passRegisterSourceToForwardingUnit, this);
+
+        pass_register_destination_thread.join();
+        pass_read_data2_thread.join();
+        pass_control_thread.join();
+        pass_register_sources_thread.join();
 
         this->is_single_read_register_data_set = false;
         this->is_double_read_register_data_set = false;
@@ -130,6 +148,8 @@ void IDEXStageRegisters::run() {
         this->is_program_counter_set = false;
         this->is_control_set = false;
         this->is_nop_asserted = false;
+        this->is_register_source1_set = false;
+        this->is_register_source2_set = false;
 
         this->stage_synchronizer->conditionalArriveSingleStage();
     }
@@ -224,16 +244,20 @@ void IDEXStageRegisters::passProgramCounterToEXAdder() {
     this->ex_adder->setInput(EXAdderInputType::PCValue, this->program_counter);
 }
 
-void IDEXStageRegisters::passReadData1ToALU() {
-    this->alu->setInput1(this->read_data_1.to_ulong());
+void IDEXStageRegisters::passProgramCounterToEXMuxALUInput1() {
+    this->ex_mux_alu_input_1->setInput(EXStageMuxALUInput1InputType::ProgramCounter, this->program_counter);
 }
 
-void IDEXStageRegisters::passReadData2ToExMux() {
-    this->ex_mux->setInput(EXStageMuxInputType::ReadData2, this->read_data_2.to_ulong());
+void IDEXStageRegisters::passReadData1ToExMuxALUInput1() {
+    this->ex_mux_alu_input_1->setInput(EXStageMuxALUInput1InputType::ReadData1, this->read_data_1.to_ulong());
 }
 
-void IDEXStageRegisters::passImmediateToEXMux() {
-    this->ex_mux->setInput(EXStageMuxInputType::ImmediateValue, this->immediate.to_ulong());
+void IDEXStageRegisters::passReadData2ToExMuxALUInput2() {
+    this->ex_mux_alu_input_2->setInput(EXStageMuxALUInput2InputType::ReadData2, this->read_data_2.to_ulong());
+}
+
+void IDEXStageRegisters::passImmediateToEXMuxALUInput2() {
+    this->ex_mux_alu_input_2->setInput(EXStageMuxALUInput2InputType::ImmediateValue, this->immediate.to_ulong());
 }
 
 void IDEXStageRegisters::passImmediateToEXAdder() {
@@ -252,6 +276,28 @@ void IDEXStageRegisters::passControlToEXMEMStageRegisters() {
     this->ex_mem_stage_register->setControl(this->control);
 }
 
-void IDEXStageRegisters::setNop() {
+void IDEXStageRegisters::assertNop() {
     this->is_nop_asserted = true;
+}
+
+void IDEXStageRegisters::setRegisterSource1(unsigned long rs1) {
+    std::lock_guard<std::mutex> id_ex_stage_registers_lock (this->getModuleMutex());
+
+    this->register_source1 = rs1;
+    this->is_register_source1_set = true;
+}
+
+void IDEXStageRegisters::setRegisterSource2(unsigned long rs2) {
+    std::lock_guard<std::mutex> id_ex_stage_registers_lock (this->getModuleMutex());
+
+    this->register_source2 = rs2;
+    this->is_register_source2_set = true;
+}
+
+void IDEXStageRegisters::passRegisterSourceToForwardingUnit() {
+    if (this->is_single_read_register_data_set) {
+        this->forwarding_unit->setSingleRegisterSource(this->register_source1);
+    } else {
+        this->forwarding_unit->setDoubleRegisterSource(this->register_source1, this->register_source2);
+    }
 }

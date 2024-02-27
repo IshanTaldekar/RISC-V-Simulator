@@ -5,7 +5,7 @@ Control::Control(const Instruction *current_instruction) {
 
     this->register_file = RegisterFile::init();
     this->if_mux = IFMux::init();
-    this->ex_mux = EXMux::init();
+    this->ex_mux = EXMuxALUInput2::init();
     this->alu = ALU::init();
     this->data_memory = DataMemory::init();
     this->wb_mux = WBMux::init();

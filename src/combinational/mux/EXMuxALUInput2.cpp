@@ -1,28 +1,28 @@
-#include "../../../include/combinational/mux/EXMux.h"
+#include "../../../include/combinational/mux/EXMuxALUInput2.h"
 
-EXMux *EXMux::current_instance = nullptr;
+EXMuxALUInput2 *EXMuxALUInput2::current_instance = nullptr;
 
-EXMux::EXMux() {
+EXMuxALUInput2::EXMuxALUInput2() {
     this->immediate = -1;
     this->read_data_2 = -1;
 
     this->is_alu_src_asserted = false;
 
-    this->alu = ALU::init();
-
     this->is_immediate_set = false;
     this->is_read_data_2_set = false;
+
+    this->alu_input_2_forwarding_mux = ALUInput2ForwardingMux::init();
 }
 
-EXMux *EXMux::init() {
-    if (EXMux::current_instance == nullptr) {
-        EXMux::current_instance = new EXMux();
+EXMuxALUInput2 *EXMuxALUInput2::init() {
+    if (EXMuxALUInput2::current_instance == nullptr) {
+        EXMuxALUInput2::current_instance = new EXMuxALUInput2();
     }
 
-    return EXMux::current_instance;
+    return EXMuxALUInput2::current_instance;
 }
 
-void EXMux::run() {
+void EXMuxALUInput2::run() {
     while (this->isAlive()) {
         std::unique_lock<std::mutex> ex_mux_lock (this->getModuleMutex());
         this->getModuleConditionVariable().wait(
@@ -44,21 +44,21 @@ void EXMux::run() {
     }
 }
 
-void EXMux::notifyModuleConditionVariable() {
+void EXMuxALUInput2::notifyModuleConditionVariable() {
     this->getModuleConditionVariable().notify_one();
 }
 
-void EXMux::setInput(StageMuxInputType type, unsigned long value) {
-    if (!std::holds_alternative<EXStageMuxInputType>(type)) {
-        std::cerr << "Incorrect StageMuxInputType passed to EXMux" << std::endl;
+void EXMuxALUInput2::setInput(MuxInputType type, unsigned long value) {
+    if (!std::holds_alternative<EXStageMuxALUInput2InputType>(type)) {
+        std::cerr << "Incorrect MuxInputType passed to EXMuxALUInput2" << std::endl;
     }
 
     std::lock_guard<std::mutex> ex_mux_lock (this->getModuleMutex());
 
-    if (std::get<EXStageMuxInputType>(type) == EXStageMuxInputType::ReadData2) {
+    if (std::get<EXStageMuxALUInput2InputType>(type) == EXStageMuxALUInput2InputType::ReadData2) {
         this->read_data_2 = value;
         this->is_read_data_2_set = true;
-    } else if (std::get<EXStageMuxInputType>(type) == EXStageMuxInputType::ImmediateValue) {
+    } else if (std::get<EXStageMuxALUInput2InputType>(type) == EXStageMuxALUInput2InputType::ImmediateValue) {
         this->immediate = value;
         this->is_immediate_set = true;
     }
@@ -66,7 +66,7 @@ void EXMux::setInput(StageMuxInputType type, unsigned long value) {
     this->notifyModuleConditionVariable();
 }
 
-void EXMux::assertControlSignal(bool is_asserted) {
+void EXMuxALUInput2::assertControlSignal(bool is_asserted) {
     std::lock_guard<std::mutex> ex_mux_lock (this->getModuleMutex());
 
     this->is_alu_src_asserted = is_asserted;
@@ -75,10 +75,10 @@ void EXMux::assertControlSignal(bool is_asserted) {
     this->notifyModuleConditionVariable();
 }
 
-void EXMux::passOutput() {
+void EXMuxALUInput2::passOutput() {
     if (this->is_alu_src_asserted) {
-        this->alu->setInput2(this->immediate);
+        this->alu_input_2_forwarding_mux->setInput(ALUInputMuxInputTypes::IDEXStageRegisters, this->immediate);
     } else {
-        this->alu->setInput2(this->read_data_2);
+        this->alu_input_2_forwarding_mux->setInput(ALUInputMuxInputTypes::IDEXStageRegisters, this->read_data_2);
     }
 }

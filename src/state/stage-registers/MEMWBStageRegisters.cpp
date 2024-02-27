@@ -92,6 +92,7 @@ void MEMWBStageRegisters::run() {
 
         this->passReadDataToWBMux();
         this->passALUResultToWBMux();
+        this->passRegisterDestinationToForwardingUnit();
 
         this->passRegisterDestinationToRegisterFile();
 
@@ -151,4 +152,8 @@ void MEMWBStageRegisters::passReadDataToWBMux() {
 
 void MEMWBStageRegisters::passRegisterDestinationToRegisterFile() {
     this->register_file->setWriteRegister(this->register_destination);
+}
+
+void MEMWBStageRegisters::passRegisterDestinationToForwardingUnit() {
+    this->forwarding_unit->setMEMWBStageRegisterDestination(this->register_destination);
 }

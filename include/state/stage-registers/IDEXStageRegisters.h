@@ -5,20 +5,23 @@
 #include "../../common/Instruction.h"
 #include "../../common/Control.h"
 #include "../../combinational/adder/EXAdder.h"
-#include "../../combinational/mux/EXMux.h"
+#include "../../combinational/mux/EXMuxALUInput1.h"
+#include "../../combinational/mux/EXMuxALUInput2.h"
 #include "../../combinational/ALU.h"
 #include "EXMEMStageRegisters.h"
 #include "../../common/StageSynchronizer.h"
+#include "../../combinational/ForwardingUnit.h"
 
 #include <bitset>
 
 class Control;
 class Instruction;
-class EXMux;
+class EXMuxALUInput2;
+class EXMuxALUInput1;
 class EXAdder;
-class ALU;
 class EXMEMStageRegisters;
 class StageSynchronizer;
+class ForwardingUnit;
 
 class IDEXStageRegisters: public Module {
     static constexpr int WORD_BIT_COUNT = 32;
@@ -30,6 +33,8 @@ class IDEXStageRegisters: public Module {
     std::bitset<WORD_BIT_COUNT> read_data_2;
     std::bitset<WORD_BIT_COUNT> immediate;
 
+    unsigned long register_source1;
+    unsigned long register_source2;
     unsigned long register_destination;
     unsigned long program_counter;
 
@@ -39,6 +44,8 @@ class IDEXStageRegisters: public Module {
     bool is_double_read_register_data_set;
     bool is_immediate_set;
     bool is_register_destination_set;
+    bool is_register_source1_set;
+    bool is_register_source2_set;
     bool is_program_counter_set;
     bool is_control_set;
 
@@ -46,12 +53,12 @@ class IDEXStageRegisters: public Module {
     bool is_reset_flag_set;
     bool is_pause_flag_set;
 
-    EXMux *ex_mux;
+    EXMuxALUInput2 *ex_mux_alu_input_2;
+    EXMuxALUInput1 *ex_mux_alu_input_1;
     EXAdder *ex_adder;
-    ALU *alu;
     EXMEMStageRegisters *ex_mem_stage_register;
-    MEMWBStageRegisters *mem_wb_stage_register;
     StageSynchronizer *stage_synchronizer;
+    ForwardingUnit *forwarding_unit;
 
 public:
     IDEXStageRegisters();
@@ -67,21 +74,26 @@ public:
     void setRegisterDestination(unsigned long rd);
     void setProgramCounter(unsigned long pc);
     void setControlModule(Control *new_control);
+    void setRegisterSource1(unsigned long rs1);
+    void setRegisterSource2(unsigned long rs2);
+
     void setInstruction(Instruction *current_instruction);
-    void setNop();
+    void assertNop();
 
     void reset();
     void pause();
 
 private:
     void passProgramCounterToEXAdder();
-    void passReadData1ToALU();
-    void passReadData2ToExMux();
-    void passImmediateToEXMux();
+    void passProgramCounterToEXMuxALUInput1();
+    void passReadData1ToExMuxALUInput1();
+    void passReadData2ToExMuxALUInput2();
+    void passImmediateToEXMuxALUInput2();
     void passImmediateToEXAdder();
     void passRegisterDestinationToEXMEMStageRegisters();
     void passReadData2ToEXMEMStageRegisters();
     void passControlToEXMEMStageRegisters();
+    void passRegisterSourceToForwardingUnit();
 
     void resetStage();
     void pauseStage();

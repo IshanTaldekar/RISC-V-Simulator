@@ -20,9 +20,14 @@ enum class IFStageMuxInputType {
     BranchedPc
 };
 
-enum class EXStageMuxInputType {
+enum class EXStageMuxALUInput2InputType {
     ReadData2 = 0,
     ImmediateValue
+};
+
+enum class EXStageMuxALUInput1InputType {
+    ProgramCounter = 0,
+    ReadData1
 };
 
 enum class WBStageMuxInputType {
@@ -35,11 +40,19 @@ enum class Stage {
     Five
 };
 
+enum class ALUInputMuxInputTypes {
+    IDEXStageRegisters = 0,
+    EXMEMStageRegisters,
+    MEMWBStageRegisters
+};
+
+
 /**
- * StageMuxInputType can hold either the value of IFStageMuxInputType, EXStageMuxInputType,
+ * MuxInputType can hold either the value of IFStageMuxInputType, EXStageMuxALUInput2InputType,
  * WBStageMuxInputType.
  * */
-using StageMuxInputType = std::variant<IFStageMuxInputType, EXStageMuxInputType, WBStageMuxInputType>;
+using MuxInputType = std::variant<IFStageMuxInputType, EXStageMuxALUInput2InputType, EXStageMuxALUInput1InputType,
+                                    WBStageMuxInputType, ALUInputMuxInputTypes>;
 
 enum class InstructionType {
     R = 0,
@@ -56,5 +69,12 @@ const std::string ID_STAGE_LOG_FILE_PATH = "../logs/IDStage.log";
 const std::string EX_STAGE_LOG_FILE_PATH = "../logs/EXStage.log";
 const std::string MEM_STAGE_LOG_FILE_PATH = "../logs/MEMStage.log";
 const std::string WB_STAGE_LOG_FILE_PATH = "../logs/MEMStage.log";
+
+enum class ALUInputMuxControlSignals {
+    IDEXStageRegisters = 0,
+    EXMEMStageRegisters,
+    MEMWBStageRegisters
+};
+
 
 #endif //RISC_V_SIMULATOR_CONFIG_H

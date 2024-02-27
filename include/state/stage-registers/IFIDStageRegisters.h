@@ -69,8 +69,10 @@ private:
     void passReadRegistersToRegisterFile();
     void passInstructionToImmediateGenerator();
     void passRegisterDestinationToIDEXStageRegisters();
-    void log(const std::string &message);
+    void passRegisterSource1ToIDEXStageRegisters();
+    void passRegisterSource2ToIDEXStageRegisters();
 
+    void log(const std::string &message);
     void resetStage();
 };
 

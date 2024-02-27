@@ -1,7 +1,7 @@
 #ifndef RISC_V_SIMULATOR_EXADDER_H
 #define RISC_V_SIMULATOR_EXADDER_H
 
-#include "Adder.h"
+#include "AdderBase.h"
 #include "../../common/Config.h"
 #include "../../state/stage-registers/EXMEMStageRegisters.h"
 
@@ -10,7 +10,7 @@
 
 class EXMEMStageRegisters;
 
-class EXAdder: protected Adder {
+class EXAdder: protected AdderBase {
     static constexpr int WORD_BIT_COUNT = 32;
 
     unsigned long program_counter;

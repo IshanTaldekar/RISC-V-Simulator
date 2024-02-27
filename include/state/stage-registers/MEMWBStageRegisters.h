@@ -6,11 +6,13 @@
 #include "../../state/RegisterFile.h"
 #include "../../combinational/mux/WBMux.h"
 #include "../../common/StageSynchronizer.h"
+#include "../../combinational/ForwardingUnit.h"
 
 class Control;
 class RegisterFile;
 class WBMux;
 class StageSynchronizer;
+class ForwardingUnit;
 
 class MEMWBStageRegisters: public Module {
     unsigned long read_data;
@@ -31,6 +33,7 @@ class MEMWBStageRegisters: public Module {
     RegisterFile *register_file;
     WBMux *wb_mux;
     StageSynchronizer *stage_synchronizer;
+    ForwardingUnit *forwarding_unit;
 
 public:
     MEMWBStageRegisters();
@@ -51,6 +54,7 @@ private:
     void passReadDataToWBMux();
     void passALUResultToWBMux();
     void passRegisterDestinationToRegisterFile();
+    void passRegisterDestinationToForwardingUnit();
 
     void resetStage();
     void pauseStage();

@@ -6,12 +6,20 @@
 #include "../../combinational/mux/IFMux.h"
 #include "MEMWBStageRegisters.h"
 #include "../../common/StageSynchronizer.h"
+#include "../../combinational/mux/forwarding/ALUInput1ForwardingMux.h"
+#include "../../combinational/mux/forwarding/ALUInput2ForwardingMux.h"
+#include "../../combinational/ForwardingUnit.h"
+#include "../../common/Config.h"
+
 
 class Control;
 class DataMemory;
 class MEMWBStageRegisters;
 class IFMux;
 class StageSynchronizer;
+class ALUInput1ForwardingMux;
+class ALUInput2ForwardingMux;
+class ForwardingUnit;
 
 class EXMEMStageRegisters: public Module {
     unsigned long branch_program_counter;
@@ -36,6 +44,9 @@ class EXMEMStageRegisters: public Module {
     MEMWBStageRegisters *mem_wb_stage_registers;
     IFMux *if_mux;
     StageSynchronizer *stage_synchronizer;
+    ALUInput1ForwardingMux *alu_input_1_forwarding_mux;
+    ALUInput2ForwardingMux *alu_input_2_forwarding_mux;
+    ForwardingUnit *forwarding_unit;
 
     static EXMEMStageRegisters *current_instance;
 
@@ -55,17 +66,17 @@ public:
     void setControl(Control *new_control);
     void setNop();
 
-    unsigned long getRegisterDestination();
-    unsigned long getRegisterDestinationData();
-
     void reset();
     void pause();
 
 private:
     void passALUResultToDataMemory();
+    void passALUResultToALUInput1ForwardingMux();
+    void passALUResultToALUInput2ForwardingMux();
     void passALUResultToMEMWBStageRegisters();
     void passWriteDataToDataMemory();
     void passRegisterDestinationToMEMWBStageRegisters();
+    void passRegisterDestinationToForwardingUnit();
     void passBranchedAddressToIFMux();
 
     void resetStage();

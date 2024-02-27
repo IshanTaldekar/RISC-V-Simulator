@@ -1,10 +1,10 @@
 #ifndef RISC_V_SIMULATOR_IFLOGGER_H
 #define RISC_V_SIMULATOR_IFLOGGER_H
 
-#include "Logger.h"
+#include "LoggerBase.h"
 #include "../Config.h"
 
-class IFLogger: protected Logger {
+class IFLogger: protected LoggerBase {
     static IFLogger *current_instance;
 
 public:

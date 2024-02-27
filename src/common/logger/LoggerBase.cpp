@@ -1,6 +1,6 @@
-#include "../../../include/common/logger/Logger.h"
+#include "../../../include/common/logger/LoggerBase.h"
 
-void Logger::openFile() {
+void LoggerBase::openFile() {
     try {
         this->log_file.open(this->log_file_path);
     } catch (const std::ios_base::failure &error) {

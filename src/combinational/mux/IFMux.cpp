@@ -40,7 +40,7 @@ void IFMux::run() {
             break;
         }
 
-        this->logger->log("[IFMux] Woken up and acquired lock. Loading output");
+        this->logger->log("[IFMux] Woken up and acquired lock. Passing output.");
 
         this->passOutput();
 
@@ -49,13 +49,13 @@ void IFMux::run() {
         this->is_incremented_pc_set = false;
         this->is_control_signal_set = false;
 
-        this->logger->log("[IFMux] Woken up and acquired lock. Loading output");
+        this->logger->log("[IFMux] Passing output.");
     }
 }
 
-void IFMux::setInput(StageMuxInputType type, unsigned long value) {
+void IFMux::setInput(MuxInputType type, unsigned long value) {
     if (!std::holds_alternative<IFStageMuxInputType>(type)) {
-        throw std::runtime_error("StageMuxInputType passed to IFMux not compatible with IFStageMuxInputTypes");
+        throw std::runtime_error("MuxInputType passed to IFMux not compatible with IFStageMuxInputTypes");
     }
 
     this->logger->log("[IFMux] setInput waiting to acquire lock");
@@ -73,7 +73,7 @@ void IFMux::setInput(StageMuxInputType type, unsigned long value) {
 
         this->logger->log("[IFMux] branched PC value set");
     } else {
-        throw std::runtime_error("IFMux::setInput did not match any input type");
+        throw std::runtime_error("IFMux::setInput did not match any input type.");
     }
 
     this->notifyModuleConditionVariable();

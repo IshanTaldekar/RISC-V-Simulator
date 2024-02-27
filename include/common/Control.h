@@ -6,7 +6,7 @@
 #include "../state/RegisterFile.h"
 #include "../combinational/mux/IFMux.h"
 #include "../combinational/mux/WBMux.h"
-#include "../combinational/mux/EXMux.h"
+#include "../combinational/mux/EXMuxALUInput2.h"
 #include "../combinational/ALU.h"
 #include "../state/DataMemory.h"
 
@@ -14,7 +14,7 @@
 
 class RegisterFile;
 class IFMux;
-class EXMux;
+class EXMuxALUInput2;
 class ALU;
 class DataMemory;
 class WBMux;
@@ -28,7 +28,7 @@ private:
 
     RegisterFile *register_file;
     IFMux *if_mux;
-    EXMux *ex_mux;
+    EXMuxALUInput2 *ex_mux;
     ALU *alu;
     DataMemory *data_memory;
     WBMux *wb_mux;

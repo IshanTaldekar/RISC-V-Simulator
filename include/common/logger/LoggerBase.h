@@ -1,12 +1,12 @@
-#ifndef RISC_V_SIMULATOR_LOGGER_H
-#define RISC_V_SIMULATOR_LOGGER_H
+#ifndef RISC_V_SIMULATOR_LOGGERBASE_H
+#define RISC_V_SIMULATOR_LOGGERBASE_H
 
 #include <string>
 #include <mutex>
 #include <fstream>
 #include <iostream>
 
-class Logger {
+class LoggerBase {
 protected:
     std::string log_file_path;
     std::ofstream log_file;
@@ -15,4 +15,4 @@ protected:
     void openFile();
 };
 
-#endif //RISC_V_SIMULATOR_LOGGER_H
+#endif //RISC_V_SIMULATOR_LOGGERBASE_H

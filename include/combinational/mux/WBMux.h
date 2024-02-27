@@ -1,14 +1,18 @@
 #ifndef RISC_V_SIMULATOR_WBMUX_H
 #define RISC_V_SIMULATOR_WBMUX_H
 
-#include "Mux.h"
+#include "MuxBase.h"
 #include "../../state/RegisterFile.h"
 #include "../../common/logger/WBLogger.h"
+#include "forwarding/ALUInput1ForwardingMux.h"
+#include "forwarding/ALUInput2ForwardingMux.h"
 
+class ALUInput1ForwardingMux;
+class ALUInput2ForwardingMux;
 class RegisterFile;
 class WBLogger;
 
-class WBMux: protected Mux {
+class WBMux: protected MuxBase {
     unsigned int read_data;
     unsigned int alu_result;
 
@@ -22,6 +26,8 @@ class WBMux: protected Mux {
     RegisterFile *register_file;
 
     WBLogger *logger;
+    ALUInput1ForwardingMux *alu_input_1_forwarding_mux;
+    ALUInput2ForwardingMux *alu_input_2_forwarding_mux;
 
 public:
     WBMux();
@@ -30,11 +36,12 @@ public:
 
     void run() override;
     void notifyModuleConditionVariable() override;
-    void setInput(StageMuxInputType type, unsigned long value) override;
+    void setInput(MuxInputType type, unsigned long value) override;
     void assertControlSignal(bool is_asserted) override;
 
 protected:
     void passOutput() override;
+    void passOutputToForwardingUnit();
 };
 
 #endif //RISC_V_SIMULATOR_WBMUX_H
