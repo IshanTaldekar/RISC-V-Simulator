@@ -64,7 +64,7 @@ public:
     void setReadData2(unsigned long value);
     void setRegisterDestination(unsigned long value);
     void setControl(Control *new_control);
-    void setNop();
+    void assertNop();
 
     void reset();
     void pause();

@@ -60,7 +60,7 @@ public:
     void reset();
     void pause();
     void resume();
-    void changeStageAndReset(Stage new_stage);
+    void changeStageAndReset(PipelineType new_stage);
 
 
 private:

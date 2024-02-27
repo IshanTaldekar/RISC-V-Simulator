@@ -27,7 +27,7 @@ void MEMWBStageRegisters::reset() {
 }
 
 void MEMWBStageRegisters::resetStage() {
-    if (this->getStage() == Stage::Single) {
+    if (this->getStage() == PipelineType::Single) {
         this->is_read_data_set = false;
         this->is_alu_result_set = false;
         this->is_register_destination_set = false;

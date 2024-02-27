@@ -10,6 +10,7 @@ EXMuxALUInput1::EXMuxALUInput1() {
     this->is_read_data_1_set = false;
 
     this->is_pass_program_counter_flag_asserted = false;
+    this->is_pass_program_counter_flag_set = false;
 
     this->alu_input_1_forwarding_mux = ALUInput1ForwardingMux::init();
 }
@@ -29,7 +30,7 @@ void EXMuxALUInput1::run() {
                 ex_mux_lock,
                 [this] {
                     return this->is_program_counter_set && this->is_read_data_1_set &&
-                        this->is_pass_program_counter_flag_asserted;
+                        this->is_pass_program_counter_flag_set;
                 }
         );
 
@@ -68,12 +69,7 @@ void EXMuxALUInput1::setInput(MuxInputType type, unsigned long value) {
 }
 
 void EXMuxALUInput1::assertControlSignal(bool is_asserted) {
-    std::lock_guard<std::mutex> ex_mux_lock (this->getModuleMutex());
-
-    this->is_pass_program_counter_flag_asserted = is_asserted;
     this->is_control_signal_set = true;
-
-    this->notifyModuleConditionVariable();
 }
 
 void EXMuxALUInput1::passOutput() {
@@ -82,4 +78,13 @@ void EXMuxALUInput1::passOutput() {
     } else {
         this->alu_input_1_forwarding_mux->setInput(ALUInputMuxInputTypes::IDEXStageRegisters, this->read_data_1);
     }
+}
+
+void EXMuxALUInput1::assertJALCustomControlSignal(bool is_asserted) {
+    std::lock_guard<std::mutex> ex_mux_lock (this->getModuleMutex());
+
+    this->is_pass_program_counter_flag_asserted = is_asserted;
+    this->is_pass_program_counter_flag_set = true;
+
+    this->notifyModuleConditionVariable();
 }

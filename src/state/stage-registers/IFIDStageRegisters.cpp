@@ -24,11 +24,11 @@ IFIDStageRegisters::IFIDStageRegisters() {
     this->stage_synchronizer = StageSynchronizer::init();
 }
 
-void IFIDStageRegisters::changeStageAndReset(Stage new_stage) {
+void IFIDStageRegisters::changeStageAndReset(PipelineType new_stage) {
     {  // Limit lock guard scope to avoid deadlock
         std::lock_guard<std::mutex> if_id_stage_registers_lock(this->getModuleMutex());
 
-        this->log("[IFIDStageRegisters] Stage change.");
+        this->log("[IFIDStageRegisters] PipelineType change.");
         this->setStage(new_stage);
     }
 
@@ -47,7 +47,7 @@ void IFIDStageRegisters::reset() {
 void IFIDStageRegisters::resetStage() {
     this->log("[IFIDStageRegisters] Reset stage.");
 
-    if (this->getStage() == Stage::Single) {
+    if (this->getStage() == PipelineType::Single) {
         this->is_program_counter_set = false;
         this->is_instruction_set = false;
     } else {
@@ -165,9 +165,7 @@ void IFIDStageRegisters::setInput(const std::variant<unsigned long, std::string>
 
         this->is_program_counter_set = true;
     } else if (std::holds_alternative<std::string>(input)) {
-        if (this->is_nop_asserted) {
-            this->instruction_bits = std::string(32, '0');
-        } else {
+        if (!this->is_nop_asserted) {
             this->instruction_bits = std::get<std::string>(input);
             this->log("[IFIDStageRegisters] Instruction set.");
         }

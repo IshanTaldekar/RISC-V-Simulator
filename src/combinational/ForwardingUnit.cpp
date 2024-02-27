@@ -36,8 +36,8 @@ void ForwardingUnit::run() {
                 forwarding_unit_lock,
                 [this] {
                     return ((this->is_single_register_source_set || this->is_double_register_source_set) &&
-                        (this->getStage() == Stage::Single || (this->is_ex_mem_stage_register_destination_set &&
-                        this->is_mem_wb_stage_register_destination_set)) || this->is_reset_flag_set);
+                        (this->getStage() == PipelineType::Single || (this->is_ex_mem_stage_register_destination_set &&
+                                                                      this->is_mem_wb_stage_register_destination_set)) || this->is_reset_flag_set);
                 }
         );
 
@@ -109,7 +109,7 @@ void ForwardingUnit::resetState() {
 }
 
 void ForwardingUnit::computeControlSignals() {
-    if (this->getStage() == Stage::Single) {
+    if (this->getStage() == PipelineType::Single) {
         this->alu_input_1_mux_control_signal = ALUInputMuxControlSignals::IDEXStageRegisters;
         this->alu_input_2_mux_control_signal = ALUInputMuxControlSignals::IDEXStageRegisters;
     } else {

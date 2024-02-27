@@ -42,7 +42,7 @@ public:
     void conditionalArriveSingleStage();
     void conditionalArriveFiveStage();
 
-    void setStage(Stage current_stage);
+    void setStage(PipelineType current_stage);
 
 private:
     void onCompletionSingleStage();

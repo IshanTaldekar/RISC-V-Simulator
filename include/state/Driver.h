@@ -38,7 +38,7 @@ public:
     void notifyModuleConditionVariable() override;
     void assertNop();
     void reset();
-    void changeStageAndReset(Stage new_stage);
+    void changeStageAndReset(PipelineType new_stage);
     void pause();
     void resume();
 

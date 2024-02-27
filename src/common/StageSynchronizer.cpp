@@ -46,6 +46,6 @@ void StageSynchronizer::onCompletionSingleStage() {
     // TODO
 }
 
-void StageSynchronizer::setStage(Stage current_stage) {
-    this->is_single_stage_mode = current_stage == Stage::Single;
+void StageSynchronizer::setStage(PipelineType current_stage) {
+    this->is_single_stage_mode = current_stage == PipelineType::Single;
 }

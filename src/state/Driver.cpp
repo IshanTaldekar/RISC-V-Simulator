@@ -17,11 +17,11 @@ Driver::Driver() {
     this->stage_synchronizer = StageSynchronizer::init();
 }
 
-void Driver::changeStageAndReset(Stage new_stage) {
+void Driver::changeStageAndReset(PipelineType new_stage) {
     {  // Limit lock guard scope to avoid deadlock
         std::lock_guard<std::mutex> driver_lock_guard (this->getModuleMutex());
 
-        this->logger->log("[Driver] Stage change." );
+        this->logger->log("[Driver] PipelineType change." );
         this->setStage(new_stage);
     }
 

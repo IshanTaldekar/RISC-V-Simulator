@@ -35,7 +35,7 @@ enum class WBStageMuxInputType {
     ALUResult
 };
 
-enum class Stage {
+enum class PipelineType {
     Single = 0,
     Five
 };
@@ -64,17 +64,18 @@ enum class InstructionType {
     UNKNOWN
 };
 
-const std::string IF_STAGE_LOG_FILE_PATH = "../logs/IFStage.log";
-const std::string ID_STAGE_LOG_FILE_PATH = "../logs/IDStage.log";
-const std::string EX_STAGE_LOG_FILE_PATH = "../logs/EXStage.log";
-const std::string MEM_STAGE_LOG_FILE_PATH = "../logs/MEMStage.log";
-const std::string WB_STAGE_LOG_FILE_PATH = "../logs/MEMStage.log";
-
 enum class ALUInputMuxControlSignals {
     IDEXStageRegisters = 0,
     EXMEMStageRegisters,
     MEMWBStageRegisters
 };
 
+enum class Stage {
+    IF = 0,
+    ID,
+    EX,
+    MEM,
+    WB
+};
 
 #endif //RISC_V_SIMULATOR_CONFIG_H

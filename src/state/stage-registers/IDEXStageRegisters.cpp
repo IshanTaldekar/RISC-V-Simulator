@@ -37,7 +37,7 @@ void IDEXStageRegisters::reset() {
 }
 
 void IDEXStageRegisters::resetStage() {
-    if (this->getStage() == Stage::Single) {
+    if (this->getStage() == PipelineType::Single) {
         this->is_single_read_register_data_set = false;
         this->is_double_read_register_data_set = false;
         this->is_immediate_set = false;
@@ -164,9 +164,11 @@ void IDEXStageRegisters::setRegisterData(const std::bitset<WORD_BIT_COUNT> &rd1)
 
     std::lock_guard<std::mutex> id_ex_stage_registers_lock (this->getModuleMutex());
 
-    this->read_data_1 = rd1;
-    this->is_single_read_register_data_set = true;
+    if (!this->is_nop_asserted) {
+        this->read_data_1 = rd1;
+    }
 
+    this->is_single_read_register_data_set = true;
     this->notifyModuleConditionVariable();
 }
 
@@ -175,11 +177,12 @@ void IDEXStageRegisters::setRegisterData(const std::bitset<WORD_BIT_COUNT> &rd1,
 
     std::lock_guard<std::mutex> id_ex_stage_registers_lock (this->getModuleMutex());
 
-    this->read_data_1 = rd1;
-    this->read_data_2 = rd2;
+    if (!this->is_nop_asserted) {
+        this->read_data_1 = rd1;
+        this->read_data_2 = rd2;
+    }
 
     this->is_double_read_register_data_set = true;
-
     this->notifyModuleConditionVariable();
 }
 
@@ -188,9 +191,11 @@ void IDEXStageRegisters::setImmediate(const std::bitset<WORD_BIT_COUNT> &imm) {
 
     std::lock_guard<std::mutex> id_ex_stage_registers_lock (this->getModuleMutex());
 
-    this->immediate = imm;
-    this->is_immediate_set = true;
+    if (!this->is_nop_asserted) {
+        this->immediate = imm;
+    }
 
+    this->is_immediate_set = true;
     this->notifyModuleConditionVariable();
 }
 
@@ -199,9 +204,11 @@ void IDEXStageRegisters::setRegisterDestination(unsigned long rd) {
 
     std::lock_guard<std::mutex> id_ex_stage_registers_lock (this->getModuleMutex());
 
-    this->register_destination = rd;
-    this->is_register_destination_set = true;
+    if (!this->is_nop_asserted) {
+        this->register_destination = rd;
+    }
 
+    this->is_register_destination_set = true;
     this->notifyModuleConditionVariable();
 }
 
@@ -210,9 +217,11 @@ void IDEXStageRegisters::setProgramCounter(unsigned long pc) {
 
     std::lock_guard<std::mutex> id_ex_stage_registers_lock (this->getModuleMutex());
 
-    this->program_counter = pc;
-    this->is_program_counter_set = true;
+    if (!this->is_nop_asserted) {
+        this->program_counter = pc;
+    }
 
+    this->is_program_counter_set = true;
     this->notifyModuleConditionVariable();
 }
 
@@ -228,7 +237,6 @@ void IDEXStageRegisters::setControlModule(Control *new_control) {
     }
 
     this->is_control_set = true;
-
     this->notifyModuleConditionVariable();
 }
 
@@ -237,7 +245,9 @@ void IDEXStageRegisters::setInstruction(Instruction *current_instruction) {
 
     std::lock_guard<std::mutex> id_ex_stage_registers_lock (this->getModuleMutex());
 
-    this->instruction = current_instruction;
+    if (!this->is_nop_asserted) {
+        this->instruction = current_instruction;
+    }
 }
 
 void IDEXStageRegisters::passProgramCounterToEXAdder() {

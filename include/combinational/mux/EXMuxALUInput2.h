@@ -16,8 +16,10 @@ class EXMuxALUInput2: protected MuxBase {
 
     bool is_immediate_set;
     bool is_read_data_2_set;
+    bool is_pass_four_flag_set;
 
     bool is_alu_src_asserted;
+    bool is_pass_four_flag_asserted;
 
     ALUInput2ForwardingMux *alu_input_2_forwarding_mux;
 
@@ -32,6 +34,7 @@ public:
     void notifyModuleConditionVariable() override;
     void setInput(MuxInputType type, unsigned long value) override;
     void assertControlSignal(bool is_asserted) override;
+    void assertJALCustomControlSignal(bool is_asserted);
 
 protected:
     void passOutput() override;

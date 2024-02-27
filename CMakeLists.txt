@@ -38,4 +38,6 @@ add_executable(RISC_V_Simulator
         src/common/StageSynchronizer.cpp
         src/combinational/ForwardingUnit.cpp
         src/combinational/mux/EXMuxALUInput1.cpp
+        include/common/Logger.h
+        src/common/Logger.cpp
 )

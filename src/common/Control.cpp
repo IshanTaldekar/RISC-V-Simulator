@@ -5,10 +5,13 @@ Control::Control(const Instruction *current_instruction) {
 
     this->register_file = RegisterFile::init();
     this->if_mux = IFMux::init();
-    this->ex_mux = EXMuxALUInput2::init();
+    this->ex_mux_alu_input_2 = EXMuxALUInput2::init();
     this->alu = ALU::init();
     this->data_memory = DataMemory::init();
     this->wb_mux = WBMux::init();
+    this->if_id_stage_registers = IFIDStageRegisters::init();
+    this->id_ex_stage_registers = IDEXStageRegisters::init();
+    this->ex_mem_stage_registers = EXMEMStageRegisters::init();
 
     this->is_reg_write_asserted = false;
     this->is_pc_src_asserted = false;
@@ -19,6 +22,7 @@ Control::Control(const Instruction *current_instruction) {
     this->is_mem_to_reg_asserted = false;
     this->is_branch_instruction = false;
     this->is_alu_result_zero = false;
+    this->is_jal_instruction = false;
 
     this->generateSignals();
     this->generateALUOpCode();
@@ -33,6 +37,10 @@ void Control::generateSignals() {
 
     if (type == InstructionType::I || type == InstructionType::J || type == InstructionType::S) {
         this->is_alu_src_asserted = true;
+
+        if (type == InstructionType::J) {
+            this->is_jal_instruction = true;
+        }
     }
 
     if (type == InstructionType::B || type == InstructionType::J) {
@@ -88,7 +96,10 @@ void Control::setIsALUResultZero(bool is_result_zero) {
 
 void Control::toggleEXStageControlSignals() {
     this->alu->setALUOp(this->alu_op);
-    this->ex_mux->assertControlSignal(this->is_alu_src_asserted);
+
+    this->ex_mux_alu_input_2->assertControlSignal(this->is_alu_src_asserted);
+    this->ex_mux_alu_input_1->assertJALCustomControlSignal(this->is_jal_instruction);
+    this->ex_mux_alu_input_2->assertJALCustomControlSignal(this->is_jal_instruction);
 }
 
 void Control::toggleMEMStageControlSignals() {
@@ -97,9 +108,20 @@ void Control::toggleMEMStageControlSignals() {
     this->if_mux->assertControlSignal(this->is_pc_src_asserted);
     this->data_memory->setMemWrite(this->is_mem_write_asserted);
     this->data_memory->setMemRead(this->is_mem_read_asserted);
+
+    if (this->is_pc_src_asserted || this->is_jal_instruction) {
+        this->if_id_stage_registers->assertNop();
+        this->id_ex_stage_registers->assertNop();
+        this->ex_mem_stage_registers->assertNop();
+    }
 }
 
 void Control::toggleWBStageControlSignals() {
     this->register_file->setRegWriteSignal(this->is_reg_write_asserted);
     this->wb_mux->assertControlSignal(this->is_mem_to_reg_asserted);
+
+    if (this->is_pc_src_asserted || this->is_jal_instruction) {
+        this->id_ex_stage_registers->assertNop();
+        this->ex_mem_stage_registers->assertNop();
+    }
 }
