@@ -5,7 +5,6 @@
 
 #include "../../../common/Config.h"
 #include "../MuxBase.h"
-#include "../../ALU.h"
 #include "../../../common/logger/EXLogger.h"
 
 class ALU;

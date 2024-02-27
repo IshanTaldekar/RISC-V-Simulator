@@ -3,6 +3,7 @@
 
 #include "ALUInputForwardingMuxBase.h"
 
+class ALU;
 class ALUInputForwardingMuxBase;
 
 class ALUInput2ForwardingMux: public ALUInputForwardingMuxBase {

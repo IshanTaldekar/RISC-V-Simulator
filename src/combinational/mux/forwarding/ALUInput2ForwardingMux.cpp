@@ -1,4 +1,5 @@
 #include "../../../../include/combinational/mux/forwarding/ALUInput2ForwardingMux.h"
+#include "../../../../include/combinational/ALU.h"
 
 ALUInput2ForwardingMux *ALUInput2ForwardingMux::current_instance = nullptr;
 

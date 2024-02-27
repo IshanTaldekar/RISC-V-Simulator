@@ -1,5 +1,7 @@
 #include "../../../include/combinational/mux/EXMuxALUInput1.h"
 
+EXMuxALUInput1 *EXMuxALUInput1::current_instance = nullptr;
+
 EXMuxALUInput1::EXMuxALUInput1() {
     this->program_counter = 0UL;
     this->read_data_1 = 0UL;

@@ -1,4 +1,4 @@
-#include "../../../../include/combinational/mux/forwarding/ALUInputForwardingMuxBase.h"
+#include "../../../../include/combinational/ALU.h"
 
 ALUInputForwardingMuxBase::ALUInputForwardingMuxBase() {
     this->id_ex_stage_registers_value = 0UL;

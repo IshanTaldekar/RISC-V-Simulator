@@ -1,7 +1,7 @@
 #include "../../../../include/combinational/mux/forwarding/ALUInput1ForwardingMux.h"
+#include "../../../../include/combinational/ALU.h"
 
 ALUInput1ForwardingMux *ALUInput1ForwardingMux::current_instance = nullptr;
-
 
 ALUInput1ForwardingMux *ALUInput1ForwardingMux::init() {
     if (ALUInput1ForwardingMux::current_instance == nullptr) {

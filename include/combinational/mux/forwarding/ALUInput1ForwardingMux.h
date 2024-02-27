@@ -4,8 +4,11 @@
 #include <string>
 
 #include "../../../common/Config.h"
-#include "ALUInputForwardingMuxBase.h"
+#include "../../../../include/combinational/mux/forwarding/ALUInputForwardingMuxBase.h"
 
+class MuxBase;
+class ALUInput1ForwardingMux;
+class ALU;
 
 class ALUInput1ForwardingMux: public ALUInputForwardingMuxBase {
     static ALUInput1ForwardingMux *current_instance;

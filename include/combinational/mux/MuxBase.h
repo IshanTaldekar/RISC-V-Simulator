@@ -1,10 +1,11 @@
 #ifndef RISC_V_SIMULATOR_MUXBASE_H
 #define RISC_V_SIMULATOR_MUXBASE_H
 
-#include "../../common/Module.h"
-#include "../../common/Config.h"
-
 #include <variant>
+
+#include "../../common/Module.h"
+
+class Module;
 
 class MuxBase: public Module {
 public:
