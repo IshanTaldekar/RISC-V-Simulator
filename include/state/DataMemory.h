@@ -8,6 +8,7 @@
 #include <fstream>
 
 #include "../common/Module.h"
+#include "../common/Logger.h"
 #include "../state/stage-registers/MEMWBStageRegisters.h"
 
 class MEMWBStageRegisters;
@@ -32,10 +33,12 @@ class DataMemory: public Module {
     bool is_mem_write_flag_set;
     bool is_mem_read_flag_set;
     bool is_input_file_read;
+    bool is_reset_flag_set;
 
     static DataMemory *current_instance;
 
     MEMWBStageRegisters *mem_wb_stage_registers;
+    Logger *logger;
 
 public:
     DataMemory();
@@ -43,7 +46,6 @@ public:
     static DataMemory *init();
 
     void run() override;
-    void notifyModuleConditionVariable() override;
 
     void setDataMemoryInputFilePath(const std::string &file_path);
 
@@ -52,11 +54,14 @@ public:
     void setMemWrite(bool is_asserted);
     void setMemRead(bool is_asserted);
 
+    void reset();
+
 private:
     void readDataMemoryFile();
     void writeData();
     void readData();
     void passReadData();
+    void resetState();
 };
 
 #endif //RISC_V_SIMULATOR_DATAMEMORY_H

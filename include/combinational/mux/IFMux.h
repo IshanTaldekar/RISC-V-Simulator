@@ -1,17 +1,17 @@
 #ifndef RISC_V_SIMULATOR_IFMUX_H
 #define RISC_V_SIMULATOR_IFMUX_H
 
+#include <iostream>
+
 #include "MuxBase.h"
 #include "../../state/Driver.h"
 #include "../../common/Config.h"
-#include "../../common/logger/IFLogger.h"
-
-#include <iostream>
+#include "../../common/Logger.h"
 
 class Driver;
-class IFLogger;
+class Logger;
 
-class IFMux: protected MuxBase {
+class IFMux: public MuxBase {
     unsigned long incremented_pc;
     unsigned long branched_pc;
 
@@ -21,7 +21,7 @@ class IFMux: protected MuxBase {
     bool is_pc_src_signal_asserted;
 
     Driver *driver;
-    IFLogger *logger;
+    Logger *logger;
 
     static IFMux *current_instance;
 
@@ -31,7 +31,6 @@ public:
     static IFMux *init();
 
     void run() override;
-    void notifyModuleConditionVariable() override;
     void setInput(MuxInputType type, unsigned long value) override;
     void assertControlSignal(bool is_asserted) override;
 

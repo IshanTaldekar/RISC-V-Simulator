@@ -5,10 +5,10 @@
 
 #include "../../../common/Config.h"
 #include "../MuxBase.h"
-#include "../../../common/logger/EXLogger.h"
+#include "../../../common/Logger.h"
 
 class ALU;
-class EXLogger;
+class Logger;
 class MuxBase;
 
 class ALUInputForwardingMuxBase: public MuxBase {
@@ -24,13 +24,12 @@ protected:
     bool is_mem_wb_stage_registers_value_set;
 
     ALU *alu;
-    EXLogger *logger;
+    Logger *logger;
 
 public:
     ALUInputForwardingMuxBase();
 
     void run() override;
-    void notifyModuleConditionVariable() override;
 
     void setInput(MuxInputType type, unsigned long value) override;
     void setMuxControlSignal(ALUInputMuxControlSignals new_signal);

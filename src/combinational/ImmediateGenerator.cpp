@@ -4,10 +4,10 @@ ImmediateGenerator *ImmediateGenerator::current_instance = nullptr;
 
 ImmediateGenerator::ImmediateGenerator() {
     this->is_instruction_set = false;
-    this->instruction = nullptr;
+    this->instruction = new Instruction(std::string(32, '0'));
 
     this->id_ex_stage_registers = IDEXStageRegisters::init();
-    this->logger = IDLogger::init();
+    this->logger = Logger::init();
 }
 
 ImmediateGenerator *ImmediateGenerator::init() {
@@ -20,19 +20,20 @@ ImmediateGenerator *ImmediateGenerator::init() {
 
 void ImmediateGenerator::run() {
     while (this->isAlive()) {
-        this->logger->log("[ImmediateGenerator] Waiting to be woken up and acquire lock.");
+        this->logger->log(Stage::ID, "[ImmediateGenerator] Waiting to be woken up and acquire lock.");
 
         std::unique_lock<std::mutex> immediate_generator_lock (this->getModuleMutex());
         this->getModuleConditionVariable().wait(
                 immediate_generator_lock,
-                [this] { return this->is_instruction_set; }
+                [this] { return this->is_instruction_set || this->isKilled(); }
         );
 
         if (this->isKilled()) {
+            this->logger->log(Stage::ID, "[ImmediateGenerator] Killed.");
             break;
         }
 
-        this->logger->log("[ImmediateGenerator] Woken up and acquired lock. Passing value IDEXStageRegisters.");
+        this->logger->log(Stage::ID, "[ImmediateGenerator] Woken up and acquired lock.");
 
         this->loadImmediateToIDEXStageRegisters();
 
@@ -41,16 +42,21 @@ void ImmediateGenerator::run() {
 }
 
 void ImmediateGenerator::setInstruction(const Instruction *current_instruction) {
+    this->logger->log(Stage::ID, "[ImmediateGenerator] setInstruction waiting to acquire lock.");
+
     std::lock_guard immediate_generator_lock (this->getModuleMutex());
 
+    this->logger->log(Stage::ID, "[ImmediateGenerator] setInstruction acquired lock. Updating value.");
+
     this->instruction = current_instruction;
+
+    this->logger->log(Stage::ID, "[ImmediateGenerator] setInstruction value updated.");
     this->notifyModuleConditionVariable();
 }
 
 void ImmediateGenerator::loadImmediateToIDEXStageRegisters() {
-    this->logger->log("[ImmediateGenerator] Waiting to load immediate to IDEXStageRegisters.");
+    this->logger->log(Stage::ID, "[ImmediateGenerator] Passing immediate to IDEXStageRegisters.");
 
-    std::lock_guard immediate_generator_lock (this->getModuleMutex());
     InstructionType type = this->instruction->getType();
 
     std::bitset<WORD_BIT_COUNT> result;
@@ -78,10 +84,5 @@ void ImmediateGenerator::loadImmediateToIDEXStageRegisters() {
     }
 
     this->id_ex_stage_registers->setImmediate(result);
-
-    this->logger->log("[ImmediateGenerator] Immediate value passed to IDEXStageRegisters.");
-}
-
-void ImmediateGenerator::notifyModuleConditionVariable() {
-    this->getModuleConditionVariable().notify_one();
+    this->logger->log(Stage::ID, "[ImmediateGenerator] Passed immediate to IDEXStageRegisters.");
 }

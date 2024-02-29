@@ -5,6 +5,7 @@
 
 #include "../common/Module.h"
 #include "../common/Control.h"
+#include "../common/Logger.h"
 
 class EXMEMStageRegisters;
 
@@ -27,6 +28,7 @@ private:
     static ALU *current_instance;
 
     EXMEMStageRegisters *ex_mem_stage_registers;
+    Logger *logger;
 
 public:
     ALU();
@@ -34,7 +36,6 @@ public:
     static ALU *init();
 
     void run() override;
-    void notifyModuleConditionVariable() override;
 
     void setInput1(unsigned long value);
     void setInput2(unsigned long value);

@@ -4,19 +4,19 @@
 #include "AdderBase.h"
 #include "../../common/Config.h"
 #include "../mux/IFMux.h"
-#include "../../common/logger/IFLogger.h"
+#include "../../common/Logger.h"
 
 class IFMux;
-class IFLogger;
+class Logger;
 
-class IFAdder: protected AdderBase {
+class IFAdder: public AdderBase {
     unsigned long program_counter;
     bool is_program_counter_set;
 
     static IFAdder *current_instance;
 
     IFMux *if_mux;
-    IFLogger *logger;
+    Logger *logger;
 
 public:
     IFAdder();
@@ -24,7 +24,6 @@ public:
 
     void run() override;
     void setInput(AdderInputType type, unsigned long value) override;
-    void notifyModuleConditionVariable() override;
 
 private:
     void passProgramCounterToIFMux();

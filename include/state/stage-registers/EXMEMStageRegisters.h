@@ -3,6 +3,7 @@
 
 #include "../../common/Module.h"
 #include "../../common/Control.h"
+#include "../../common/Logger.h"
 #include "../../combinational/mux/IFMux.h"
 #include "MEMWBStageRegisters.h"
 #include "../../common/StageSynchronizer.h"
@@ -47,6 +48,7 @@ class EXMEMStageRegisters: public Module {
     ALUInput1ForwardingMux *alu_input_1_forwarding_mux;
     ALUInput2ForwardingMux *alu_input_2_forwarding_mux;
     ForwardingUnit *forwarding_unit;
+    Logger *logger;
 
     static EXMEMStageRegisters *current_instance;
 
@@ -56,7 +58,6 @@ public:
     static EXMEMStageRegisters *init();
 
     void run() override;
-    void notifyModuleConditionVariable() override;
 
     void setBranchedProgramCounter(unsigned long value);
     void setALUResult(unsigned long value);
@@ -64,10 +65,12 @@ public:
     void setReadData2(unsigned long value);
     void setRegisterDestination(unsigned long value);
     void setControl(Control *new_control);
-    void assertNop();
 
+    void assertNop();
     void reset();
     void pause();
+    void resume();
+    void changeStageAndReset(PipelineType new_pipeline_type);
 
 private:
     void passALUResultToDataMemory();
@@ -78,9 +81,7 @@ private:
     void passRegisterDestinationToMEMWBStageRegisters();
     void passRegisterDestinationToForwardingUnit();
     void passBranchedAddressToIFMux();
-
     void resetStage();
-    void pauseStage();
 };
 
 #endif //RISC_V_SIMULATOR_EXMEMSTAGEREGISTERS_H

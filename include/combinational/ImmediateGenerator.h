@@ -4,11 +4,12 @@
 #include "../common/Module.h"
 #include "../common/Instruction.h"
 #include "../common/Config.h"
+#include "../common/Logger.h"
 #include "../state/stage-registers/IDEXStageRegisters.h"
 
 class Instruction;
 class IDEXStageRegisters;
-class IDLogger;
+class Logger;
 
 class ImmediateGenerator: public Module {
     static constexpr int WORD_BIT_COUNT = 32;
@@ -17,7 +18,7 @@ class ImmediateGenerator: public Module {
     const Instruction *instruction;
 
     IDEXStageRegisters *id_ex_stage_registers;
-    IDLogger *logger;
+    Logger *logger;
 
     bool is_instruction_set;
 
@@ -27,7 +28,6 @@ public:
     static ImmediateGenerator *init();
 
     void run() override;
-    void notifyModuleConditionVariable() override;
 
     void setInstruction(const Instruction *current_instruction);
 

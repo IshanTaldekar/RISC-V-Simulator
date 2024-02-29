@@ -13,7 +13,7 @@ Driver::Driver() {
     this->instruction_memory = InstructionMemory::init();
     this->if_id_stage_registers = IFIDStageRegisters::init();
     this->if_adder = IFAdder::init();
-    this->logger = IFLogger::init();
+    this->logger = Logger::init();
     this->stage_synchronizer = StageSynchronizer::init();
 }
 
@@ -21,8 +21,8 @@ void Driver::changeStageAndReset(PipelineType new_stage) {
     {  // Limit lock guard scope to avoid deadlock
         std::lock_guard<std::mutex> driver_lock_guard (this->getModuleMutex());
 
-        this->logger->log("[Driver] PipelineType change." );
-        this->setStage(new_stage);
+        this->logger->log(Stage::IF, "[Driver] PipelineType change." );
+        this->setPipelineType(new_stage);
     }
 
     this->reset();
@@ -31,15 +31,11 @@ void Driver::changeStageAndReset(PipelineType new_stage) {
 void Driver::reset() {
     std::lock_guard<std::mutex> driver_lock_guard (this->getModuleMutex());
 
-    this->logger->log("[Driver] Reset flag set.");
-
     this->is_reset_flag_set = true;
     this->notifyModuleConditionVariable();
 }
 
 void Driver::resetStage() {
-    this->logger->log("[Driver] Reset stage: program counter is 0.");
-
     this->program_counter = 0UL;
 
     this->is_new_program_counter_set = true;
@@ -47,14 +43,13 @@ void Driver::resetStage() {
 }
 
 void Driver::pause() {
-    this->logger->log("[Driver] Pausing execution.");
+    this->logger->log(Stage::IF, "[Driver] Paused.");
 
     this->is_pause_flag_set = true;
-    this->notifyModuleConditionVariable();
 }
 
 void Driver::resume() {
-    this->logger->log("[Driver] Resuming execution.");
+    this->logger->log(Stage::IF, "[Driver] Resumed.");
 
     this->is_pause_flag_set = false;
     this->notifyModuleConditionVariable();
@@ -63,21 +58,22 @@ void Driver::resume() {
 void Driver::setProgramCounter(unsigned long value) {
     this->stage_synchronizer->conditionalArriveFiveStage();
 
-    this->logger->log("[Driver] setProgramCounter waiting to acquire lock.");
+    this->logger->log(Stage::IF, "[Driver] setProgramCounter waiting to acquire lock.");
 
     std::unique_lock<std::mutex> driver_lock (this->getModuleMutex());
 
+    this->logger->log(Stage::IF, "[Driver] setProgramCounter acquired lock. Updating value.");
+
     if (!this->is_nop_asserted) {
         this->program_counter = value;
+        this->logger->log(Stage::IF, "[Driver] setProgramCounter updated value.");
     } else {
         this->is_nop_asserted = false;
+        this->logger->log(Stage::IF, "[Driver] setProgramCounter update skipped. NOP asserted.");
     }
 
     this->is_new_program_counter_set = true;
-
     this->notifyModuleConditionVariable();
-
-    this->logger->log("[Driver] PC set.");
 }
 
 Driver *Driver::init() {
@@ -90,37 +86,35 @@ Driver *Driver::init() {
 
 void Driver::run() {
     while (this->isAlive()) {
-        this->logger->log("[Driver] Waiting to be woken up and acquire lock.");
+        this->logger->log(Stage::IF, "[Driver] Waiting to be woken up and acquire lock.");
 
         std::unique_lock<std::mutex> driver_lock (this->getModuleMutex());
         this->getModuleConditionVariable().wait(
                 driver_lock,
                 [this] {
-                    return this->is_new_program_counter_set || !this->is_pause_flag_set || this->is_reset_flag_set;
+                    return (this->is_new_program_counter_set && !this->is_pause_flag_set) || this->is_reset_flag_set;
                 }
         );
 
         if (this->isKilled()) {
+            this->logger->log(Stage::IF, "[Driver] Killed.");
             break;
         }
 
         if (this->is_reset_flag_set) {
+            this->logger->log(Stage::IF, "[Driver] Resetting stage.");
+
             this->resetStage();
             this->is_reset_flag_set = false;
 
+            this->logger->log(Stage::IF, "[Driver] Reset.");
             continue;
         }
 
-        if (this->is_pause_flag_set) {
-            continue;
-        }
+        this->logger->log(Stage::IF, "[Driver] Woken up and acquired lock.");
 
-        this->logger->log("[Driver] Woken up and acquired lock. Passing values to AdderBase and InstructionMemory.");
-
-        this->passProgramCounterToAdder();
+        this->passProgramCounterToIFAdder();
         this->passProgramCounterToInstructionMemory();
-
-        this->logger->log("[Driver] Passing values to the IFStageRegister.");
 
         std::thread pass_program_counter_thread (&Driver::passProgramCounterToIFIDStageRegisters, this);
 
@@ -131,37 +125,32 @@ void Driver::run() {
 }
 
 void Driver::passProgramCounterToInstructionMemory() {
-    this->logger->log("[Driver] Passing program counter to instruction_bits data_memory.");
+    this->logger->log(Stage::IF, "[Driver] Passing program counter to InstructionMemory.");
 
     this->instruction_memory->setProgramCounter(this->program_counter);
     this->instruction_memory->notifyModuleConditionVariable();
 
-    this->logger->log("[Driver] program counter passed to instruction_bits data_memory and instruction_bits data_memory notified.");
+    this->logger->log(Stage::IF, "[Driver] Passed program counter to InstructionMemory.");
 }
 
-void Driver::passProgramCounterToAdder() {
-    this->logger->log("[Driver] passing program counter to adder.");
+void Driver::passProgramCounterToIFAdder() {
+    this->logger->log(Stage::IF, "[Driver] Passing program counter to IFAdder.");
 
     this->if_adder->setInput(IFAdderInputType::PCValue, this->program_counter);
     this->if_adder->notifyModuleConditionVariable();
 
-    this->logger->log("[Driver] program counter passed to adder and adder notified.");
+    this->logger->log(Stage::IF, "[Driver] Passed program counter to IFAdder.");
 }
 
 void Driver::passProgramCounterToIFIDStageRegisters() {
-    this->logger->log("[Driver] passing program counter to IF/ID stage registers.");
+    this->logger->log(Stage::IF, "[Driver] Passing program counter to IFIDStageRegisters.");
 
     this->if_id_stage_registers->setInput(this->program_counter);
     this->if_id_stage_registers->notifyModuleConditionVariable();
 
-    this->logger->log("[Driver] program counter passed to IF/ID stage registers.");
-}
-
-void Driver::notifyModuleConditionVariable() {
-    this->getModuleConditionVariable().notify_one();
+    this->logger->log(Stage::IF, "[Driver] Passed program counter to IFIDStageRegisters.");
 }
 
 void Driver::assertNop() {
-    std::lock_guard<std::mutex> driver_lock (this->getModuleMutex());
     this->is_nop_asserted = true;
 }

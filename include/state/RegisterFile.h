@@ -7,10 +7,11 @@
 #include <iostream>
 
 #include "../common/Module.h"
-#include "../common/logger/IDLogger.h"
+#include "../common/Logger.h"
 #include "../state/stage-registers/IDEXStageRegisters.h"
 
 class IDEXStageRegisters;
+class Logger;
 
 class RegisterFile: public Module {
     static constexpr int REGISTERS_COUNT = 32;
@@ -26,6 +27,8 @@ class RegisterFile: public Module {
     unsigned long register_destination;  // corresponds to the RISC-V rd register
     std::bitset<WORD_BIT_COUNT> write_data;  // data to be written to rd
 
+    bool is_reg_write_signal_asserted;
+
     bool is_single_read_register_set;
     bool is_double_read_register_set;
     bool is_write_register_set;
@@ -38,7 +41,7 @@ class RegisterFile: public Module {
 
     bool is_write_thread_finished;
 
-    IDLogger *logger;
+    Logger *logger;
     IDEXStageRegisters *id_ex_stage_registers;
 
 public:
@@ -47,7 +50,6 @@ public:
     static RegisterFile *init();
 
     void run() override;
-    void notifyModuleConditionVariable() override;
 
     void setReadRegister(unsigned long rs1);
     void setReadRegisters(unsigned long rs1, unsigned long rs2);

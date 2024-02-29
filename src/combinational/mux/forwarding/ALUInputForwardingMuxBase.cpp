@@ -12,7 +12,7 @@ ALUInputForwardingMuxBase::ALUInputForwardingMuxBase() {
     this->is_mem_wb_stage_registers_value_set = false;
 
     this->alu = ALU::init();
-    this->logger = EXLogger::init();
+    this->logger = Logger::init();
 }
 
 void ALUInputForwardingMuxBase::setInput(MuxInputType type, unsigned long value) {
@@ -20,7 +20,7 @@ void ALUInputForwardingMuxBase::setInput(MuxInputType type, unsigned long value)
         throw std::runtime_error("MuxInputType passed to ALUInputForwardingMuxBase not compatible with ALUInputMuxInputTypes.");
     }
 
-    this->logger->log("[" + this->getModuleTag() + "] setInput waiting to acquire lock");
+    this->logger->log(Stage::EX, "[" + this->getModuleTag() + "] setInput waiting to acquire lock.");
 
     std::lock_guard<std::mutex> mux_lock (this->getModuleMutex());
 
@@ -37,34 +37,41 @@ void ALUInputForwardingMuxBase::setInput(MuxInputType type, unsigned long value)
         throw std::runtime_error("ALUInputForwardingMuxBase::setInput parameters did not match any input type.");
     }
 
+    this->logger->log(Stage::EX, "[" + this->getModuleTag() + "] setInput updated value.");
     this->notifyModuleConditionVariable();
 }
 
 void ALUInputForwardingMuxBase::setMuxControlSignal(ALUInputMuxControlSignals new_signal) {
+    this->logger->log(Stage::EX, "[" + this->getModuleTag() + "] setControlSignal waiting to be "
+                                                              "woken up and acquire lock.");
+
     std::lock_guard<std::mutex> mux_lock (this->getModuleMutex());
 
     this->control_signal = new_signal;
     this->is_control_signal_set = true;
+
+    this->logger->log(Stage::EX, "[" + this->getModuleTag() + "] setControlSignal control set.");
 }
 
 void ALUInputForwardingMuxBase::run() {
     while (this->isAlive()) {
-        this->logger->log("[" + this->getModuleTag() + "] Waiting to wakeup and acquire lock.");
+        this->logger->log(Stage::EX, "[" + this->getModuleTag() + "] Waiting to be woken up and acquire lock.");
 
         std::unique_lock<std::mutex> mux_lock (this->getModuleMutex());
         this->getModuleConditionVariable().wait(
                 mux_lock,
                 [this] {
-                    return this->is_id_ex_stage_registers_value_set && this->is_ex_mem_stage_registers_value_set
-                           && this->is_mem_wb_stage_registers_value_set && this->is_control_signal_set;
+                    return (this->is_id_ex_stage_registers_value_set && this->is_ex_mem_stage_registers_value_set
+                           && this->is_mem_wb_stage_registers_value_set && this->is_control_signal_set) || this->isKilled();
                 }
         );
 
         if (this->isKilled()) {
+            this->logger->log(Stage::EX, "[" + this->getModuleTag() + "] Killed.");
             break;
         }
 
-        this->logger->log("[" + this->getModuleTag() + "] Woken up and acquired lock. Passing output.");
+        this->logger->log(Stage::EX, "[" + this->getModuleTag() + "] Woken up and acquired lock.");
 
         this->passOutput();
 
@@ -72,11 +79,5 @@ void ALUInputForwardingMuxBase::run() {
         this->is_ex_mem_stage_registers_value_set = false;
         this->is_mem_wb_stage_registers_value_set = false;
         this->is_control_signal_set = false;
-
-        this->logger->log("[" + this->getModuleTag() + "] Passed output.");
     }
-}
-
-void ALUInputForwardingMuxBase::notifyModuleConditionVariable() {
-    this->getModuleConditionVariable().notify_one();
 }

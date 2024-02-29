@@ -10,6 +10,7 @@
 #include "../../combinational/ALU.h"
 #include "EXMEMStageRegisters.h"
 #include "../../common/StageSynchronizer.h"
+#include "../../common/Logger.h"
 #include "../../combinational/ForwardingUnit.h"
 
 #include <bitset>
@@ -22,6 +23,7 @@ class EXAdder;
 class EXMEMStageRegisters;
 class StageSynchronizer;
 class ForwardingUnit;
+class Logger;
 
 class IDEXStageRegisters: public Module {
     static constexpr int WORD_BIT_COUNT = 32;
@@ -48,6 +50,7 @@ class IDEXStageRegisters: public Module {
     bool is_register_source2_set;
     bool is_program_counter_set;
     bool is_control_set;
+    bool is_instruction_set;
 
     bool is_nop_asserted;
     bool is_reset_flag_set;
@@ -59,6 +62,7 @@ class IDEXStageRegisters: public Module {
     EXMEMStageRegisters *ex_mem_stage_register;
     StageSynchronizer *stage_synchronizer;
     ForwardingUnit *forwarding_unit;
+    Logger *logger;
 
 public:
     IDEXStageRegisters();
@@ -66,7 +70,6 @@ public:
     static IDEXStageRegisters *init();
 
     void run() override;
-    void notifyModuleConditionVariable() override;
 
     void setRegisterData(const std::bitset<WORD_BIT_COUNT> &rd1);
     void setRegisterData(const std::bitset<WORD_BIT_COUNT> &rd1, const std::bitset<WORD_BIT_COUNT> &rd2);
@@ -76,12 +79,13 @@ public:
     void setControlModule(Control *new_control);
     void setRegisterSource1(unsigned long rs1);
     void setRegisterSource2(unsigned long rs2);
-
     void setInstruction(Instruction *current_instruction);
-    void assertNop();
 
+    void assertNop();
     void reset();
     void pause();
+    void resume();
+    void changeStageAndReset(PipelineType new_pipeline_type);
 
 private:
     void passProgramCounterToEXAdder();
@@ -96,7 +100,6 @@ private:
     void passRegisterSourceToForwardingUnit();
 
     void resetStage();
-    void pauseStage();
 };
 
 #endif //RISC_V_SIMULATOR_IDEXSTAGEREGISTERS_H

@@ -12,6 +12,8 @@ ALUInput1ForwardingMux *ALUInput1ForwardingMux::init() {
 }
 
 void ALUInput1ForwardingMux::passOutput() {
+    this->logger->log(Stage::EX, "[" + this->getModuleTag() + "] Passing value to ALU Input 1.");
+
     if (this->control_signal == ALUInputMuxControlSignals::IDEXStageRegisters) {
         this->alu->setInput1(this->id_ex_stage_registers_value);
     } else if (this->control_signal == ALUInputMuxControlSignals::EXMEMStageRegisters) {
@@ -21,6 +23,8 @@ void ALUInput1ForwardingMux::passOutput() {
     } else {
         throw std::runtime_error("[ALUInput1ForwardingMux] control signal type did not match any existing type.");
     }
+
+    this->logger->log(Stage::EX, "[" + this->getModuleTag() + "] Passed value to ALU Input 1.");
 }
 
 std::string ALUInput1ForwardingMux::getModuleTag() {

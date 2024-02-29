@@ -1,16 +1,17 @@
 #ifndef RISC_V_SIMULATOR_EXADDER_H
 #define RISC_V_SIMULATOR_EXADDER_H
 
-#include "AdderBase.h"
-#include "../../common/Config.h"
-#include "../../state/stage-registers/EXMEMStageRegisters.h"
-
 #include <bitset>
 #include <iostream>
 
+#include "AdderBase.h"
+#include "../../common/Config.h"
+#include "../../state/stage-registers/EXMEMStageRegisters.h"
+#include "../../common/Logger.h"
+
 class EXMEMStageRegisters;
 
-class EXAdder: protected AdderBase {
+class EXAdder: public AdderBase {
     static constexpr int WORD_BIT_COUNT = 32;
 
     unsigned long program_counter;
@@ -21,6 +22,7 @@ class EXAdder: protected AdderBase {
     bool is_immediate_set;
 
     EXMEMStageRegisters *ex_mem_stage_registers;
+    Logger *logger;
 
     static EXAdder *current_instance;
 
@@ -30,7 +32,6 @@ public:
 
     void run() override;
     void setInput(AdderInputType type, unsigned long value) override;
-    void notifyModuleConditionVariable() override;
 
 private:
     void computeResult();

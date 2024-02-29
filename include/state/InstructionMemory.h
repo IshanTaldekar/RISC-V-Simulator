@@ -8,7 +8,7 @@
 
 #include "stage-registers/IFIDStageRegisters.h"
 #include "../common/Module.h"
-#include "../common/logger/IFLogger.h"
+#include "../common/Logger.h"
 
 class IFIDStageRegisters;
 
@@ -24,7 +24,7 @@ class InstructionMemory: public Module {
     std::string instruction;
 
     IFIDStageRegisters *if_id_stage_registers;
-    IFLogger *logger;
+    Logger *logger;
 
 public:
     InstructionMemory();
@@ -33,9 +33,8 @@ public:
     static InstructionMemory *current_instance;
 
     void run() override;
-    void notifyModuleConditionVariable() override;
 
-    void loadInstructionMemoryFromFilePath(const std::string &file_path);
+    void setInstructionMemoryInputFilePath(const std::string &file_path);
     void setProgramCounter(unsigned long value);
 
 private:

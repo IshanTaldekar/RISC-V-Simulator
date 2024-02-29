@@ -3,11 +3,13 @@
 
 #include "MuxBase.h"
 #include "forwarding/ALUInput1ForwardingMux.h"
+#include "../../common/Logger.h"
 
 class MuxBase;
 class ALUInput1ForwardingMux;
+class Logger;
 
-class EXMuxALUInput1: protected MuxBase {
+class EXMuxALUInput1: public MuxBase {
     unsigned long program_counter;
     unsigned long read_data_1;
 
@@ -18,6 +20,7 @@ class EXMuxALUInput1: protected MuxBase {
     bool is_pass_program_counter_flag_set;
 
     ALUInput1ForwardingMux *alu_input_1_forwarding_mux;
+    Logger *logger;
 
     static EXMuxALUInput1 *current_instance;
 
@@ -27,7 +30,6 @@ public:
     static EXMuxALUInput1 *init();
 
     void run() override;
-    void notifyModuleConditionVariable() override;
     void setInput(MuxInputType type, unsigned long value) override;
     void assertControlSignal(bool is_asserted) override;
     void assertJALCustomControlSignal(bool is_asserted);

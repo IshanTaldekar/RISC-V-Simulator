@@ -10,8 +10,6 @@ add_executable(RISC_V_Simulator
         src/common/Module.cpp
         src/state/stage-registers/EXMEMStageRegisters.cpp
         src/combinational/ALU.cpp
-        src/common/logger/EXLogger.cpp
-        src/common/logger/LoggerBase.cpp
         src/combinational/mux/MuxBase.cpp
         src/combinational/mux/forwarding/ALUInputForwardingMuxBase.cpp
         src/combinational/mux/forwarding/ALUInput2ForwardingMux.cpp
@@ -25,10 +23,6 @@ add_executable(RISC_V_Simulator
         src/combinational/ImmediateGenerator.cpp
         src/state/RegisterFile.cpp
         src/common/Instruction.cpp
-        src/common/logger/WBLogger.cpp
-        src/common/logger/MEMLogger.cpp
-        src/common/logger/IDLogger.cpp
-        src/common/logger/IFLogger.cpp
         src/state/stage-registers/IFIDStageRegisters.cpp
         src/combinational/mux/IFMux.cpp
         src/state/InstructionMemory.cpp

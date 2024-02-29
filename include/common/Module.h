@@ -13,13 +13,13 @@ class Module {
     std::mutex module_mutex;
     std::condition_variable module_condition_variable;
 
-    Stage stage;
+    PipelineType pipeline_type;
 
 public:
     Module();
 
     virtual void run() = 0;
-    virtual void notifyModuleConditionVariable() = 0;
+    void notifyModuleConditionVariable();
 
     void kill();
     [[nodiscard]] bool isAlive() const;
@@ -28,8 +28,8 @@ public:
     std::mutex &getModuleMutex();
     std::condition_variable &getModuleConditionVariable();
 
-    void setStage(Stage current_stage);
-    Stage getStage();
+    void setPipelineType(PipelineType current_type);
+    PipelineType getPipelineType();
 };
 
 #endif //RISC_V_SIMULATOR_MODULE_H

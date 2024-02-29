@@ -1,12 +1,13 @@
 #include "../../include/common/Module.h"
 
 Module::Module() {
-    this->stage = Stage::Single;
+    this->pipeline_type = PipelineType::Single;
     this->is_alive = true;
 }
 
 void Module::kill() {
     this->is_alive = false;
+    this->notifyModuleConditionVariable();
 }
 
 bool Module::isAlive() const {
@@ -25,12 +26,15 @@ std::condition_variable &Module::getModuleConditionVariable() {
     return this->module_condition_variable;
 }
 
-void Module::setStage(Stage current_stage) {
+void Module::setPipelineType(PipelineType current_type) {
     std::lock_guard<std::mutex> module_lock (this->module_mutex);
-
-    stage = current_stage;
+    pipeline_type = current_type;
 }
 
-Stage Module::getStage() {
-    return this->stage;
+PipelineType Module::getPipelineType() {
+    return this->pipeline_type;
+}
+
+void Module::notifyModuleConditionVariable() {
+    this->getModuleConditionVariable().notify_one();
 }

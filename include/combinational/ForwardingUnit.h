@@ -3,11 +3,13 @@
 
 #include "../common/Module.h"
 #include "../common/Config.h"
+#include "../common/Logger.h"
 #include "../combinational/mux/forwarding/ALUInput1ForwardingMux.h"
 #include "../combinational/mux/forwarding/ALUInput2ForwardingMux.h"
 
 class ALUInput1ForwardingMux;
 class ALUInput2ForwardingMux;
+class Logger;
 
 class ForwardingUnit: public Module {
     unsigned long register_source1;
@@ -29,13 +31,14 @@ class ForwardingUnit: public Module {
     ALUInputMuxControlSignals alu_input_1_mux_control_signal;
     ALUInputMuxControlSignals alu_input_2_mux_control_signal;
 
+    Logger *logger;
+
 public:
     ForwardingUnit();
 
     static ForwardingUnit *init();
 
     void run() override;
-    void notifyModuleConditionVariable() override;
 
     void setSingleRegisterSource(unsigned long rs1);
     void setDoubleRegisterSource(unsigned long rs1, unsigned long rs2);
@@ -45,8 +48,8 @@ public:
     void reset();
 
 private:
-    void passControlSignalToALUInputMux1();
-    void passControlSignalToALUInputMux2();
+    void passControlSignalToALUInput1ForwardingMux();
+    void passControlSignalToALUInput2ForwardingMux();
 
     void resetState();
     void computeControlSignals();

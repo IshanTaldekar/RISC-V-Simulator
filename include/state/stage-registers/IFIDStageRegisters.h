@@ -3,8 +3,7 @@
 
 #include "../../common/Config.h"
 #include "../../common/Module.h"
-#include "../../common/logger/IFLogger.h"
-#include "../../common/logger/IDLogger.h"
+#include "../../common/Logger.h"
 #include "../../state/stage-registers/IDEXStageRegisters.h"
 #include "../../common/Instruction.h"
 #include "../../common/Control.h"
@@ -20,6 +19,7 @@ class Control;
 class RegisterFile;
 class ImmediateGenerator;
 class StageSynchronizer;
+class Logger;
 
 class IFIDStageRegisters: public Module {
     static constexpr int WORD_BIT_COUNT = 32;
@@ -27,17 +27,15 @@ class IFIDStageRegisters: public Module {
     unsigned long program_counter;
 
     std::string instruction_bits;
+
     Instruction *instruction;
-
     Control *control;
-
-    IFLogger *if_logger;
-    IDLogger *id_logger;
 
     IDEXStageRegisters *id_ex_stage_registers;
     RegisterFile *register_file;
     ImmediateGenerator *immediate_generator;
     StageSynchronizer *stage_synchronizer;
+    Logger *logger;
 
     bool is_program_counter_set;
     bool is_instruction_set;
@@ -53,15 +51,14 @@ public:
     static IFIDStageRegisters *init();
 
     void run() override;
-    void notifyModuleConditionVariable() override;
 
     void setInput(const std::variant<unsigned long, std::string> &input);
     void assertNop();
+
     void reset();
     void pause();
     void resume();
     void changeStageAndReset(PipelineType new_stage);
-
 
 private:
     void passProgramCounterToIDEXStageRegisters();
@@ -71,8 +68,7 @@ private:
     void passRegisterDestinationToIDEXStageRegisters();
     void passRegisterSource1ToIDEXStageRegisters();
     void passRegisterSource2ToIDEXStageRegisters();
-
-    void log(const std::string &message);
+    void passInstructionToIDEXStageRegisters();
     void resetStage();
 };
 

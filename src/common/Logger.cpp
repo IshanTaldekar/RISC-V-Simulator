@@ -16,6 +16,12 @@ Logger::Logger() {
     std::thread ex_stage_log_writer (&Logger::writeEXStageMessagesToFile, this);
     std::thread mem_stage_log_writer (&Logger::writeMEMStageMessagesToFile, this);
     std::thread wb_stage_log_writer (&Logger::writeWBStageMessagesToFile, this);
+
+    if_stage_log_writer.detach();
+    id_stage_log_writer.detach();
+    ex_stage_log_writer.detach();
+    mem_stage_log_writer.detach();
+    wb_stage_log_writer.detach();
 }
 
 Logger::~Logger() {

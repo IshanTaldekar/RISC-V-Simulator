@@ -3,6 +3,7 @@
 
 #include "../../common/Module.h"
 #include "../../common/Control.h"
+#include "../../common/Logger.h"
 #include "../../state/RegisterFile.h"
 #include "../../combinational/mux/WBMux.h"
 #include "../../common/StageSynchronizer.h"
@@ -13,6 +14,7 @@ class RegisterFile;
 class WBMux;
 class StageSynchronizer;
 class ForwardingUnit;
+class Logger;
 
 class MEMWBStageRegisters: public Module {
     unsigned long read_data;
@@ -34,6 +36,7 @@ class MEMWBStageRegisters: public Module {
     WBMux *wb_mux;
     StageSynchronizer *stage_synchronizer;
     ForwardingUnit *forwarding_unit;
+    Logger *logger;
 
 public:
     MEMWBStageRegisters();
@@ -41,7 +44,6 @@ public:
     static MEMWBStageRegisters *init();
 
     void run() override;
-    void notifyModuleConditionVariable() override;
 
     void setReadData(unsigned long value);
     void setALUResult(unsigned long value);
@@ -49,6 +51,7 @@ public:
 
     void reset();
     void pause();
+    void resume();
 
 private:
     void passReadDataToWBMux();
@@ -57,7 +60,6 @@ private:
     void passRegisterDestinationToForwardingUnit();
 
     void resetStage();
-    void pauseStage();
 };
 
 #endif //RISC_V_SIMULATOR_MEMWBSTAGEREGISTERS_H

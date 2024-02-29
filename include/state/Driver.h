@@ -5,7 +5,7 @@
 #include "stage-registers/IFIDStageRegisters.h"
 #include "../combinational/adder/IFAdder.h"
 #include "../common/Module.h"
-#include "../common/logger/IFLogger.h"
+#include "../common/Logger.h"
 #include "../common/StageSynchronizer.h"
 
 class InstructionMemory;
@@ -24,7 +24,7 @@ class Driver: public Module {
     InstructionMemory *instruction_memory;
     IFIDStageRegisters *if_id_stage_registers;
     IFAdder *if_adder;
-    IFLogger *logger;
+    Logger *logger;
     StageSynchronizer *stage_synchronizer;
 
 public:
@@ -35,7 +35,6 @@ public:
     static Driver *init();
 
     void run() override;
-    void notifyModuleConditionVariable() override;
     void assertNop();
     void reset();
     void changeStageAndReset(PipelineType new_stage);
@@ -44,7 +43,7 @@ public:
 
 private:
     void passProgramCounterToInstructionMemory();
-    void passProgramCounterToAdder();
+    void passProgramCounterToIFAdder();
     void passProgramCounterToIFIDStageRegisters();
 
     void resetStage();

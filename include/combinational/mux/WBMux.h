@@ -3,16 +3,16 @@
 
 #include "MuxBase.h"
 #include "../../state/RegisterFile.h"
-#include "../../common/logger/WBLogger.h"
+#include "../../common/Logger.h"
 #include "forwarding/ALUInput1ForwardingMux.h"
 #include "forwarding/ALUInput2ForwardingMux.h"
 
 class ALUInput1ForwardingMux;
 class ALUInput2ForwardingMux;
 class RegisterFile;
-class WBLogger;
+class Logger;
 
-class WBMux: protected MuxBase {
+class WBMux: public MuxBase {
     unsigned int read_data;
     unsigned int alu_result;
 
@@ -25,7 +25,7 @@ class WBMux: protected MuxBase {
 
     RegisterFile *register_file;
 
-    WBLogger *logger;
+    Logger *logger;
     ALUInput1ForwardingMux *alu_input_1_forwarding_mux;
     ALUInput2ForwardingMux *alu_input_2_forwarding_mux;
 
@@ -35,13 +35,12 @@ public:
     static WBMux *init();
 
     void run() override;
-    void notifyModuleConditionVariable() override;
     void setInput(MuxInputType type, unsigned long value) override;
     void assertControlSignal(bool is_asserted) override;
 
 protected:
     void passOutput() override;
-    void passOutputToForwardingUnit();
+    void passOutputToForwardingMuxes();
 };
 
 #endif //RISC_V_SIMULATOR_WBMUX_H
