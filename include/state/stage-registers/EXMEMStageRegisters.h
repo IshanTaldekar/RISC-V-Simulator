@@ -51,6 +51,7 @@ class EXMEMStageRegisters: public Module {
     Logger *logger;
 
     static EXMEMStageRegisters *current_instance;
+    static std::mutex initialization_mutex;
 
 public:
     EXMEMStageRegisters();

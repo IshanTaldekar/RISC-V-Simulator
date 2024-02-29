@@ -1,6 +1,7 @@
 #include "../../../include/state/stage-registers/IDEXStageRegisters.h"
 
 IDEXStageRegisters *IDEXStageRegisters::current_instance = nullptr;
+std::mutex IDEXStageRegisters::initialization_mutex;
 
 IDEXStageRegisters::IDEXStageRegisters() {
     this->register_source1 = 0UL;
@@ -96,6 +97,8 @@ void IDEXStageRegisters::resume() {
 }
 
 IDEXStageRegisters *IDEXStageRegisters::init() {
+    std::lock_guard<std::mutex> id_ex_stage_registers_lock (IDEXStageRegisters::initialization_mutex);
+
     if (IDEXStageRegisters::current_instance == nullptr) {
         IDEXStageRegisters::current_instance = new IDEXStageRegisters();
     }

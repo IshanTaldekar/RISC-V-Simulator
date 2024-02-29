@@ -22,6 +22,7 @@ class WBMux: public MuxBase {
     bool is_alu_result_set;
 
     static WBMux *current_instance;
+    static std::mutex initialization_mutex;
 
     RegisterFile *register_file;
 

@@ -1,6 +1,7 @@
 #include "../../../include/combinational/adder/EXAdder.h"
 
 EXAdder *EXAdder::current_instance = nullptr;
+std::mutex EXAdder::initialization_mutex;
 
 EXAdder::EXAdder() {
     this->program_counter = 0UL;
@@ -15,6 +16,8 @@ EXAdder::EXAdder() {
 }
 
 EXAdder *EXAdder::init() {
+    std::lock_guard<std::mutex> ex_adder_lock (EXAdder::initialization_mutex);
+
     if (EXAdder::current_instance == nullptr) {
         EXAdder::current_instance = new EXAdder();
     }

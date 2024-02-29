@@ -1,6 +1,7 @@
 #include "../../../include/state/stage-registers/MEMWBStageRegisters.h"
 
 MEMWBStageRegisters *MEMWBStageRegisters::current_instance = nullptr;
+std::mutex MEMWBStageRegisters::initialization_mutex;
 
 MEMWBStageRegisters::MEMWBStageRegisters() {
     this->read_data = 0UL;
@@ -58,6 +59,8 @@ void MEMWBStageRegisters::resume() {
 }
 
 MEMWBStageRegisters *MEMWBStageRegisters::init() {
+    std::lock_guard<std::mutex> mem_wb_stage_registers_lock (MEMWBStageRegisters::initialization_mutex);
+
     if (MEMWBStageRegisters::current_instance == nullptr) {
         MEMWBStageRegisters::current_instance = new MEMWBStageRegisters();
     }

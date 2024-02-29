@@ -14,6 +14,7 @@ class IFAdder: public AdderBase {
     bool is_program_counter_set;
 
     static IFAdder *current_instance;
+    static std::mutex initialization_mutex;
 
     IFMux *if_mux;
     Logger *logger;

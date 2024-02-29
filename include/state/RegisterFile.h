@@ -18,6 +18,7 @@ class RegisterFile: public Module {
     static constexpr int WORD_BIT_COUNT = 32;
 
     static RegisterFile *current_instance;
+    static std::mutex initialization_mutex;
 
     std::vector<std::bitset<WORD_BIT_COUNT>> registers;
 

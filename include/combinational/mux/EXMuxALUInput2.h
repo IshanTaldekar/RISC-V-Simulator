@@ -26,6 +26,7 @@ class EXMuxALUInput2: public MuxBase {
     Logger *logger;
 
     static EXMuxALUInput2 *current_instance;
+    static std::mutex initialization_mutex;
 
 public:
     EXMuxALUInput2();

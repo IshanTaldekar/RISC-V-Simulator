@@ -1,6 +1,7 @@
 #include "../../include/state/InstructionMemory.h"
 
 InstructionMemory *InstructionMemory::current_instance = nullptr;
+std::mutex InstructionMemory::initialization_mutex;
 
 InstructionMemory::InstructionMemory() {
     this->instruction_memory_file_path = "";
@@ -14,6 +15,8 @@ InstructionMemory::InstructionMemory() {
 }
 
 InstructionMemory *InstructionMemory::init() {
+    std::lock_guard<std::mutex> instruction_memory_lock (InstructionMemory::initialization_mutex);
+
     if (InstructionMemory::current_instance == nullptr) {
         InstructionMemory::current_instance = new InstructionMemory();
     }

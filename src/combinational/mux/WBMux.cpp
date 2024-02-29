@@ -1,6 +1,7 @@
 #include "../../../include/combinational/mux/WBMux.h"
 
 WBMux *WBMux::current_instance = nullptr;
+std::mutex WBMux::initialization_mutex;
 
 WBMux::WBMux() {
     this->read_data = 0UL;
@@ -18,6 +19,8 @@ WBMux::WBMux() {
 }
 
 WBMux *WBMux::init() {
+    std::lock_guard<std::mutex> wb_mux_lock (WBMux::initialization_mutex);
+
     if (WBMux::current_instance == nullptr) {
         WBMux::current_instance = new WBMux();
     }

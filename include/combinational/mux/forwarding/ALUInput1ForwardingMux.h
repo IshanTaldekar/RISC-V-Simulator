@@ -12,6 +12,7 @@ class ALU;
 
 class ALUInput1ForwardingMux: public ALUInputForwardingMuxBase {
     static ALUInput1ForwardingMux *current_instance;
+    static std::mutex initialization_mutex;
 
 public:
     static ALUInput1ForwardingMux *init();

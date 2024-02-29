@@ -15,6 +15,8 @@ class ImmediateGenerator: public Module {
     static constexpr int WORD_BIT_COUNT = 32;
 
     static ImmediateGenerator *current_instance;
+    static std::mutex initialization_mutex;
+
     const Instruction *instruction;
 
     IDEXStageRegisters *id_ex_stage_registers;

@@ -27,11 +27,13 @@ class Driver: public Module {
     Logger *logger;
     StageSynchronizer *stage_synchronizer;
 
+    static Driver *current_instance;
+    static std::mutex initialization_mutex;
+
 public:
     Driver();
     void setProgramCounter(unsigned long value);
 
-    static Driver *current_instance;
     static Driver *init();
 
     void run() override;

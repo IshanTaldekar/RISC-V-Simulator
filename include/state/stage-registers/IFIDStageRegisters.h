@@ -44,10 +44,12 @@ class IFIDStageRegisters: public Module {
     bool is_reset_flag_set;
     bool is_pause_flag_set;
 
+    static IFIDStageRegisters *current_instance;
+    static std::mutex initialization_mutex;
+
 public:
     IFIDStageRegisters();
 
-    static IFIDStageRegisters *current_instance;
     static IFIDStageRegisters *init();
 
     void run() override;

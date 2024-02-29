@@ -1,6 +1,7 @@
 #include "../../include/combinational/ALU.h"
 
 ALU *ALU::current_instance = nullptr;
+std::mutex ALU::initialization_mutex;
 
 ALU::ALU() {
     this->input1 = 0UL;
@@ -96,6 +97,8 @@ void ALU::run() {
 }
 
 ALU *ALU::init() {
+    std::lock_guard<std::mutex> alu_lock (ALU::initialization_mutex);
+
     if (ALU::current_instance == nullptr) {
         ALU::current_instance = new ALU();
     }

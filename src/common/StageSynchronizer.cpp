@@ -1,6 +1,7 @@
 #include "../../include/common/StageSynchronizer.h"
 
 StageSynchronizer *StageSynchronizer::current_instance = nullptr;
+std::mutex StageSynchronizer::initialization_mutex;
 
 StageSynchronizer::StageSynchronizer() {
     std::function<void()> single_stage_on_completion = [this]() -> void { this->onCompletionSingleStage(); };
@@ -27,6 +28,8 @@ void StageSynchronizer::conditionalArriveFiveStage() {
 }
 
 StageSynchronizer* StageSynchronizer::init() {
+    std::lock_guard<std::mutex> stage_synchronizer_lock (StageSynchronizer::initialization_mutex);
+
     if (StageSynchronizer::current_instance == nullptr) {
         StageSynchronizer::current_instance = new StageSynchronizer();
     }

@@ -1,6 +1,7 @@
 #include "../../../include/combinational/mux/IFMux.h"
 
 IFMux *IFMux::current_instance = nullptr;
+std::mutex IFMux::initialization_mutex;
 
 IFMux::IFMux() {
     this->is_pc_src_signal_asserted = false;
@@ -17,6 +18,8 @@ IFMux::IFMux() {
 }
 
 IFMux *IFMux::init() {
+    std::lock_guard<std::mutex> if_mux_lock (IFMux::initialization_mutex);
+
     if (IFMux::current_instance == nullptr) {
         IFMux::current_instance = new IFMux();
     }

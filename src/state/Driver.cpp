@@ -1,6 +1,7 @@
 #include "../../include/state/Driver.h"
 
 Driver *Driver::current_instance = nullptr;
+std::mutex Driver::initialization_mutex;
 
 Driver::Driver() {
     this->program_counter = 0UL;
@@ -77,6 +78,8 @@ void Driver::setProgramCounter(unsigned long value) {
 }
 
 Driver *Driver::init() {
+    std::lock_guard<std::mutex> driver_lock (Driver::initialization_mutex);
+
     if (Driver::current_instance == nullptr) {
         Driver::current_instance = new Driver();
     }

@@ -26,11 +26,13 @@ class InstructionMemory: public Module {
     IFIDStageRegisters *if_id_stage_registers;
     Logger *logger;
 
+    static InstructionMemory *current_instance;
+    static std::mutex initialization_mutex;
+
 public:
     InstructionMemory();
 
     static InstructionMemory *init();
-    static InstructionMemory *current_instance;
 
     void run() override;
 

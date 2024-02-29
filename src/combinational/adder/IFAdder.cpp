@@ -1,6 +1,7 @@
 #include "../../../include/combinational/adder/IFAdder.h"
 
 IFAdder *IFAdder::current_instance = nullptr;
+std::mutex IFAdder::initialization_mutex;
 
 IFAdder::IFAdder() {
     this->program_counter = 0;
@@ -11,6 +12,8 @@ IFAdder::IFAdder() {
 }
 
 IFAdder *IFAdder::init() {
+    std::lock_guard<std::mutex> if_adder_lock (IFAdder::initialization_mutex);
+
     if (IFAdder::current_instance == nullptr) {
         IFAdder::current_instance = new IFAdder();
     }

@@ -1,6 +1,7 @@
 #include "../../include/combinational/ImmediateGenerator.h"
 
 ImmediateGenerator *ImmediateGenerator::current_instance = nullptr;
+std::mutex ImmediateGenerator::initialization_mutex;
 
 ImmediateGenerator::ImmediateGenerator() {
     this->is_instruction_set = false;
@@ -11,6 +12,8 @@ ImmediateGenerator::ImmediateGenerator() {
 }
 
 ImmediateGenerator *ImmediateGenerator::init() {
+    std::lock_guard<std::mutex> immediate_generator_lock (ImmediateGenerator::initialization_mutex);
+
     if (ImmediateGenerator::current_instance == nullptr) {
         ImmediateGenerator::current_instance = new ImmediateGenerator();
     }

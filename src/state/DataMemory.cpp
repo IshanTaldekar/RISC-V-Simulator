@@ -1,6 +1,7 @@
 #include "../../include/state/DataMemory.h"
 
 DataMemory *DataMemory::current_instance = nullptr;
+std::mutex DataMemory::initialization_mutex;
 
 DataMemory::DataMemory() {
     this->address = 0UL;
@@ -23,6 +24,8 @@ DataMemory::DataMemory() {
 }
 
 DataMemory *DataMemory::init() {
+    std::lock_guard<std::mutex> data_memory_lock (DataMemory::initialization_mutex);
+
     if (DataMemory::current_instance == nullptr) {
         DataMemory::current_instance = new DataMemory();
     }

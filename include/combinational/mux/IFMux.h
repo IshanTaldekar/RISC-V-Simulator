@@ -24,6 +24,7 @@ class IFMux: public MuxBase {
     Logger *logger;
 
     static IFMux *current_instance;
+    static std::mutex initialization_mutex;
 
 public:
     IFMux();

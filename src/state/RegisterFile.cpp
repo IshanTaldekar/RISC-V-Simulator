@@ -1,6 +1,7 @@
 #include "../../include/state/RegisterFile.h"
 
 RegisterFile *RegisterFile::current_instance = nullptr;
+std::mutex RegisterFile::initialization_mutex;
 
 RegisterFile::RegisterFile() {
     this->is_single_read_register_set = false;
@@ -30,6 +31,8 @@ RegisterFile::RegisterFile() {
 }
 
 RegisterFile *RegisterFile::init() {
+    std::lock_guard<std::mutex> register_file_lock (RegisterFile::initialization_mutex);
+
     if (RegisterFile::current_instance == nullptr) {
         RegisterFile::current_instance = new RegisterFile();
     }

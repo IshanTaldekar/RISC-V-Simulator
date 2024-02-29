@@ -1,6 +1,7 @@
 #include "../../include/combinational/ForwardingUnit.h"
 
 ForwardingUnit *ForwardingUnit::current_instance = nullptr;
+std::mutex ForwardingUnit::initialization_mutex;
 
 ForwardingUnit::ForwardingUnit() {
     this->register_source1 = 0UL;
@@ -23,6 +24,8 @@ ForwardingUnit::ForwardingUnit() {
 }
 
 ForwardingUnit *ForwardingUnit::init() {
+    std::lock_guard<std::mutex> forwarding_unit_lock (ForwardingUnit::initialization_mutex);
+
     if (ForwardingUnit::current_instance == nullptr) {
         ForwardingUnit::current_instance = new ForwardingUnit();
     }

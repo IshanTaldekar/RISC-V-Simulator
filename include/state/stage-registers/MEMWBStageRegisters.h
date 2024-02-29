@@ -29,6 +29,7 @@ class MEMWBStageRegisters: public Module {
     bool is_pause_flag_set;
 
     static MEMWBStageRegisters *current_instance;
+    static std::mutex initialization_mutex;
 
     Control *control;
 

@@ -41,6 +41,7 @@ class IDEXStageRegisters: public Module {
     unsigned long program_counter;
 
     static IDEXStageRegisters *current_instance;
+    static std::mutex initialization_mutex;
 
     bool is_single_read_register_data_set;
     bool is_double_read_register_data_set;

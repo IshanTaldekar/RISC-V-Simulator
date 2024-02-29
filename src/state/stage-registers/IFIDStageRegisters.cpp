@@ -1,6 +1,7 @@
 #include "../../../include/state/stage-registers/IFIDStageRegisters.h"
 
 IFIDStageRegisters *IFIDStageRegisters::current_instance = nullptr;
+std::mutex IFIDStageRegisters::initialization_mutex;
 
 IFIDStageRegisters::IFIDStageRegisters() {
     this->program_counter = 0UL;
@@ -72,6 +73,8 @@ void IFIDStageRegisters::resume() {
 }
 
 IFIDStageRegisters *IFIDStageRegisters::init() {
+    std::lock_guard<std::mutex> if_id_stage_registers_lock (IFIDStageRegisters::initialization_mutex);
+
     if (IFIDStageRegisters::current_instance == nullptr) {
         IFIDStageRegisters::current_instance = new IFIDStageRegisters();
     }

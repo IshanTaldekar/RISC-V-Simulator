@@ -27,6 +27,7 @@ class StageSynchronizer {
     static constexpr int FIVE_STAGE_THREAD_COUNT = 17;
 
     static StageSynchronizer *current_instance;
+    static std::mutex initialization_mutex;
 
     Driver *driver;
     IFIDStageRegisters *if_id_stage_registers;

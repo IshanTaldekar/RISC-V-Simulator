@@ -1,6 +1,7 @@
 #include "../../../include/combinational/mux/EXMuxALUInput1.h"
 
 EXMuxALUInput1 *EXMuxALUInput1::current_instance = nullptr;
+std::mutex EXMuxALUInput1::initialization_mutex;
 
 EXMuxALUInput1::EXMuxALUInput1() {
     this->program_counter = 0UL;
@@ -17,6 +18,8 @@ EXMuxALUInput1::EXMuxALUInput1() {
 }
 
 EXMuxALUInput1 *EXMuxALUInput1::init() {
+    std::lock_guard<std::mutex> ex_mux_alu_input_1 (EXMuxALUInput1::initialization_mutex);
+
     if (EXMuxALUInput1::current_instance == nullptr) {
         EXMuxALUInput1::current_instance = new EXMuxALUInput1();
     }

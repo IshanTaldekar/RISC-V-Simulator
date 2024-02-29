@@ -2,8 +2,11 @@
 #include "../../../../include/combinational/ALU.h"
 
 ALUInput1ForwardingMux *ALUInput1ForwardingMux::current_instance = nullptr;
+std::mutex ALUInput1ForwardingMux::initialization_mutex;
 
 ALUInput1ForwardingMux *ALUInput1ForwardingMux::init() {
+    std::lock_guard<std::mutex> alu_input_1_forwarding_mux_lock (ALUInput1ForwardingMux::initialization_mutex);
+
     if (ALUInput1ForwardingMux::current_instance == nullptr) {
         ALUInput1ForwardingMux::current_instance = new ALUInput1ForwardingMux();
     }

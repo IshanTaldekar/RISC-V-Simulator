@@ -1,6 +1,7 @@
 #include "../../../include/state/stage-registers/EXMEMStageRegisters.h"
 
 EXMEMStageRegisters *EXMEMStageRegisters::current_instance = nullptr;
+std::mutex EXMEMStageRegisters::initialization_mutex;
 
 EXMEMStageRegisters::EXMEMStageRegisters() {
     this->branch_program_counter = 0UL;
@@ -92,6 +93,8 @@ void EXMEMStageRegisters::resume() {
 }
 
 EXMEMStageRegisters *EXMEMStageRegisters::init() {
+    std::lock_guard<std::mutex> ex_mem_stage_registers_lock (EXMEMStageRegisters::initialization_mutex);
+
     if (EXMEMStageRegisters::current_instance == nullptr) {
         EXMEMStageRegisters::current_instance = new EXMEMStageRegisters();
     }

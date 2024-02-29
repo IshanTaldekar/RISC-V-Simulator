@@ -24,6 +24,7 @@ class ForwardingUnit: public Module {
     bool is_reset_flag_set;
 
     static ForwardingUnit *current_instance;
+    static std::mutex initialization_mutex;
 
     ALUInput1ForwardingMux *alu_input_1_mux;
     ALUInput2ForwardingMux *alu_input_2_mux;

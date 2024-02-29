@@ -25,6 +25,7 @@ class EXAdder: public AdderBase {
     Logger *logger;
 
     static EXAdder *current_instance;
+    static std::mutex initialization_mutex;
 
 public:
     EXAdder();

@@ -36,6 +36,7 @@ class DataMemory: public Module {
     bool is_reset_flag_set;
 
     static DataMemory *current_instance;
+    static std::mutex initialization_mutex;
 
     MEMWBStageRegisters *mem_wb_stage_registers;
     Logger *logger;

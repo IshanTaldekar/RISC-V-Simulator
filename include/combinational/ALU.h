@@ -26,6 +26,7 @@ private:
     std::bitset<ALU_OP_BIT_COUNT> alu_op;
 
     static ALU *current_instance;
+    static std::mutex initialization_mutex;
 
     EXMEMStageRegisters *ex_mem_stage_registers;
     Logger *logger;
