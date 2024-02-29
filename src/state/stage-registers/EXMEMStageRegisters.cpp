@@ -20,16 +20,16 @@ EXMEMStageRegisters::EXMEMStageRegisters() {
     this->is_reset_flag_set = false;
     this->is_pause_flag_set = false;
 
-    this->control = new Control(new Instruction(std::string(32, '0')));
+    this->control = nullptr;
 
-    this->data_memory = DataMemory::init();
-    this->mem_wb_stage_registers = MEMWBStageRegisters::init();
-    this->if_mux = IFMux::init();
-    this->stage_synchronizer = StageSynchronizer::init();
-    this->alu_input_1_forwarding_mux = ALUInput1ForwardingMux::init();
-    this->alu_input_2_forwarding_mux = ALUInput2ForwardingMux::init();
-    this->forwarding_unit = ForwardingUnit::init();
-    this->logger = Logger::init();
+    this->data_memory = nullptr;
+    this->mem_wb_stage_registers = nullptr;
+    this->if_mux = nullptr;
+    this->stage_synchronizer = nullptr;
+    this->alu_input_1_forwarding_mux = nullptr;
+    this->alu_input_2_forwarding_mux = nullptr;
+    this->forwarding_unit = nullptr;
+    this->logger = nullptr;
 }
 
 void EXMEMStageRegisters::changeStageAndReset(PipelineType new_pipeline_type) {
@@ -99,7 +99,22 @@ EXMEMStageRegisters *EXMEMStageRegisters::init() {
     return EXMEMStageRegisters::current_instance;
 }
 
+void EXMEMStageRegisters::initDependencies() {
+    this->control = new Control(new Instruction(std::string(32, '0')));
+
+    this->data_memory = DataMemory::init();
+    this->mem_wb_stage_registers = MEMWBStageRegisters::init();
+    this->if_mux = IFMux::init();
+    this->stage_synchronizer = StageSynchronizer::init();
+    this->alu_input_1_forwarding_mux = ALUInput1ForwardingMux::init();
+    this->alu_input_2_forwarding_mux = ALUInput2ForwardingMux::init();
+    this->forwarding_unit = ForwardingUnit::init();
+    this->logger = Logger::init();
+}
+
 void EXMEMStageRegisters::run() {
+    this->initDependencies();
+
     while (this->isAlive()) {
         this->logger->log(Stage::EX, "[EXMEMStageRegisters] Waiting to be woken up and acquire lock.");
 

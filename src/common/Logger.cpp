@@ -10,18 +10,6 @@ Logger::Logger() {
     this->ex_stage_log_file.open(LOG_DIRECTORY_PATH + EX_STAGE_LOG_FILE_NAME);
     this->mem_stage_log_file.open(LOG_DIRECTORY_PATH + MEM_STAGE_LOG_FILE_NAME);
     this->wb_stage_log_file.open(LOG_DIRECTORY_PATH + WB_STAGE_LOG_FILE_NAME);
-
-    std::thread if_stage_log_writer (&Logger::writeIFStageMessagesToFile, this);
-    std::thread id_stage_log_writer (&Logger::writeIDStageMessagesToFile, this);
-    std::thread ex_stage_log_writer (&Logger::writeEXStageMessagesToFile, this);
-    std::thread mem_stage_log_writer (&Logger::writeMEMStageMessagesToFile, this);
-    std::thread wb_stage_log_writer (&Logger::writeWBStageMessagesToFile, this);
-
-    if_stage_log_writer.detach();
-    id_stage_log_writer.detach();
-    ex_stage_log_writer.detach();
-    mem_stage_log_writer.detach();
-    wb_stage_log_writer.detach();
 }
 
 Logger::~Logger() {
@@ -38,6 +26,24 @@ Logger *Logger::init() {
     }
 
     return Logger::current_instance;
+}
+
+void Logger::run() {
+    std::thread if_stage_log_writer (&Logger::writeIFStageMessagesToFile, this);
+    std::thread id_stage_log_writer (&Logger::writeIDStageMessagesToFile, this);
+    std::thread ex_stage_log_writer (&Logger::writeEXStageMessagesToFile, this);
+    std::thread mem_stage_log_writer (&Logger::writeMEMStageMessagesToFile, this);
+    std::thread wb_stage_log_writer (&Logger::writeWBStageMessagesToFile, this);
+
+    if_stage_log_writer.detach();
+    id_stage_log_writer.detach();
+    ex_stage_log_writer.detach();
+    mem_stage_log_writer.detach();
+    wb_stage_log_writer.detach();
+
+    while (!this->is_killed) {
+        sleep(1);
+    }
 }
 
 void Logger::log(Stage current_stage, const std::string &message) {
@@ -79,7 +85,7 @@ void Logger::enqueueIFStageMessage(const std::string &message) {
     this->if_stage_condition_variable.wait(
             if_stage_lock,
             [this] {
-                return this->if_stage_messages_queue.size() == MAX_MESSAGE_QUEUE_SIZE;
+                return this->if_stage_messages_queue.size() != MAX_MESSAGE_QUEUE_SIZE;
             }
     );
 
@@ -92,7 +98,7 @@ void Logger::enqueueIDStageMessage(const std::string &message) {
     this->id_stage_condition_variable.wait(
             id_stage_lock,
             [this] {
-                return this->id_stage_messages_queue.size() == MAX_MESSAGE_QUEUE_SIZE;
+                return this->id_stage_messages_queue.size() != MAX_MESSAGE_QUEUE_SIZE;
             }
     );
 
@@ -105,7 +111,7 @@ void Logger::enqueueEXStageMessage(const std::string &message) {
     this->ex_stage_condition_variable.wait(
             ex_stage_lock,
             [this] {
-                return this->ex_stage_messages_queue.size() == MAX_MESSAGE_QUEUE_SIZE;
+                return this->ex_stage_messages_queue.size() != MAX_MESSAGE_QUEUE_SIZE;
             }
     );
 
@@ -115,10 +121,10 @@ void Logger::enqueueEXStageMessage(const std::string &message) {
 
 void Logger::enqueueMEMStageMessage(const std::string &message) {
     std::unique_lock<std::mutex> mem_stage_lock (this->mem_stage_mutex);
-    this->ex_stage_condition_variable.wait(
+    this->mem_stage_condition_variable.wait(
             mem_stage_lock,
             [this] {
-                return this->mem_stage_messages_queue.size() == MAX_MESSAGE_QUEUE_SIZE;
+                return this->mem_stage_messages_queue.size() != MAX_MESSAGE_QUEUE_SIZE;
             }
     );
 
@@ -198,8 +204,8 @@ void Logger::writeEXStageMessagesToFile() {
 
 void Logger::writeMEMStageMessagesToFile() {
     while (!this->is_killed) {
-        std::unique_lock<std::mutex> mem_stage_lock(this->ex_stage_mutex);
-        this->ex_stage_condition_variable.wait(
+        std::unique_lock<std::mutex> mem_stage_lock(this->mem_stage_mutex);
+        this->mem_stage_condition_variable.wait(
                 mem_stage_lock,
                 [this] {
                     return !this->mem_stage_messages_queue.empty() || this->is_killed;

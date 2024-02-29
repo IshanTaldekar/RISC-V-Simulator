@@ -39,6 +39,7 @@ public:
 
 protected:
     void passOutput() override;
+    void initDependencies() override;
 };
 
 #endif //RISC_V_SIMULATOR_EXMUXALUINPUT2_H

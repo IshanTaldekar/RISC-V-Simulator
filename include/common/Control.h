@@ -26,7 +26,7 @@ public:
     static constexpr int ALU_OP_BIT_COUNT = 4;
 
 private:
-    const Instruction *instruction;
+    Instruction *instruction;
 
     RegisterFile *register_file;
     IFMux *if_mux;
@@ -52,7 +52,7 @@ private:
     std::bitset<ALU_OP_BIT_COUNT> alu_op;
 
 public:
-    explicit Control(const Instruction *instruction);
+    explicit Control(Instruction *instruction);
 
     void setIsALUResultZero(bool is_result_zero);
 
@@ -63,6 +63,7 @@ public:
 private:
     void generateSignals();
     void generateALUOpCode();
+    void initDependencies();
 };
 
 #endif //RISC_V_SIMULATOR_CONTROL_H

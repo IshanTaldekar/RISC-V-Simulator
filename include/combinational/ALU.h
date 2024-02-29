@@ -46,6 +46,7 @@ private:
     void computeResult();
     void passZeroFlagToEXMEMStageRegisters();
     void passResultToEXMEMStageRegisters();
+    void initDependencies() override;
 };
 
 #endif //RISC_V_SIMULATOR_ALU_H

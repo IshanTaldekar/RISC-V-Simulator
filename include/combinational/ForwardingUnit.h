@@ -53,6 +53,8 @@ private:
 
     void resetState();
     void computeControlSignals();
+
+    void initDependencies() override;
 };
 
 #endif //RISC_V_SIMULATOR_FORWARDINGUNIT_H

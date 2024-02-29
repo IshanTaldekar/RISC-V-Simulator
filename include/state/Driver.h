@@ -47,6 +47,7 @@ private:
     void passProgramCounterToIFIDStageRegisters();
 
     void resetStage();
+    void initDependencies() override;
 };
 
 #endif //RISC_V_SIMULATOR_DRIVER_H

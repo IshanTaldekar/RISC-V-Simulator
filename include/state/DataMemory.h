@@ -62,6 +62,7 @@ private:
     void readData();
     void passReadData();
     void resetState();
+    void initDependencies() override;
 };
 
 #endif //RISC_V_SIMULATOR_DATAMEMORY_H

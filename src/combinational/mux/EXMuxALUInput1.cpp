@@ -12,8 +12,8 @@ EXMuxALUInput1::EXMuxALUInput1() {
     this->is_pass_program_counter_flag_asserted = false;
     this->is_pass_program_counter_flag_set = false;
 
-    this->alu_input_1_forwarding_mux = ALUInput1ForwardingMux::init();
-    this->logger = Logger::init();
+    this->alu_input_1_forwarding_mux = nullptr;
+    this->logger = nullptr;
 }
 
 EXMuxALUInput1 *EXMuxALUInput1::init() {
@@ -24,7 +24,14 @@ EXMuxALUInput1 *EXMuxALUInput1::init() {
     return EXMuxALUInput1::current_instance;
 }
 
+void EXMuxALUInput1::initDependencies() {
+    this->alu_input_1_forwarding_mux = ALUInput1ForwardingMux::init();
+    this->logger = Logger::init();
+}
+
 void EXMuxALUInput1::run() {
+    this->initDependencies();
+
     while (this->isAlive()) {
         this->logger->log(Stage::EX, "[EXMuxALUInput1] Waiting to be woken up and acquire lock.");
 

@@ -12,14 +12,14 @@ IFIDStageRegisters::IFIDStageRegisters() {
     this->is_reset_flag_set = false;
     this->is_pause_flag_set = false;
 
-    this->instruction = new Instruction(std::string(32, '0'));
-    this->control = new Control(this->instruction);
+    this->instruction = nullptr;
+    this->control = nullptr;
 
-    this->register_file = RegisterFile::init();
-    this->id_ex_stage_registers = IDEXStageRegisters::init();
-    this->immediate_generator = ImmediateGenerator::init();
-    this->stage_synchronizer = StageSynchronizer::init();
-    this->logger = Logger::init();
+    this->register_file = nullptr;
+    this->id_ex_stage_registers = nullptr;
+    this->immediate_generator = nullptr;
+    this->stage_synchronizer = nullptr;
+    this->logger = nullptr;
 }
 
 void IFIDStageRegisters::changeStageAndReset(PipelineType new_stage) {
@@ -79,7 +79,20 @@ IFIDStageRegisters *IFIDStageRegisters::init() {
     return IFIDStageRegisters::current_instance;
 }
 
+void IFIDStageRegisters::initDependencies() {
+    this->instruction = new Instruction(std::string(32, '0'));
+    this->control = new Control(this->instruction);
+
+    this->register_file = RegisterFile::init();
+    this->id_ex_stage_registers = IDEXStageRegisters::init();
+    this->immediate_generator = ImmediateGenerator::init();
+    this->stage_synchronizer = StageSynchronizer::init();
+    this->logger = Logger::init();
+}
+
 void IFIDStageRegisters::run() {
+    this->initDependencies();
+
     while (this->isAlive()) {
         this->logger->log(Stage::IF, "[IFIDStageRegisters] Waiting to be woken up and acquire lock.");
 

@@ -100,6 +100,7 @@ private:
     void passRegisterSourceToForwardingUnit();
 
     void resetStage();
+    void initDependencies() override;
 };
 
 #endif //RISC_V_SIMULATOR_IDEXSTAGEREGISTERS_H

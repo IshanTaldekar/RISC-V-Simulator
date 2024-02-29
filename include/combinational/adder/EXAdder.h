@@ -36,6 +36,7 @@ public:
 private:
     void computeResult();
     void passBranchAddressToEXMEMStageRegisters();
+    void initDependencies() override;
 };
 
 #endif //RISC_V_SIMULATOR_EXADDER_H

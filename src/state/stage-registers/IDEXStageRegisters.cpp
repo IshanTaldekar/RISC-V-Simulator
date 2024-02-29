@@ -3,9 +3,6 @@
 IDEXStageRegisters *IDEXStageRegisters::current_instance = nullptr;
 
 IDEXStageRegisters::IDEXStageRegisters() {
-    this->instruction = new Instruction(std::string(32, '0'));
-//    this->control = new Control(this->instruction);
-
     this->register_source1 = 0UL;
     this->register_source2 = 0UL;
     this->register_destination = 0UL;
@@ -24,13 +21,16 @@ IDEXStageRegisters::IDEXStageRegisters() {
     this->is_register_source2_set = false;
     this->is_instruction_set = false;
 
-    this->ex_mux_alu_input_1 = EXMuxALUInput1::init();
-    this->ex_mux_alu_input_2 = EXMuxALUInput2::init();
-    this->ex_adder = EXAdder::init();
-    this->forwarding_unit = ForwardingUnit::init();
-    this->ex_mem_stage_register = EXMEMStageRegisters::init();
-    this->stage_synchronizer = StageSynchronizer::init();
-    this->logger = Logger::init();
+    this->instruction = nullptr;
+    this->control = nullptr;
+
+    this->ex_mux_alu_input_1 = nullptr;
+    this->ex_mux_alu_input_2 = nullptr;
+    this->ex_adder = nullptr;
+    this->forwarding_unit = nullptr;
+    this->ex_mem_stage_register = nullptr;
+    this->stage_synchronizer = nullptr;
+    this->logger = nullptr;
 }
 
 void IDEXStageRegisters::changeStageAndReset(PipelineType new_pipeline_type) {
@@ -103,7 +103,22 @@ IDEXStageRegisters *IDEXStageRegisters::init() {
     return IDEXStageRegisters::current_instance;
 }
 
+void IDEXStageRegisters::initDependencies() {
+    this->instruction = new Instruction(std::string(32, '0'));
+    this->control = new Control(this->instruction);
+
+    this->ex_mux_alu_input_1 = EXMuxALUInput1::init();
+    this->ex_mux_alu_input_2 = EXMuxALUInput2::init();
+    this->ex_adder = EXAdder::init();
+    this->forwarding_unit = ForwardingUnit::init();
+    this->ex_mem_stage_register = EXMEMStageRegisters::init();
+    this->stage_synchronizer = StageSynchronizer::init();
+    this->logger = Logger::init();
+}
+
 void IDEXStageRegisters::run() {
+    this->initDependencies();
+
     while (this->isAlive()) {
         this->logger->log(Stage::ID, "[IDEXStageRegisters] Waiting to be woken up and acquire lock.");
 
@@ -321,7 +336,7 @@ void IDEXStageRegisters::setRegisterSource1(unsigned long rs1) {
 
     if (!this->is_nop_asserted) {
         this->register_source1 = rs1;
-        this->logger->log(Stage::ID, "[IDEXStageRegisters] setRegisterSource1 acquired lock. Updating value.");
+        this->logger->log(Stage::ID, "[IDEXStageRegisters] setRegisterSource1 value updated.");
     } else {
         this->logger->log(Stage::ID, "[IDEXStageRegisters] setRegisterSource1 update skipped. NOP asserted.");
     }
@@ -341,7 +356,7 @@ void IDEXStageRegisters::setRegisterSource2(unsigned long rs2) {
 
     if (!this->is_nop_asserted) {
         this->register_source2 = rs2;
-        this->logger->log(Stage::ID, "[IDEXStageRegisters] setRegisterSource2 acquired lock. Updating value.");
+        this->logger->log(Stage::ID, "[IDEXStageRegisters] setRegisterSource2 value updated.");
     } else {
         this->logger->log(Stage::ID, "[IDEXStageRegisters] setRegisterSource2 update skipped. NOP asserted.");
     }

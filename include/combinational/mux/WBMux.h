@@ -41,6 +41,7 @@ public:
 protected:
     void passOutput() override;
     void passOutputToForwardingMuxes();
+    void initDependencies() override;
 };
 
 #endif //RISC_V_SIMULATOR_WBMUX_H

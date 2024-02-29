@@ -55,6 +55,7 @@ public:
     static Logger *init();
 
     void log(Stage current_stage, const std::string &message);
+    void run();
     void kill();
 
 private:

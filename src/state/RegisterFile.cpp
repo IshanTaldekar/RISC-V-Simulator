@@ -5,11 +5,18 @@ RegisterFile *RegisterFile::current_instance = nullptr;
 RegisterFile::RegisterFile() {
     this->is_single_read_register_set = false;
     this->is_double_read_register_set = false;
-    this->is_write_register_set = false;
-    this->is_reg_write_signal_set = false;
     this->is_write_thread_finished = false;
-    this->is_write_data_set = false;
     this->is_reset_flag_set = false;
+
+    if (this->getPipelineType() == PipelineType::Single) {
+        this->is_write_register_set = true;
+        this->is_write_data_set = true;
+        this->is_reg_write_signal_set = true;
+    } else {
+        this->is_write_register_set = false;
+        this->is_write_data_set = false;
+        this->is_reg_write_signal_set = false;
+    }
 
     this->is_reg_write_signal_asserted = false;
 
@@ -18,10 +25,8 @@ RegisterFile::RegisterFile() {
 
     this->register_destination = 0UL;
 
-    this->logger = Logger::init();
-    this->id_ex_stage_registers = IDEXStageRegisters::init();
-
-    this->resetRegisterFileContents();
+    this->logger = nullptr;
+    this->id_ex_stage_registers = nullptr;
 }
 
 RegisterFile *RegisterFile::init() {
@@ -32,7 +37,15 @@ RegisterFile *RegisterFile::init() {
     return RegisterFile::current_instance;
 }
 
+void RegisterFile::initDependencies() {
+    this->logger = Logger::init();
+    this->id_ex_stage_registers = IDEXStageRegisters::init();
+}
+
 void RegisterFile::run() {
+    this->initDependencies();
+    this->resetRegisterFileContents();
+
     while (this->isAlive()) {
         this->logger->log(Stage::ID, "[RegisterFile] Waiting to be woken up and acquire lock.");
 
@@ -54,6 +67,7 @@ void RegisterFile::run() {
         if (this->is_reset_flag_set) {
             this->logger->log(Stage::ID, "[RegisterFile] Resetting stage.");
 
+            this->resetState();
             this->resetRegisterFileContents();
 
             this->logger->log(Stage::ID, "[RegisterFile] Reset.");
@@ -173,9 +187,6 @@ void RegisterFile::passReadRegisterDataToIDEXStageRegister() {
             [this] { return this->is_write_thread_finished; }
     );
 
-
-    std::lock_guard<std::mutex> register_file_lock (this->getModuleMutex());
-
     if (!this->is_single_read_register_set && !this->is_double_read_register_set) {
         throw std::runtime_error("[RegisterFile] no register read set for a cycle.");
     }
@@ -203,8 +214,6 @@ void RegisterFile::passReadRegisterDataToIDEXStageRegister() {
 void RegisterFile::writeDataToRegisterFile() {
     this->logger->log(Stage::IF, "[RegisterFile] writeDataToRegisterFile Waiting to acquire lock to "
                                  "write to register file.");
-
-    std::lock_guard<std::mutex> register_file_lock (this->getModuleMutex());
 
     if ( this->is_reg_write_signal_set && this->is_reg_write_signal_asserted && this->register_destination != 0) {
         this->registers.at(this->register_destination) = this->write_data;
@@ -238,3 +247,16 @@ void RegisterFile::resetRegisterFileContents() {
     this->logger->log(Stage::IF, "[RegisterFile] Registers cleared.");
 }
 
+void RegisterFile::resetState() {
+    if (this->getPipelineType() == PipelineType::Single) {
+        this->is_write_register_set = true;
+        this->is_write_data_set = true;
+        this->is_reg_write_signal_set = true;
+    } else {
+        this->is_write_register_set = false;
+        this->is_write_data_set = false;
+        this->is_reg_write_signal_set = false;
+    }
+
+    this->is_reg_write_signal_asserted = false;
+}

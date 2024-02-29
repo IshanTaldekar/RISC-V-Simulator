@@ -11,10 +11,10 @@ WBMux::WBMux() {
     this->is_read_data_set = false;
     this->is_alu_result_set = false;
 
-    this->register_file = RegisterFile::init();
-    this->alu_input_1_forwarding_mux = ALUInput1ForwardingMux::init();
-    this->alu_input_2_forwarding_mux = ALUInput2ForwardingMux::init();
-    this->logger = Logger::init();
+    this->register_file = nullptr;
+    this->alu_input_1_forwarding_mux = nullptr;
+    this->alu_input_2_forwarding_mux = nullptr;
+    this->logger = nullptr;
 }
 
 WBMux *WBMux::init() {
@@ -25,7 +25,16 @@ WBMux *WBMux::init() {
     return WBMux::current_instance;
 }
 
+void WBMux::initDependencies() {
+    this->register_file = RegisterFile::init();
+    this->alu_input_1_forwarding_mux = ALUInput1ForwardingMux::init();
+    this->alu_input_2_forwarding_mux = ALUInput2ForwardingMux::init();
+    this->logger = Logger::init();
+}
+
 void WBMux::run() {
+    this->initDependencies();
+
     while (this->isAlive()) {
         this->logger->log(Stage::WB, "[WBMux] Waiting to be woken up and acquire lock.");
 

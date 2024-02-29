@@ -60,6 +60,7 @@ enum class InstructionType {
     J,
     B,
     S,
+    HALT,
     CUSTOM,
     UNKNOWN
 };

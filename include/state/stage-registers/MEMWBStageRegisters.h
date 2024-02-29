@@ -60,6 +60,7 @@ private:
     void passRegisterDestinationToForwardingUnit();
 
     void resetStage();
+    void initDependencies() override;
 };
 
 #endif //RISC_V_SIMULATOR_MEMWBSTAGEREGISTERS_H

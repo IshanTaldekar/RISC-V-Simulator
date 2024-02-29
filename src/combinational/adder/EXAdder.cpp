@@ -7,8 +7,8 @@ EXAdder::EXAdder() {
     this->immediate = 0UL;
     this->result = 0UL;
 
-    this->ex_mem_stage_registers = EXMEMStageRegisters::init();
-    this->logger = Logger::init();
+    this->ex_mem_stage_registers = nullptr;
+    this->logger = nullptr;
 
     this->is_program_counter_set = false;
     this->is_immediate_set = false;
@@ -22,7 +22,14 @@ EXAdder *EXAdder::init() {
     return EXAdder::current_instance;
 }
 
+void EXAdder::initDependencies() {
+    this->ex_mem_stage_registers = EXMEMStageRegisters::init();
+    this->logger = Logger::init();
+}
+
 void EXAdder::run() {
+    this->initDependencies();
+
     while (this->isAlive()) {
         this->logger->log(Stage::EX, "[EXAdder] Waiting to be woken up and acquire lock.");
 
@@ -67,7 +74,6 @@ void EXAdder::setInput(AdderInputType type, unsigned long value) {
     }
 
     this->logger->log(Stage::EX, "[EXAdder] setInput value updated.");
-
     this->notifyModuleConditionVariable();
 }
 

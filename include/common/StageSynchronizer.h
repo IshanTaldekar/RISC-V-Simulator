@@ -21,7 +21,7 @@ class StageSynchronizer {
     std::barrier<std::function<void()>> *single_stage_barrier;
     std::barrier<std::function<void()>> *five_stage_barrier;
 
-    bool is_single_stage_mode;
+    PipelineType current_pipeline_type;
 
     static constexpr int SINGLE_STAGE_THREAD_COUNT = 5;
     static constexpr int FIVE_STAGE_THREAD_COUNT = 17;
@@ -34,6 +34,8 @@ class StageSynchronizer {
     EXMEMStageRegisters *ex_mem_stage_registers;
     MEMWBStageRegisters *mem_wb_stage_registers;
 
+    int current_cycle;
+
 public:
     StageSynchronizer();
 
@@ -42,7 +44,7 @@ public:
     void conditionalArriveSingleStage();
     void conditionalArriveFiveStage();
 
-    void setStage(PipelineType current_stage);
+    void setStage(PipelineType new_pipeline_type);
 
 private:
     void onCompletionSingleStage();

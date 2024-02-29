@@ -6,8 +6,8 @@ ImmediateGenerator::ImmediateGenerator() {
     this->is_instruction_set = false;
     this->instruction = new Instruction(std::string(32, '0'));
 
-    this->id_ex_stage_registers = IDEXStageRegisters::init();
-    this->logger = Logger::init();
+    this->id_ex_stage_registers = nullptr;
+    this->logger = nullptr;
 }
 
 ImmediateGenerator *ImmediateGenerator::init() {
@@ -18,7 +18,14 @@ ImmediateGenerator *ImmediateGenerator::init() {
     return ImmediateGenerator::current_instance;
 }
 
+void ImmediateGenerator::initDependencies() {
+    this->id_ex_stage_registers = IDEXStageRegisters::init();
+    this->logger = Logger::init();
+}
+
 void ImmediateGenerator::run() {
+    this->initDependencies();
+
     while (this->isAlive()) {
         this->logger->log(Stage::ID, "[ImmediateGenerator] Waiting to be woken up and acquire lock.");
 
@@ -49,6 +56,7 @@ void ImmediateGenerator::setInstruction(const Instruction *current_instruction) 
     this->logger->log(Stage::ID, "[ImmediateGenerator] setInstruction acquired lock. Updating value.");
 
     this->instruction = current_instruction;
+    this->is_instruction_set = true;
 
     this->logger->log(Stage::ID, "[ImmediateGenerator] setInstruction value updated.");
     this->notifyModuleConditionVariable();

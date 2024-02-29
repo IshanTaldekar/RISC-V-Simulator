@@ -10,11 +10,11 @@ Driver::Driver() {
     this->is_reset_flag_set = false;
     this->is_pause_flag_set = false;
 
-    this->instruction_memory = InstructionMemory::init();
-    this->if_id_stage_registers = IFIDStageRegisters::init();
-    this->if_adder = IFAdder::init();
-    this->logger = Logger::init();
-    this->stage_synchronizer = StageSynchronizer::init();
+    this->instruction_memory = nullptr;
+    this->if_id_stage_registers = nullptr;
+    this->if_adder = nullptr;
+    this->logger = nullptr;
+    this->stage_synchronizer = nullptr;
 }
 
 void Driver::changeStageAndReset(PipelineType new_stage) {
@@ -84,7 +84,17 @@ Driver *Driver::init() {
     return Driver::current_instance;
 }
 
+void Driver::initDependencies() {
+    this->instruction_memory = InstructionMemory::init();
+    this->if_id_stage_registers = IFIDStageRegisters::init();
+    this->if_adder = IFAdder::init();
+    this->logger = Logger::init();
+    this->stage_synchronizer = StageSynchronizer::init();
+}
+
 void Driver::run() {
+    this->initDependencies();
+
     while (this->isAlive()) {
         this->logger->log(Stage::IF, "[Driver] Waiting to be woken up and acquire lock.");
 
@@ -117,6 +127,7 @@ void Driver::run() {
         this->passProgramCounterToInstructionMemory();
 
         std::thread pass_program_counter_thread (&Driver::passProgramCounterToIFIDStageRegisters, this);
+        pass_program_counter_thread.join();
 
         this->is_new_program_counter_set = false;
 

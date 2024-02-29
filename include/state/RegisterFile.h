@@ -65,6 +65,9 @@ private:
     void passReadRegisterDataToIDEXStageRegister();
     void writeDataToRegisterFile();
     void resetRegisterFileContents();
+
+    void initDependencies() override;
+    void resetState();
 };
 
 #endif //RISC_V_SIMULATOR_REGISTERFILE_H

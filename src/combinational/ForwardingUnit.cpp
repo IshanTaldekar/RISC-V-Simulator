@@ -17,9 +17,9 @@ ForwardingUnit::ForwardingUnit() {
     this->alu_input_1_mux_control_signal = ALUInputMuxControlSignals::IDEXStageRegisters;
     this->alu_input_2_mux_control_signal = ALUInputMuxControlSignals::IDEXStageRegisters;
 
-    this->alu_input_1_mux = ALUInput1ForwardingMux::init();
-    this->alu_input_2_mux = ALUInput2ForwardingMux::init();
-    this->logger = Logger::init();
+    this->alu_input_1_mux = nullptr;
+    this->alu_input_2_mux = nullptr;
+    this->logger = nullptr;
 }
 
 ForwardingUnit *ForwardingUnit::init() {
@@ -30,7 +30,15 @@ ForwardingUnit *ForwardingUnit::init() {
     return ForwardingUnit::current_instance;
 }
 
+void ForwardingUnit::initDependencies() {
+    this->alu_input_1_mux = ALUInput1ForwardingMux::init();
+    this->alu_input_2_mux = ALUInput2ForwardingMux::init();
+    this->logger = Logger::init();
+}
+
 void ForwardingUnit::run() {
+    this->initDependencies();
+
     while (this->isAlive()) {
         this->logger->log(Stage::EX, "[ForwardingUnit] Waiting to be woken up and acquire lock.");
 

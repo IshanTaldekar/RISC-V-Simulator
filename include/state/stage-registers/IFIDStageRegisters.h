@@ -69,7 +69,9 @@ private:
     void passRegisterSource1ToIDEXStageRegisters();
     void passRegisterSource2ToIDEXStageRegisters();
     void passInstructionToIDEXStageRegisters();
+
     void resetStage();
+    void initDependencies() override;
 };
 
 #endif //RISC_V_SIMULATOR_IFIDSTAGEREGISTERS_H

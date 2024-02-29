@@ -7,10 +7,15 @@ ALUInputForwardingMuxBase::ALUInputForwardingMuxBase() {
 
     this->control_signal = ALUInputMuxControlSignals::IDEXStageRegisters;
 
+    this->alu = nullptr;
+    this->logger = nullptr;
+
     this->is_id_ex_stage_registers_value_set = false;
     this->is_ex_mem_stage_registers_value_set = false;
     this->is_mem_wb_stage_registers_value_set = false;
+}
 
+void ALUInputForwardingMuxBase::initDependencies() {
     this->alu = ALU::init();
     this->logger = Logger::init();
 }
@@ -54,6 +59,8 @@ void ALUInputForwardingMuxBase::setMuxControlSignal(ALUInputMuxControlSignals ne
 }
 
 void ALUInputForwardingMuxBase::run() {
+    this->initDependencies();
+
     while (this->isAlive()) {
         this->logger->log(Stage::EX, "[" + this->getModuleTag() + "] Waiting to be woken up and acquire lock.");
 

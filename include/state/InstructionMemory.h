@@ -42,6 +42,7 @@ private:
     void readInstructionMemoryFile();
 
     void passInstructionIntoIFIDStageRegisters();
+    void initDependencies() override;
 };
 
 #endif //RISC_V_SIMULATOR_INSTRUCTIONMEMORY_H

@@ -1,6 +1,6 @@
 #include "../../include/common/Instruction.h"
 
-Instruction::Instruction(const std::string &instruction) {
+Instruction::Instruction(std::string instruction) {
     this->instruction = instruction;
 
     this->opcode_to_type_mapping = std::unordered_map<std::string, InstructionType>{
@@ -10,7 +10,8 @@ Instruction::Instruction(const std::string &instruction) {
             {"1100011", InstructionType::B},
             {"0000011", InstructionType::I},
             {"0100011", InstructionType::S},
-            {"1111111", InstructionType::CUSTOM}
+            {"1111111", InstructionType::HALT},
+            {"0000000", InstructionType::CUSTOM}
     };
 }
 

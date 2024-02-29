@@ -13,8 +13,8 @@ ALU::ALU() {
     this->is_input2_set = false;
     this->is_alu_op_set = false;
 
-    this->ex_mem_stage_registers = EXMEMStageRegisters::init();
-    this->logger = Logger::init();
+    this->ex_mem_stage_registers = nullptr;
+    this->logger = nullptr;
 }
 
 void ALU::setInput1(unsigned long value) {
@@ -60,6 +60,8 @@ void ALU::setALUOp(const std::bitset<ALU_OP_BIT_COUNT> &value) {
 }
 
 void ALU::run() {
+    this->initDependencies();
+
     while (this->isAlive()) {
         this->logger->log(Stage::EX, "[ALU] Waiting to be woken up and acquire lock.");
 
@@ -99,6 +101,11 @@ ALU *ALU::init() {
     }
 
     return ALU::current_instance;
+}
+
+void ALU::initDependencies() {
+    this->ex_mem_stage_registers = EXMEMStageRegisters::init();
+    this->logger = Logger::init();
 }
 
 void ALU::computeResult() {

@@ -30,6 +30,9 @@ public:
 
     void setPipelineType(PipelineType current_type);
     PipelineType getPipelineType();
+
+protected:
+    virtual void initDependencies() = 0;
 };
 
 #endif //RISC_V_SIMULATOR_MODULE_H

@@ -33,6 +33,7 @@ public:
 
 private:
     void loadImmediateToIDEXStageRegisters();
+    void initDependencies() override;
 };
 
 #endif //RISC_V_SIMULATOR_IMMEDIATEGENERATOR_H

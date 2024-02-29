@@ -1,18 +1,7 @@
 #include "../../include/common/Control.h"
 
-Control::Control(const Instruction *current_instruction) {
+Control::Control(Instruction *current_instruction) {
     this->instruction = current_instruction;
-
-    this->register_file = RegisterFile::init();
-    this->if_mux = IFMux::init();
-    this->ex_mux_alu_input_1 = EXMuxALUInput1::init();
-    this->ex_mux_alu_input_2 = EXMuxALUInput2::init();
-    this->alu = ALU::init();
-    this->data_memory = DataMemory::init();
-    this->wb_mux = WBMux::init();
-    this->if_id_stage_registers = IFIDStageRegisters::init();
-    this->id_ex_stage_registers = IDEXStageRegisters::init();
-    this->ex_mem_stage_registers = EXMEMStageRegisters::init();
 
     this->is_reg_write_asserted = false;
     this->is_pc_src_asserted = false;
@@ -24,6 +13,17 @@ Control::Control(const Instruction *current_instruction) {
     this->is_branch_instruction = false;
     this->is_alu_result_zero = false;
     this->is_jal_instruction = false;
+
+    this->register_file = nullptr;
+    this->if_mux = nullptr;
+    this->ex_mux_alu_input_1 = nullptr;
+    this->ex_mux_alu_input_2 = nullptr;
+    this->alu = nullptr;
+    this->data_memory = nullptr;
+    this->wb_mux = nullptr;
+    this->if_id_stage_registers = nullptr;
+    this->id_ex_stage_registers = nullptr;
+    this->ex_mem_stage_registers = nullptr;
 
     this->generateSignals();
     this->generateALUOpCode();
@@ -96,6 +96,10 @@ void Control::setIsALUResultZero(bool is_result_zero) {
 }
 
 void Control::toggleEXStageControlSignals() {
+    if (!this->alu) {
+        this->initDependencies();
+    }
+
     this->alu->setALUOp(this->alu_op);
 
     this->ex_mux_alu_input_2->assertControlSignal(this->is_alu_src_asserted);
@@ -104,6 +108,10 @@ void Control::toggleEXStageControlSignals() {
 }
 
 void Control::toggleMEMStageControlSignals() {
+    if (!this->if_mux) {
+        this->initDependencies();
+    }
+
     this->is_pc_src_asserted &= (this->is_alu_result_zero & this->is_branch_instruction);
 
     this->if_mux->assertControlSignal(this->is_pc_src_asserted);
@@ -118,6 +126,10 @@ void Control::toggleMEMStageControlSignals() {
 }
 
 void Control::toggleWBStageControlSignals() {
+    if (!this->register_file) {
+        this->initDependencies();
+    }
+
     this->register_file->setRegWriteSignal(this->is_reg_write_asserted);
     this->wb_mux->assertControlSignal(this->is_mem_to_reg_asserted);
 
@@ -125,4 +137,17 @@ void Control::toggleWBStageControlSignals() {
         this->id_ex_stage_registers->assertNop();
         this->ex_mem_stage_registers->assertNop();
     }
+}
+
+void Control::initDependencies() {
+    this->register_file = RegisterFile::init();
+    this->if_mux = IFMux::init();
+    this->ex_mux_alu_input_1 = EXMuxALUInput1::init();
+    this->ex_mux_alu_input_2 = EXMuxALUInput2::init();
+    this->alu = ALU::init();
+    this->data_memory = DataMemory::init();
+    this->wb_mux = WBMux::init();
+    this->if_id_stage_registers = IFIDStageRegisters::init();
+    this->id_ex_stage_registers = IDEXStageRegisters::init();
+    this->ex_mem_stage_registers = EXMEMStageRegisters::init();
 }

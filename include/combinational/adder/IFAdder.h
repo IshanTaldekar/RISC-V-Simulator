@@ -27,6 +27,7 @@ public:
 
 private:
     void passProgramCounterToIFMux();
+    void initDependencies() override;
 };
 
 #endif //RISC_V_SIMULATOR_IFADDER_H

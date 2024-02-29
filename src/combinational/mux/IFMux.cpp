@@ -3,9 +3,6 @@
 IFMux *IFMux::current_instance = nullptr;
 
 IFMux::IFMux() {
-    this->driver = Driver::init();
-    this->logger = Logger::init();
-
     this->is_pc_src_signal_asserted = false;
     this->is_incremented_pc_set = false;
     this->is_branched_pc_set = false;
@@ -14,6 +11,9 @@ IFMux::IFMux() {
     this->branched_pc = 0UL;
 
     this->is_control_signal_set = false;
+
+    this->driver = nullptr;
+    this->logger = nullptr;
 }
 
 IFMux *IFMux::init() {
@@ -24,7 +24,14 @@ IFMux *IFMux::init() {
     return IFMux::current_instance;
 }
 
+void IFMux::initDependencies() {
+    this->driver = Driver::init();
+    this->logger = Logger::init();
+}
+
 void IFMux::run() {
+    this->initDependencies();
+
     while (this->isAlive()) {
         this->logger->log(Stage::IF, "[IFMux] Waiting to be woken up and acquire lock.");
 

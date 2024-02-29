@@ -18,8 +18,8 @@ DataMemory::DataMemory() {
     this->is_input_file_read = false;
     this->is_reset_flag_set = false;
 
-    this->mem_wb_stage_registers = MEMWBStageRegisters::init();
-    this->logger = Logger::init();
+    this->mem_wb_stage_registers = nullptr;
+    this->logger = nullptr;
 }
 
 DataMemory *DataMemory::init() {
@@ -30,7 +30,14 @@ DataMemory *DataMemory::init() {
     return DataMemory::current_instance;
 }
 
+void DataMemory::initDependencies() {
+    this->mem_wb_stage_registers = MEMWBStageRegisters::init();
+    this->logger = Logger::init();
+}
+
 void DataMemory::run() {
+    this->initDependencies();
+
     this->logger->log(Stage::MEM, "[DataMemory] Waiting for data memory file to be set and acquire lock.");
 
     std::unique_lock<std::mutex> data_memory_lock (this->getModuleMutex());
@@ -81,6 +88,10 @@ void DataMemory::run() {
 }
 
 void DataMemory::setDataMemoryInputFilePath(const std::string &file_path) {
+    if (!this->logger) {
+        this->initDependencies();
+    }
+
     this->logger->log(Stage::MEM, "[DataMemory] setDataMemoryInputFilePath waiting to acquire lock.");
 
     std::lock_guard<std::mutex> data_memory_lock (this->getModuleMutex());

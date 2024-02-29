@@ -36,6 +36,7 @@ public:
 
 protected:
     virtual std::string getModuleTag() = 0;
+    void initDependencies() override;
 };
 
 #endif //RISC_V_SIMULATOR_ALUINPUTFORWARDINGMUXBASE_H

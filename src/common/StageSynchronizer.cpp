@@ -15,11 +15,13 @@ StageSynchronizer::StageSynchronizer() {
     this->ex_mem_stage_registers = EXMEMStageRegisters::init();
     this->mem_wb_stage_registers = MEMWBStageRegisters::init();
 
-    this->is_single_stage_mode = true;
+    this->current_cycle = 0;
+
+    this->current_pipeline_type = PipelineType::Single;
 }
 
 void StageSynchronizer::conditionalArriveFiveStage() {
-    if (!this->is_single_stage_mode) {
+    if (this->current_pipeline_type == PipelineType::Five) {
         this->five_stage_barrier->arrive_and_wait();
     }
 }
@@ -33,19 +35,19 @@ StageSynchronizer* StageSynchronizer::init() {
 }
 
 void StageSynchronizer::conditionalArriveSingleStage() {
-    if (this->is_single_stage_mode) {
+    if (this->current_pipeline_type == PipelineType::Single) {
         this->single_stage_barrier->arrive_and_wait();
     }
 }
 
 void StageSynchronizer::onCompletionFiveStage() {
-    // TODO
+    std::cout << this->current_cycle++ << std::endl;
 }
 
 void StageSynchronizer::onCompletionSingleStage() {
-    // TODO
+    std::cout << this->current_cycle++ << std::endl;
 }
 
-void StageSynchronizer::setStage(PipelineType current_stage) {
-    this->is_single_stage_mode = current_stage == PipelineType::Single;
+void StageSynchronizer::setStage(PipelineType new_pipeline_type) {
+    this->current_pipeline_type = new_pipeline_type;
 }

@@ -36,6 +36,7 @@ public:
 
 protected:
     void passOutput() override;
+    void initDependencies() override;
 };
 
 #endif //RISC_V_SIMULATOR_IFMUX_H

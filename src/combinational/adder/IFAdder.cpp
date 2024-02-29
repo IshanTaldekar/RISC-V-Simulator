@@ -6,8 +6,8 @@ IFAdder::IFAdder() {
     this->program_counter = 0;
     this->is_program_counter_set = false;
 
-    this->if_mux = IFMux::init();
-    this->logger = Logger::init();
+    this->if_mux = nullptr;
+    this->logger = nullptr;
 }
 
 IFAdder *IFAdder::init() {
@@ -18,7 +18,14 @@ IFAdder *IFAdder::init() {
     return IFAdder::current_instance;
 }
 
+void IFAdder::initDependencies() {
+    this->if_mux = IFMux::init();
+    this->logger = Logger::init();
+}
+
 void IFAdder::run() {
+    this->initDependencies();
+
     while (this->isAlive()) {
         this->logger->log(Stage::IF, "[IFAdder] Waiting to acquire lock and wake up.");
 

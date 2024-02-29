@@ -36,7 +36,7 @@ private:
     const std::vector<std::pair<int, int>> J_TYPE_IMMEDIATE_SEGMENTS {{0, 20}};
 
 public:
-    explicit Instruction(const std::string &instruction);
+    explicit Instruction(std::string instruction);
 
     std::bitset<FUNCT7_BIT_COUNT> getFunct7() const;
     std::bitset<FUNCT3_BIT_COUNT> getFunct3() const;
