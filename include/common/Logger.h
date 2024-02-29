@@ -47,6 +47,7 @@ class Logger {
     std::ofstream wb_stage_log_file;
 
     static Logger *current_instance;
+    static std::mutex initialization_mutex;
 
 public:
     Logger();
@@ -55,7 +56,6 @@ public:
     static Logger *init();
 
     void log(Stage current_stage, const std::string &message);
-    void run();
     void kill();
 
 private:

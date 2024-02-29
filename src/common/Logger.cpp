@@ -1,6 +1,7 @@
 #include "../../include/common/Logger.h"
 
 Logger *Logger::current_instance = nullptr;
+std::mutex Logger::initialization_mutex;
 
 Logger::Logger() {
     this->is_killed = false;
@@ -10,25 +11,7 @@ Logger::Logger() {
     this->ex_stage_log_file.open(LOG_DIRECTORY_PATH + EX_STAGE_LOG_FILE_NAME);
     this->mem_stage_log_file.open(LOG_DIRECTORY_PATH + MEM_STAGE_LOG_FILE_NAME);
     this->wb_stage_log_file.open(LOG_DIRECTORY_PATH + WB_STAGE_LOG_FILE_NAME);
-}
 
-Logger::~Logger() {
-    this->if_stage_log_file.close();
-    this->id_stage_log_file.close();
-    this->ex_stage_log_file.close();
-    this->mem_stage_log_file.close();
-    this->wb_stage_log_file.close();
-}
-
-Logger *Logger::init() {
-    if (Logger::current_instance == nullptr) {
-        Logger::current_instance = new Logger();
-    }
-
-    return Logger::current_instance;
-}
-
-void Logger::run() {
     std::thread if_stage_log_writer (&Logger::writeIFStageMessagesToFile, this);
     std::thread id_stage_log_writer (&Logger::writeIDStageMessagesToFile, this);
     std::thread ex_stage_log_writer (&Logger::writeEXStageMessagesToFile, this);
@@ -40,10 +23,24 @@ void Logger::run() {
     ex_stage_log_writer.detach();
     mem_stage_log_writer.detach();
     wb_stage_log_writer.detach();
+}
 
-    while (!this->is_killed) {
-        sleep(1);
+Logger::~Logger() {
+    this->if_stage_log_file.close();
+    this->id_stage_log_file.close();
+    this->ex_stage_log_file.close();
+    this->mem_stage_log_file.close();
+    this->wb_stage_log_file.close();
+}
+
+Logger *Logger::init() {
+    std::lock_guard<std::mutex> logger_lock (Logger::initialization_mutex);
+    
+    if (Logger::current_instance == nullptr) {
+        Logger::current_instance = new Logger();
     }
+
+    return Logger::current_instance;
 }
 
 void Logger::log(Stage current_stage, const std::string &message) {
