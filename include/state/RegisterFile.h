@@ -45,6 +45,8 @@ class RegisterFile: public Module {
     Logger *logger;
     IDEXStageRegisters *id_ex_stage_registers;
 
+    std::string output_file_path;
+
 public:
     RegisterFile();
 
@@ -61,6 +63,8 @@ public:
     void setRegWriteSignal(bool is_asserted);
 
     void reset();
+
+    void writeRegisterFileContentsToOutputFile();
 
 private:
     void passReadRegisterDataToIDEXStageRegister();

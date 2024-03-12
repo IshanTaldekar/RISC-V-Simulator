@@ -28,6 +28,10 @@ RegisterFile::RegisterFile() {
 
     this->logger = nullptr;
     this->id_ex_stage_registers = nullptr;
+
+    this->output_file_path = "../output/RegisterFile.out";
+    std::ofstream output_file (this->output_file_path, std::ios::out);
+    output_file.close();
 }
 
 RegisterFile *RegisterFile::init() {
@@ -81,6 +85,9 @@ void RegisterFile::run() {
 
         std::thread write_register_thread (&RegisterFile::writeDataToRegisterFile, this);
         std::thread pass_data_thread (&RegisterFile::passReadRegisterDataToIDEXStageRegister, this);
+
+        write_register_thread.detach();
+        pass_data_thread.detach();
 
         this->getModuleConditionVariable().wait(
                 register_file_lock,
@@ -169,7 +176,7 @@ void RegisterFile::setRegWriteSignal(bool is_asserted) {
 void RegisterFile::setWriteData(unsigned long value) {
     this->logger->log(Stage::ID, "[RegisterFile] setWriteData waiting to acquire lock.");
 
-    std::lock_guard<std::mutex> register_file_lock (this->getModuleMutex());
+    std::unique_lock<std::mutex> load_lock (this->write_load_mutex);
 
     this->logger->log(Stage::ID, "[RegisterFile] setWriteData acquired lock. Updating value.");
 
@@ -262,4 +269,15 @@ void RegisterFile::resetState() {
     }
 
     this->is_reg_write_signal_asserted = false;
+}
+
+void RegisterFile::writeRegisterFileContentsToOutputFile() {
+    std::ofstream output_file (this->output_file_path, std::ios::app);
+
+    for (const std::bitset<RegisterFile::WORD_BIT_COUNT> &data: this->registers) {
+        output_file << data.to_string() << std::endl;
+    }
+
+    output_file << std::endl << std::string(20, '-') << std::endl << std::endl;
+    output_file.close();
 }
