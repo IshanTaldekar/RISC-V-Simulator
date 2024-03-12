@@ -174,6 +174,22 @@ void MEMWBStageRegisters::setRegisterDestination(unsigned long value) {
     this->notifyModuleConditionVariable();
 }
 
+void MEMWBStageRegisters::setControl(Control *new_control) {
+    this->stage_synchronizer->conditionalArriveFiveStage();
+
+    this->logger->log(Stage::MEM, "[MEMWBStageRegisters] setControl waiting to acquire lock.");
+
+    std::lock_guard<std::mutex> mem_wb_stage_registers_lock (this->getModuleMutex());
+
+    this->logger->log(Stage::MEM, "[MEMWBStageRegisters] setControl acquired lock. Updating value.");
+
+    this->control = new_control;
+    this->is_control_set = true;
+
+    this->logger->log(Stage::MEM, "[MEMWBStageRegisters] setControl updated value.");
+    this->notifyModuleConditionVariable();
+}
+
 void MEMWBStageRegisters::passALUResultToWBMux() {
     this->logger->log(Stage::MEM, "[MEMWBStageRegisters] Passing ALU result to WBMux.");
     this->wb_mux->setInput(WBStageMuxInputType::ALUResult, this->alu_result);

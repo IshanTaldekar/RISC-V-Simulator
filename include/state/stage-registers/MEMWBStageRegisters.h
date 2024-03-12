@@ -49,6 +49,7 @@ public:
     void setReadData(unsigned long value);
     void setALUResult(unsigned long value);
     void setRegisterDestination(unsigned long value);
+    void setControl(Control *new_control);
 
     void reset();
     void pause();
