@@ -16,6 +16,9 @@ StageSynchronizer::StageSynchronizer() {
     this->ex_mem_stage_registers = EXMEMStageRegisters::init();
     this->mem_wb_stage_registers = MEMWBStageRegisters::init();
 
+    this->register_file = RegisterFile::init();
+    this->data_memory = DataMemory::init();
+
     this->current_cycle = 0;
 
     this->current_pipeline_type = PipelineType::Single;
@@ -44,11 +47,18 @@ void StageSynchronizer::conditionalArriveSingleStage() {
 }
 
 void StageSynchronizer::onCompletionFiveStage() {
-    std::cout << this->current_cycle++ << std::endl;
+    std::cout << "Cycle: " << this->current_cycle++ << std::endl;
 }
 
 void StageSynchronizer::onCompletionSingleStage() {
-    std::cout << this->current_cycle++ << std::endl;
+    std::cout << "Cycle: " << this->current_cycle++ << std::endl;
+
+    this->register_file->writeRegisterFileContentsToOutputFile();
+
+    if (this->if_id_stage_registers->getInstruction()->getType() == InstructionType::HALT) {
+        this->driver->pause();
+        this->data_memory->writeDataMemoryContentsToOutput();
+    }
 }
 
 void StageSynchronizer::setStage(PipelineType new_pipeline_type) {

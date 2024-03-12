@@ -16,6 +16,8 @@ class IFIDStageRegisters;
 class IDEXStageRegisters;
 class EXMEMStageRegisters;
 class MEMWBStageRegisters;
+class RegisterFile;
+class DataMemory;
 
 class StageSynchronizer {
     std::barrier<std::function<void()>> *single_stage_barrier;
@@ -34,6 +36,9 @@ class StageSynchronizer {
     IDEXStageRegisters *id_ex_stage_registers;
     EXMEMStageRegisters *ex_mem_stage_registers;
     MEMWBStageRegisters *mem_wb_stage_registers;
+
+    RegisterFile *register_file;
+    DataMemory *data_memory;
 
     int current_cycle;
 
