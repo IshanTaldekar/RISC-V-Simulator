@@ -41,6 +41,8 @@ class DataMemory: public Module {
     MEMWBStageRegisters *mem_wb_stage_registers;
     Logger *logger;
 
+    std::string output_file_path;
+
 public:
     DataMemory();
 
@@ -56,6 +58,7 @@ public:
     void setMemRead(bool is_asserted);
 
     void reset();
+    void writeDataMemoryContentsToOutput();
 
 private:
     void readDataMemoryFile();

@@ -21,6 +21,10 @@ DataMemory::DataMemory() {
 
     this->mem_wb_stage_registers = nullptr;
     this->logger = nullptr;
+
+    this->output_file_path = "../output/DataMemory.out";
+    std::ofstream output_file (this->output_file_path, std::ios::out);
+    output_file.close();
 }
 
 DataMemory *DataMemory::init() {
@@ -55,7 +59,7 @@ void DataMemory::run() {
         this->getModuleConditionVariable().wait(
                 data_memory_lock,
                 [this] {
-                    return (this->is_address_set && this->is_write_data_set && this->is_read_data_set &&
+                    return (this->is_address_set && this->is_write_data_set &&
                             this->is_mem_write_flag_set && this->is_mem_read_flag_set && this->is_input_file_read) ||
                             this->is_reset_flag_set || this->isKilled();
                 }
@@ -104,7 +108,7 @@ void DataMemory::setDataMemoryInputFilePath(const std::string &file_path) {
     this->data_memory_file_path = file_path;
     this->readDataMemoryFile();
 
-    this->logger->log(Stage::MEM, "[DataMemory] setBranchedProgramCounter updated value.");
+    this->logger->log(Stage::MEM, "[DataMemory] setDataMemoryInputFilePath updated value.");
     this->notifyModuleConditionVariable();
 }
 
@@ -174,6 +178,12 @@ void DataMemory::readDataMemoryFile() {
         this->data_memory.push_back(byte_instruction);
     }
 
+    int data_memory_size = static_cast<int>(this->data_memory.size());
+
+    for (int i = 0; i < 1000 - data_memory_size; ++i) {
+        this->data_memory.emplace_back(8, '0');
+    }
+
     this->is_input_file_read = true;
     data_memory_file.close();
 
@@ -234,4 +244,14 @@ void DataMemory::resetState() {
     this->is_mem_write_flag_set = false;
     this->is_mem_read_flag_set = false;
     this->is_input_file_read = false;
+}
+
+void DataMemory::writeDataMemoryContentsToOutput() {
+    std::ofstream output_file (this->output_file_path, std::ios::app);
+
+    for (const std::string &data: this->data_memory) {
+        output_file << data << std::endl;
+    }
+
+    output_file.close();
 }
