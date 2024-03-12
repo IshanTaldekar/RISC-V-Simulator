@@ -62,6 +62,8 @@ public:
     void resume();
     void changeStageAndReset(PipelineType new_stage);
 
+    Instruction *getInstruction();
+
 private:
     void passProgramCounterToIDEXStageRegisters();
     void passControlToIDEXStageRegisters();

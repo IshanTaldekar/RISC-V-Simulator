@@ -82,6 +82,8 @@ private:
     void passRegisterDestinationToMEMWBStageRegisters();
     void passRegisterDestinationToForwardingUnit();
     void passBranchedAddressToIFMux();
+    void passControlToMEMWBStageRegisters();
+
     void resetStage();
     void initDependencies() override;
 };

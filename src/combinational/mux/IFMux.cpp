@@ -109,7 +109,7 @@ void IFMux::assertControlSignal(bool is_asserted) {
 void IFMux::passOutput() {
     this->logger->log(Stage::IF, "[IFMux] Passing output to Driver.");
 
-    if (this->is_pc_src_signal_asserted) {
+    if (!this->is_pc_src_signal_asserted) {
         this->driver->setProgramCounter(this->incremented_pc);
         this->logger->log(Stage::IF, "[IFMux] Passed PC to Driver.");
     } else {

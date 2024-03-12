@@ -161,9 +161,11 @@ void EXMEMStageRegisters::run() {
 
         std::thread pass_alu_result_thread (&EXMEMStageRegisters::passALUResultToMEMWBStageRegisters, this);
         std::thread pass_register_destination_thread (&EXMEMStageRegisters::passRegisterDestinationToMEMWBStageRegisters, this);
+        std::thread pass_control_thread (&EXMEMStageRegisters::passControlToMEMWBStageRegisters, this);
 
         pass_alu_result_thread.join();
         pass_register_destination_thread.join();
+        pass_control_thread.join();
 
         this->is_branch_program_counter_set = false;
         this->is_alu_result_set = false;
@@ -218,7 +220,7 @@ void EXMEMStageRegisters::setALUResult(unsigned long value) {
 }
 
 void EXMEMStageRegisters::setIsResultZeroFlag(bool asserted) {
-    this->stage_synchronizer->conditionalArriveSingleStage();
+    this->stage_synchronizer->conditionalArriveFiveStage();
 
     this->logger->log(Stage::EX, "[EXMEMStageRegisters] setIsResultZeroFlag waiting to acquire lock.");
 
@@ -296,6 +298,12 @@ void EXMEMStageRegisters::setControl(Control *new_control) {
 
     this->is_control_set = true;
     this->notifyModuleConditionVariable();
+}
+
+void EXMEMStageRegisters::passControlToMEMWBStageRegisters() {
+    this->logger->log(Stage::EX, "[EXMEMStageRegisters] Passing ALU result to Data Memory.");
+    this->mem_wb_stage_registers->setControl(this->control);
+    this->logger->log(Stage::EX, "[EXMEMStageRegisters] Passed ALU result to Data Memory.");
 }
 
 void EXMEMStageRegisters::passALUResultToDataMemory() {

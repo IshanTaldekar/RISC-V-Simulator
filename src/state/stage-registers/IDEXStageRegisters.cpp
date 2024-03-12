@@ -82,9 +82,6 @@ void IDEXStageRegisters::resetStage() {
 
     this->is_nop_asserted = false;
     this->is_reset_flag_set = false;
-
-    this->instruction = new Instruction(std::string(32, '0'));
-    this->control = new Control(this->instruction);
 }
 
 void IDEXStageRegisters::pause() {
@@ -107,8 +104,7 @@ IDEXStageRegisters *IDEXStageRegisters::init() {
 }
 
 void IDEXStageRegisters::initDependencies() {
-    this->instruction = new Instruction(std::string(32, '0'));
-    this->control = new Control(this->instruction);
+    std::lock_guard<std::mutex> id_ex_stage_registers_lock (this->getModuleMutex());
 
     this->ex_mux_alu_input_1 = EXMuxALUInput1::init();
     this->ex_mux_alu_input_2 = EXMuxALUInput2::init();
@@ -154,6 +150,11 @@ void IDEXStageRegisters::run() {
 
         this->logger->log(Stage::ID, "[IDEXStageRegisters] Woken up and acquired lock.");
 
+        if (!this->control || !this->instruction) {
+            this->instruction = new Instruction(std::string(32, '0'));
+            this->control = new Control(this->instruction);
+        }
+
         this->control->toggleEXStageControlSignals();
 
         this->passProgramCounterToEXAdder();
@@ -179,6 +180,7 @@ void IDEXStageRegisters::run() {
         this->is_program_counter_set = false;
         this->is_control_set = false;
         this->is_nop_asserted = false;
+        this->is_instruction_set = false;
         this->is_register_source1_set = false;
         this->is_register_source2_set = false;
 
@@ -188,6 +190,10 @@ void IDEXStageRegisters::run() {
 
 void IDEXStageRegisters::setRegisterData(const std::bitset<WORD_BIT_COUNT> &rd1) {
     this->stage_synchronizer->conditionalArriveFiveStage();
+
+    if (!this->logger) {
+        this->initDependencies();
+    }
 
     this->logger->log(Stage::ID, "[IDEXStageRegisters] setRegisterData waiting to acquire lock.");
 
@@ -208,6 +214,10 @@ void IDEXStageRegisters::setRegisterData(const std::bitset<WORD_BIT_COUNT> &rd1)
 
 void IDEXStageRegisters::setRegisterData(const std::bitset<WORD_BIT_COUNT> &rd1, const std::bitset<WORD_BIT_COUNT> &rd2) {
     this->stage_synchronizer->conditionalArriveFiveStage();
+
+    if (!this->logger) {
+        this->initDependencies();
+    }
 
     this->logger->log(Stage::ID, "[IDEXStageRegisters] setRegisterData waiting to acquire lock.");
 
@@ -230,6 +240,10 @@ void IDEXStageRegisters::setRegisterData(const std::bitset<WORD_BIT_COUNT> &rd1,
 void IDEXStageRegisters::setImmediate(const std::bitset<WORD_BIT_COUNT> &imm) {
     this->stage_synchronizer->conditionalArriveFiveStage();
 
+    if (!this->logger) {
+        this->initDependencies();
+    }
+
     this->logger->log(Stage::ID, "[IDEXStageRegisters] setImmediate waiting to acquire lock.");
 
     std::lock_guard<std::mutex> id_ex_stage_registers_lock (this->getModuleMutex());
@@ -249,6 +263,10 @@ void IDEXStageRegisters::setImmediate(const std::bitset<WORD_BIT_COUNT> &imm) {
 
 void IDEXStageRegisters::setRegisterDestination(unsigned long rd) {
     this->stage_synchronizer->conditionalArriveFiveStage();
+
+    if (!this->logger) {
+        this->initDependencies();
+    }
 
     this->logger->log(Stage::ID, "[IDEXStageRegisters] setRegisterDestination waiting to acquire lock.");
 
@@ -270,6 +288,10 @@ void IDEXStageRegisters::setRegisterDestination(unsigned long rd) {
 void IDEXStageRegisters::setProgramCounter(unsigned long pc) {
     this->stage_synchronizer->conditionalArriveFiveStage();
 
+    if (!this->logger) {
+        this->initDependencies();
+    }
+
     this->logger->log(Stage::ID, "[IDEXStageRegisters] setProgramCounter waiting to acquire lock.");
 
     std::lock_guard<std::mutex> id_ex_stage_registers_lock (this->getModuleMutex());
@@ -289,6 +311,10 @@ void IDEXStageRegisters::setProgramCounter(unsigned long pc) {
 
 void IDEXStageRegisters::setControlModule(Control *new_control) {
     this->stage_synchronizer->conditionalArriveFiveStage();
+
+    if (!this->logger) {
+        this->initDependencies();
+    }
 
     this->logger->log(Stage::ID, "[IDEXStageRegisters] setControlModule waiting to acquire lock.");
 
@@ -311,6 +337,10 @@ void IDEXStageRegisters::setControlModule(Control *new_control) {
 void IDEXStageRegisters::setInstruction(Instruction *current_instruction) {
     this->stage_synchronizer->conditionalArriveFiveStage();
 
+    if (!this->logger) {
+        this->initDependencies();
+    }
+
     this->logger->log(Stage::ID, "[IDEXStageRegisters] setInstruction waiting to acquire lock.");
 
     std::lock_guard<std::mutex> id_ex_stage_registers_lock (this->getModuleMutex());
@@ -331,6 +361,10 @@ void IDEXStageRegisters::setInstruction(Instruction *current_instruction) {
 void IDEXStageRegisters::setRegisterSource1(unsigned long rs1) {
     this->stage_synchronizer->conditionalArriveFiveStage();
 
+    if (!this->logger) {
+        this->initDependencies();
+    }
+
     this->logger->log(Stage::ID, "[IDEXStageRegisters] setRegisterSource1 waiting to acquire lock.");
 
     std::lock_guard<std::mutex> id_ex_stage_registers_lock (this->getModuleMutex());
@@ -350,6 +384,10 @@ void IDEXStageRegisters::setRegisterSource1(unsigned long rs1) {
 
 void IDEXStageRegisters::setRegisterSource2(unsigned long rs2) {
     this->stage_synchronizer->conditionalArriveFiveStage();
+
+    if (!this->logger) {
+        this->initDependencies();
+    }
 
     this->logger->log(Stage::ID, "[IDEXStageRegisters] setRegisterSource2 waiting to acquire lock.");
 

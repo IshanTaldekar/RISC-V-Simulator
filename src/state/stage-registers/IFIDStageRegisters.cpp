@@ -250,3 +250,7 @@ void IFIDStageRegisters::passInstructionToIDEXStageRegisters() {
     this->id_ex_stage_registers->setInstruction(this->instruction);
     this->logger->log(Stage::IF, "[IFIDStageRegisters] Passed instruction to IDEXStageRegisters.");
 }
+
+Instruction *IFIDStageRegisters::getInstruction() {
+    return this->instruction;
+}

@@ -25,6 +25,12 @@ InstructionMemory *InstructionMemory::init() {
 }
 
 void InstructionMemory::initDependencies() {
+    std::lock_guard<std::mutex> instruction_memory_lock (this->getModuleMutex());
+
+    if (this->if_id_stage_registers) {
+        return;
+    }
+
     this->if_id_stage_registers = IFIDStageRegisters::init();
     this->logger = Logger::init();
 }
@@ -97,7 +103,8 @@ void InstructionMemory::setProgramCounter(unsigned long value) {
 void InstructionMemory::fetchInstructionFromMemory() {
     this->logger->log(Stage::IF, "[InstructionMemory] Fetching instruction from data_memory.");
 
-    // TODO: Determine big/little endian
+    this->instruction.clear();
+
     for (unsigned long i = this->program_counter; i < this->program_counter + 4; ++i) {
         try {
             this->instruction += this->data.at(i);

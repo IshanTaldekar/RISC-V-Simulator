@@ -46,7 +46,6 @@ void IFAdder::run() {
         this->logger->log(Stage::IF, "[IFAdder] Woken up and acquired lock.");
 
         this->passProgramCounterToIFMux();
-        this->if_mux->notifyModuleConditionVariable();
 
         this->is_program_counter_set = false;
     }
@@ -75,6 +74,6 @@ void IFAdder::setInput(AdderInputType type, unsigned long value) {
 
 void IFAdder::passProgramCounterToIFMux() {
     this->logger->log(Stage::IF, "[IFAdder] Waiting to pass PCValue to IFMux.");
-    this->if_mux->setInput(IFStageMuxInputType::IncrementedPc, this->program_counter);
+    this->if_mux->setInput(IFStageMuxInputType::IncrementedPc, this->program_counter + 4);
     this->logger->log(Stage::IF, "[IFAdder] PCValue passed to IFMux.");
 }

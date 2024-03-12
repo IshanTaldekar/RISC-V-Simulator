@@ -56,6 +56,7 @@ void ALUInputForwardingMuxBase::setMuxControlSignal(ALUInputMuxControlSignals ne
     this->is_control_signal_set = true;
 
     this->logger->log(Stage::EX, "[" + this->getModuleTag() + "] setControlSignal control set.");
+    this->notifyModuleConditionVariable();
 }
 
 void ALUInputForwardingMuxBase::run() {
@@ -68,8 +69,9 @@ void ALUInputForwardingMuxBase::run() {
         this->getModuleConditionVariable().wait(
                 mux_lock,
                 [this] {
-                    return (this->is_id_ex_stage_registers_value_set && this->is_ex_mem_stage_registers_value_set
-                           && this->is_mem_wb_stage_registers_value_set && this->is_control_signal_set) || this->isKilled();
+                    return this->is_id_ex_stage_registers_value_set && (this->getPipelineType() == PipelineType::Single ||
+                            (this->is_ex_mem_stage_registers_value_set && this->is_mem_wb_stage_registers_value_set))
+                            && this->is_control_signal_set || this->isKilled();
                 }
         );
 
