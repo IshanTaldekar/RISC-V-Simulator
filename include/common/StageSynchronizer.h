@@ -25,7 +25,7 @@ class StageSynchronizer {
 
     PipelineType current_pipeline_type;
 
-    static constexpr int SINGLE_STAGE_THREAD_COUNT = 5;
+    static constexpr int SINGLE_STAGE_THREAD_COUNT = 6;
     static constexpr int FIVE_STAGE_THREAD_COUNT = 17;
 
     static StageSynchronizer *current_instance;
@@ -41,6 +41,8 @@ class StageSynchronizer {
     DataMemory *data_memory;
 
     int current_cycle;
+    bool is_single_stage_halt_set;
+    bool is_five_stage_halt_set;
 
 public:
     StageSynchronizer();

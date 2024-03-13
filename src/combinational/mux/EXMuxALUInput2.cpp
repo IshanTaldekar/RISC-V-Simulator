@@ -4,8 +4,8 @@ EXMuxALUInput2 *EXMuxALUInput2::current_instance = nullptr;
 std::mutex EXMuxALUInput2::initialization_mutex;
 
 EXMuxALUInput2::EXMuxALUInput2() {
-    this->immediate = 0UL;
-    this->read_data_2 = 0UL;
+    this->immediate = std::bitset<WORD_BIT_COUNT>(std::string(32, '0'));
+    this->read_data_2 = std::bitset<WORD_BIT_COUNT>(std::string(32, '0'));
 
     this->is_alu_src_asserted = false;
     this->is_pass_four_flag_asserted = false;
@@ -64,9 +64,10 @@ void EXMuxALUInput2::run() {
     }
 }
 
-void EXMuxALUInput2::setInput(MuxInputType type, unsigned long value) {
-    if (!std::holds_alternative<EXStageMuxALUInput2InputType>(type)) {
-        throw std::runtime_error("Incorrect MuxInputType passed to EXMuxALUInput2");
+void EXMuxALUInput2::setInput(const MuxInputType &type, const MuxInputDataType &value) {
+    if (!std::holds_alternative<EXStageMuxALUInput2InputType>(type) ||
+            !std::holds_alternative<std::bitset<WORD_BIT_COUNT>>(value)) {
+        throw std::runtime_error("EXMuxALUInput2::setInput: incompatible data types passed.");
     }
 
     this->logger->log(Stage::EX, "[EXMuxALUInput2] setInput waiting to be woken up and acquire lock.");
@@ -76,10 +77,10 @@ void EXMuxALUInput2::setInput(MuxInputType type, unsigned long value) {
     this->logger->log(Stage::EX, "[EXMuxALUInput2] setInput Woken up and acquired lock. Updating value.");
 
     if (std::get<EXStageMuxALUInput2InputType>(type) == EXStageMuxALUInput2InputType::ReadData2) {
-        this->read_data_2 = value;
+        this->read_data_2 = std::get<std::bitset<WORD_BIT_COUNT>>(value);
         this->is_read_data_2_set = true;
     } else if (std::get<EXStageMuxALUInput2InputType>(type) == EXStageMuxALUInput2InputType::ImmediateValue) {
-        this->immediate = value;
+        this->immediate = std::get<std::bitset<WORD_BIT_COUNT>>(value);
         this->is_immediate_set = true;
     }
 

@@ -3,6 +3,7 @@
 
 #include <variant>
 #include <string>
+#include <bitset>
 
 enum class IFAdderInputType {
     PCValue = 0
@@ -78,5 +79,10 @@ enum class Stage {
     MEM,
     WB
 };
+
+constexpr int WORD_BIT_COUNT = 32;
+
+using MuxInputDataType = std::variant<std::bitset<WORD_BIT_COUNT>, unsigned long>;
+using AdderInputDataType = std::variant<std::bitset<WORD_BIT_COUNT>, unsigned long>;
 
 #endif //RISC_V_SIMULATOR_CONFIG_H

@@ -26,8 +26,6 @@ class ForwardingUnit;
 class Logger;
 
 class IDEXStageRegisters: public Module {
-    static constexpr int WORD_BIT_COUNT = 32;
-
     Control *control;
     Instruction *instruction;
 

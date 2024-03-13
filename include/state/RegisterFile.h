@@ -8,14 +8,15 @@
 
 #include "../common/Module.h"
 #include "../common/Logger.h"
+#include "../common/StageSynchronizer.h"
 #include "../state/stage-registers/IDEXStageRegisters.h"
 
 class IDEXStageRegisters;
 class Logger;
+class StageSynchronizer;
 
 class RegisterFile: public Module {
     static constexpr int REGISTERS_COUNT = 32;
-    static constexpr int WORD_BIT_COUNT = 32;
 
     static RegisterFile *current_instance;
     static std::mutex initialization_mutex;
@@ -44,6 +45,7 @@ class RegisterFile: public Module {
 
     Logger *logger;
     IDEXStageRegisters *id_ex_stage_registers;
+    StageSynchronizer *stage_synchronizer;
 
     std::string output_file_path;
 
@@ -58,13 +60,13 @@ public:
     void setReadRegisters(unsigned long rs1, unsigned long rs2);
 
     void setWriteRegister(unsigned long rd);
-    void setWriteData(unsigned long value);
+    void setWriteData(const std::bitset<WORD_BIT_COUNT> &value);
 
     void setRegWriteSignal(bool is_asserted);
 
     void reset();
 
-    void writeRegisterFileContentsToOutputFile();
+    void writeRegisterFileContentsToOutputFile(int cycle_count);
 
 private:
     void passReadRegisterDataToIDEXStageRegister();

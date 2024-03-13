@@ -8,7 +8,7 @@
 
 class AdderBase: public Module {
 public:
-    virtual void setInput(AdderInputType type, unsigned long value) = 0;
+    virtual void setInput(const AdderInputType &type, const AdderInputDataType &value) = 0;
 };
 
 

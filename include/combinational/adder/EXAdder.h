@@ -15,7 +15,7 @@ class EXAdder: public AdderBase {
     static constexpr int WORD_BIT_COUNT = 32;
 
     unsigned long program_counter;
-    unsigned long immediate;
+    std::bitset<WORD_BIT_COUNT> immediate;
     unsigned long result;
 
     bool is_program_counter_set;
@@ -32,7 +32,7 @@ public:
     static EXAdder* init();
 
     void run() override;
-    void setInput(AdderInputType type, unsigned long value) override;
+    void setInput(const AdderInputType &type, const AdderInputDataType &value) override;
 
 private:
     void computeResult();

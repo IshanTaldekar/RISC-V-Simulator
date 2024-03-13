@@ -10,6 +10,9 @@
 #include "../combinational/mux/EXMuxALUInput1.h"
 #include "../combinational/ALU.h"
 #include "../state/DataMemory.h"
+#include "../state/stage-registers/IFIDStageRegisters.h"
+#include "../state/stage-registers/IDEXStageRegisters.h"
+#include "../state/stage-registers/EXMEMStageRegisters.h"
 
 #include <bitset>
 
@@ -20,6 +23,9 @@ class EXMuxALUInput2;
 class ALU;
 class DataMemory;
 class WBMux;
+class IFIDStageRegisters;
+class IDEXStageRegisters;
+class EXMEMStageRegisters;
 
 class Control {
 public:

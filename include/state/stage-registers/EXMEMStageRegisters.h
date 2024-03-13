@@ -24,9 +24,10 @@ class ForwardingUnit;
 
 class EXMEMStageRegisters: public Module {
     unsigned long branch_program_counter;
-    unsigned long alu_result;
-    unsigned long read_data_2;
     unsigned long register_destination;
+
+    std::bitset<WORD_BIT_COUNT> alu_result;
+    std::bitset<WORD_BIT_COUNT> read_data_2;
 
     bool is_alu_result_zero;
 
@@ -61,9 +62,9 @@ public:
     void run() override;
 
     void setBranchedProgramCounter(unsigned long value);
-    void setALUResult(unsigned long value);
+    void setALUResult(const std::bitset<WORD_BIT_COUNT> &value);
     void setIsResultZeroFlag(bool asserted);
-    void setReadData2(unsigned long value);
+    void setReadData2(const std::bitset<WORD_BIT_COUNT> &value);
     void setRegisterDestination(unsigned long value);
     void setControl(Control *new_control);
 

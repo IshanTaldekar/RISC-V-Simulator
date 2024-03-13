@@ -21,8 +21,9 @@ class DataMemory: public Module {
     std::string data_memory_file_path;
 
     unsigned long address;
-    unsigned long write_data;
-    unsigned long read_data;
+
+    std::bitset<WORD_BIT_COUNT> write_data;
+    std::bitset<WORD_BIT_COUNT> read_data;
 
     bool is_mem_write_asserted;
     bool is_mem_read_asserted;
@@ -53,7 +54,7 @@ public:
     void setDataMemoryInputFilePath(const std::string &file_path);
 
     void setAddress(unsigned long value);
-    void setWriteData(unsigned long value);
+    void setWriteData(const std::bitset<WORD_BIT_COUNT> &value);
     void setMemWrite(bool is_asserted);
     void setMemRead(bool is_asserted);
 

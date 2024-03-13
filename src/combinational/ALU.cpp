@@ -4,9 +4,9 @@ ALU *ALU::current_instance = nullptr;
 std::mutex ALU::initialization_mutex;
 
 ALU::ALU() {
-    this->input1 = 0UL;
-    this->input2 = 0UL;
-    this->result = 0UL;
+    this->input1 = std::bitset<WORD_BIT_COUNT>(std::string(32, '0'));
+    this->input2 = std::bitset<WORD_BIT_COUNT>(std::string(32, '0'));
+    this->result = std::bitset<WORD_BIT_COUNT>(std::string(32, '0'));
 
     this->is_result_zero = false;
 
@@ -18,7 +18,7 @@ ALU::ALU() {
     this->logger = nullptr;
 }
 
-void ALU::setInput1(unsigned long value) {
+void ALU::setInput1(const std::bitset<WORD_BIT_COUNT> &value) {
     this->logger->log(Stage::EX, "[ALU] setInput1 waiting to acquire lock.");
 
     std::lock_guard<std::mutex> alu_lock (this->getModuleMutex());
@@ -32,7 +32,7 @@ void ALU::setInput1(unsigned long value) {
     this->notifyModuleConditionVariable();
 }
 
-void ALU::setInput2(unsigned long value) {
+void ALU::setInput2(const std::bitset<WORD_BIT_COUNT> &value) {
     this->logger->log(Stage::EX, "[ALU] setInput2 waiting to acquire lock.");
 
     std::lock_guard<std::mutex> alu_lock (this->getModuleMutex());
@@ -115,18 +115,18 @@ void ALU::computeResult() {
     this->logger->log(Stage::EX, "[ALU] Computing result.");
 
     if (this->alu_op == std::bitset<ALU_OP_BIT_COUNT>("0000")) {  // Add
-        this->result = this->input1 + this->input2;
+        this->result = BitwiseOperations::addInputs(this->input1, this->input2);
     } else if (this->alu_op == std::bitset<ALU_OP_BIT_COUNT>("0001")) {  // subtract
-        this->result = this->input1 - this->input2;
+        this->result = BitwiseOperations::subtractInputs(this->input1, this->input2);
     } else if (this->alu_op == std::bitset<ALU_OP_BIT_COUNT>("0010")) {  // Xor
-        this->result = this->input1 ^ this->input2;
+        this->result = BitwiseOperations::bitwiseXorInputs(this->input1, this->input2);
     } else if (this->alu_op == std::bitset<ALU_OP_BIT_COUNT>("0011")) {  // Or
-        this->result = this->input1 | this->input2;
+        this->result = BitwiseOperations::bitwiseOrInputs(this->input1, this->input2);
     } else if (this->alu_op == std::bitset<ALU_OP_BIT_COUNT>("0100")) {  // And
-        this->result = this->input1 & this->input2;
+        this->result = BitwiseOperations::bitwiseAndInputs(this->input1, this->input2);
     }
 
-    this->is_result_zero = this->result == 0;
+    this->is_result_zero = this->result.to_ulong() == 0;
 
     this->logger->log(Stage::EX, "[ALU] Result computed.");
 }

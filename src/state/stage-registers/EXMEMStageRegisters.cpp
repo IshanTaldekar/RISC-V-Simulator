@@ -5,9 +5,10 @@ std::mutex EXMEMStageRegisters::initialization_mutex;
 
 EXMEMStageRegisters::EXMEMStageRegisters() {
     this->branch_program_counter = 0UL;
-    this->alu_result = 0UL;
-    this->read_data_2 = 0UL;
     this->register_destination = 0UL;
+
+    this->alu_result = std::bitset<WORD_BIT_COUNT>(std::string(32, '0'));
+    this->read_data_2 = std::bitset<WORD_BIT_COUNT>(std::string(32, '0'));
 
     this->is_alu_result_zero = false;
 
@@ -199,7 +200,7 @@ void EXMEMStageRegisters::setBranchedProgramCounter(unsigned long value) {
     this->notifyModuleConditionVariable();
 }
 
-void EXMEMStageRegisters::setALUResult(unsigned long value) {
+void EXMEMStageRegisters::setALUResult(const std::bitset<WORD_BIT_COUNT> &value) {
     this->stage_synchronizer->conditionalArriveFiveStage();
 
     this->logger->log(Stage::EX, "[EXMEMStageRegisters] setALUResult waiting to acquire lock.");
@@ -239,7 +240,7 @@ void EXMEMStageRegisters::setIsResultZeroFlag(bool asserted) {
     this->notifyModuleConditionVariable();
 }
 
-void EXMEMStageRegisters::setReadData2(unsigned long value) {
+void EXMEMStageRegisters::setReadData2(const std::bitset<WORD_BIT_COUNT> &value) {
     this->stage_synchronizer->conditionalArriveFiveStage();
 
     this->logger->log(Stage::EX, "[EXMEMStageRegisters] setReadData2 waiting to acquire lock.");
@@ -308,7 +309,7 @@ void EXMEMStageRegisters::passControlToMEMWBStageRegisters() {
 
 void EXMEMStageRegisters::passALUResultToDataMemory() {
     this->logger->log(Stage::EX, "[EXMEMStageRegisters] Passing ALU result to Data Memory.");
-    this->data_memory->setAddress(this->alu_result);
+    this->data_memory->setAddress(this->alu_result.to_ulong());
     this->logger->log(Stage::EX, "[EXMEMStageRegisters] Passed ALU result to Data Memory.");
 }
 

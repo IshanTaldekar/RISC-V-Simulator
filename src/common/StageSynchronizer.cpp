@@ -19,6 +19,9 @@ StageSynchronizer::StageSynchronizer() {
     this->register_file = RegisterFile::init();
     this->data_memory = DataMemory::init();
 
+    this->is_single_stage_halt_set = false;
+    this->is_five_stage_halt_set = false;
+
     this->current_cycle = 0;
 
     this->current_pipeline_type = PipelineType::Single;
@@ -51,9 +54,9 @@ void StageSynchronizer::onCompletionFiveStage() {
 }
 
 void StageSynchronizer::onCompletionSingleStage() {
-    std::cout << "Cycle: " << this->current_cycle++ << std::endl;
+    std::cout << "Cycle: " << this->current_cycle << std::endl;
 
-    this->register_file->writeRegisterFileContentsToOutputFile();
+    this->register_file->writeRegisterFileContentsToOutputFile(this->current_cycle++);
 
     if (this->if_id_stage_registers->getInstruction()->getType() == InstructionType::HALT) {
         this->driver->pause();

@@ -13,9 +13,9 @@ class MuxBase;
 
 class ALUInputForwardingMuxBase: public MuxBase {
 protected:
-    unsigned long id_ex_stage_registers_value;
-    unsigned long ex_mem_stage_registers_value;
-    unsigned long mem_wb_stage_registers_value;
+    std::bitset<WORD_BIT_COUNT> id_ex_stage_registers_value;
+    std::bitset<WORD_BIT_COUNT> ex_mem_stage_registers_value;
+    std::bitset<WORD_BIT_COUNT> mem_wb_stage_registers_value;
 
     ALUInputMuxControlSignals control_signal;
 
@@ -31,7 +31,7 @@ public:
 
     void run() override;
 
-    void setInput(MuxInputType type, unsigned long value) override;
+    void setInput(const MuxInputType &type, const MuxInputDataType &value) override;
     void setMuxControlSignal(ALUInputMuxControlSignals new_signal);
 
 protected:

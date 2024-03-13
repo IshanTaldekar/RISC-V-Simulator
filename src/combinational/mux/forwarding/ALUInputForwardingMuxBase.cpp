@@ -1,9 +1,9 @@
 #include "../../../../include/combinational/ALU.h"
 
 ALUInputForwardingMuxBase::ALUInputForwardingMuxBase() {
-    this->id_ex_stage_registers_value = 0UL;
-    this->ex_mem_stage_registers_value = 0UL;
-    this->mem_wb_stage_registers_value = 0UL;
+    this->id_ex_stage_registers_value = std::bitset<WORD_BIT_COUNT>(std::string(32, '0'));
+    this->ex_mem_stage_registers_value = std::bitset<WORD_BIT_COUNT>(std::string(32, '0'));
+    this->mem_wb_stage_registers_value = std::bitset<WORD_BIT_COUNT>(std::string(32, '0'));
 
     this->control_signal = ALUInputMuxControlSignals::IDEXStageRegisters;
 
@@ -20,9 +20,10 @@ void ALUInputForwardingMuxBase::initDependencies() {
     this->logger = Logger::init();
 }
 
-void ALUInputForwardingMuxBase::setInput(MuxInputType type, unsigned long value) {
-    if (!std::holds_alternative<ALUInputMuxInputTypes>(type)) {
-        throw std::runtime_error("MuxInputType passed to ALUInputForwardingMuxBase not compatible with ALUInputMuxInputTypes.");
+void ALUInputForwardingMuxBase::setInput(const MuxInputType &type, const MuxInputDataType &value) {
+    if (!std::holds_alternative<ALUInputMuxInputTypes>(type) ||
+            !std::holds_alternative<std::bitset<WORD_BIT_COUNT>>(value)) {
+        throw std::runtime_error("ALUInputForwardingMuxBase::setInput: incompatible data types passed.");
     }
 
     this->logger->log(Stage::EX, "[" + this->getModuleTag() + "] setInput waiting to acquire lock.");
@@ -30,13 +31,13 @@ void ALUInputForwardingMuxBase::setInput(MuxInputType type, unsigned long value)
     std::lock_guard<std::mutex> mux_lock (this->getModuleMutex());
 
     if (std::get<ALUInputMuxInputTypes>(type) == ALUInputMuxInputTypes::IDEXStageRegisters) {
-        this->id_ex_stage_registers_value = value;
+        this->id_ex_stage_registers_value = std::get<std::bitset<WORD_BIT_COUNT>>(value);
         this->is_id_ex_stage_registers_value_set = true;
     } else if (std::get<ALUInputMuxInputTypes>(type) == ALUInputMuxInputTypes::EXMEMStageRegisters) {
-        this->ex_mem_stage_registers_value = value;
+        this->ex_mem_stage_registers_value = std::get<std::bitset<WORD_BIT_COUNT>>(value);
         this->is_ex_mem_stage_registers_value_set = true;
     } else if (std::get<ALUInputMuxInputTypes>(type) == ALUInputMuxInputTypes::MEMWBStageRegisters) {
-        this->mem_wb_stage_registers_value = value;
+        this->mem_wb_stage_registers_value = std::get<std::bitset<WORD_BIT_COUNT>>(value);
         this->is_mem_wb_stage_registers_value_set = true;
     } else {
         throw std::runtime_error("ALUInputForwardingMuxBase::setInput parameters did not match any input type.");

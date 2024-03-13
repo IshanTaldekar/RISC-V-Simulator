@@ -126,7 +126,7 @@ void DataMemory::setAddress(unsigned long value) {
     this->notifyModuleConditionVariable();
 }
 
-void DataMemory::setWriteData(unsigned long value) {
+void DataMemory::setWriteData(const std::bitset<WORD_BIT_COUNT> &value) {
     this->logger->log(Stage::MEM, "[DataMemory] setWriteData waiting to acquire lock.");
 
     std::lock_guard<std::mutex> data_memory_guard (this->getModuleMutex());
@@ -210,7 +210,7 @@ void DataMemory::readData() {
             }
         }
 
-        this->read_data = std::bitset<WORD_BIT_COUNT>(word).to_ulong();
+        this->read_data = std::bitset<WORD_BIT_COUNT>(word);
         this->logger->log(Stage::MEM, "[DataMemory] Data memory read.");
     }
 }

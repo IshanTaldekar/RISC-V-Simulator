@@ -4,8 +4,8 @@ MEMWBStageRegisters *MEMWBStageRegisters::current_instance = nullptr;
 std::mutex MEMWBStageRegisters::initialization_mutex;
 
 MEMWBStageRegisters::MEMWBStageRegisters() {
-    this->read_data = 0UL;
-    this->alu_result = 0UL;
+    this->read_data = std::bitset<WORD_BIT_COUNT>(std::string(32, '0'));
+    this->alu_result = std::bitset<WORD_BIT_COUNT>(std::string(32, '0'));
     this->register_destination = 0L;
 
     this->is_read_data_set = false;
@@ -126,7 +126,7 @@ void MEMWBStageRegisters::run() {
     }
 }
 
-void MEMWBStageRegisters::setReadData(unsigned long value) {
+void MEMWBStageRegisters::setReadData(const std::bitset<WORD_BIT_COUNT> &value) {
     this->stage_synchronizer->conditionalArriveFiveStage();
 
     this->logger->log(Stage::MEM, "[MEMWBStageRegisters] setReadData waiting to acquire lock.");
@@ -142,7 +142,7 @@ void MEMWBStageRegisters::setReadData(unsigned long value) {
     this->notifyModuleConditionVariable();
 }
 
-void MEMWBStageRegisters::setALUResult(unsigned long value) {
+void MEMWBStageRegisters::setALUResult(const std::bitset<WORD_BIT_COUNT> &value) {
     this->stage_synchronizer->conditionalArriveFiveStage();
 
     this->logger->log(Stage::MEM, "[MEMWBStageRegisters] setALUResult waiting to acquire lock.");

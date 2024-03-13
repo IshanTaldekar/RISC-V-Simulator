@@ -17,8 +17,8 @@ class ForwardingUnit;
 class Logger;
 
 class MEMWBStageRegisters: public Module {
-    unsigned long read_data;
-    unsigned long alu_result;
+    std::bitset<WORD_BIT_COUNT> read_data;
+    std::bitset<WORD_BIT_COUNT> alu_result;
     unsigned long register_destination;
 
     bool is_read_data_set;
@@ -46,8 +46,8 @@ public:
 
     void run() override;
 
-    void setReadData(unsigned long value);
-    void setALUResult(unsigned long value);
+    void setReadData(const std::bitset<WORD_BIT_COUNT> &value);
+    void setALUResult(const std::bitset<WORD_BIT_COUNT> &value);
     void setRegisterDestination(unsigned long value);
     void setControl(Control *new_control);
 

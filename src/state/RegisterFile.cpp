@@ -9,15 +9,9 @@ RegisterFile::RegisterFile() {
     this->is_write_thread_finished = false;
     this->is_reset_flag_set = false;
 
-    if (this->getPipelineType() == PipelineType::Single) {
-        this->is_write_register_set = true;
-        this->is_write_data_set = true;
-        this->is_reg_write_signal_set = true;
-    } else {
-        this->is_write_register_set = false;
-        this->is_write_data_set = false;
-        this->is_reg_write_signal_set = false;
-    }
+    this->is_write_register_set = false;
+    this->is_write_data_set = false;
+    this->is_reg_write_signal_set = false;
 
     this->is_reg_write_signal_asserted = false;
 
@@ -28,6 +22,7 @@ RegisterFile::RegisterFile() {
 
     this->logger = nullptr;
     this->id_ex_stage_registers = nullptr;
+    this->stage_synchronizer = nullptr;
 
     this->output_file_path = "../output/RegisterFile.out";
     std::ofstream output_file (this->output_file_path, std::ios::out);
@@ -47,6 +42,7 @@ RegisterFile *RegisterFile::init() {
 void RegisterFile::initDependencies() {
     this->logger = Logger::init();
     this->id_ex_stage_registers = IDEXStageRegisters::init();
+    this->stage_synchronizer = StageSynchronizer::init();
 }
 
 void RegisterFile::run() {
@@ -60,9 +56,10 @@ void RegisterFile::run() {
         this->getModuleConditionVariable().wait(
                 register_file_lock,
                 [this] {
-                    return (this->is_write_register_set && this->is_write_data_set && this->is_reg_write_signal_set &&
-                           (this->is_single_read_register_set || this->is_double_read_register_set)) ||
-                           this->is_reset_flag_set || this->isKilled();
+                    return ((this->getPipelineType() == PipelineType::Single || (this->is_write_register_set &&
+                            this->is_write_data_set && this->is_reg_write_signal_set)) &&
+                            (this->is_single_read_register_set || this->is_double_read_register_set)) ||
+                            this->is_reset_flag_set || this->isKilled();
                 }
         );
 
@@ -83,25 +80,47 @@ void RegisterFile::run() {
 
         this->logger->log(Stage::ID, "[RegisterFile] Woken up and acquired lock.");
 
-        std::thread write_register_thread (&RegisterFile::writeDataToRegisterFile, this);
-        std::thread pass_data_thread (&RegisterFile::passReadRegisterDataToIDEXStageRegister, this);
+        if (this->getPipelineType() == PipelineType::Single) {
+            this->is_write_thread_finished = true;
+            this->passReadRegisterDataToIDEXStageRegister();
 
-        write_register_thread.detach();
-        pass_data_thread.detach();
+            this->logger->log(Stage::ID, "[RegisterFile] Waiting for write items.");
 
-        this->getModuleConditionVariable().wait(
-                register_file_lock,
-                [this] {
-                    return !this->is_write_register_set && !this->is_write_data_set &&
-                            !(this->is_single_read_register_set || this->is_double_read_register_set);
-                }
-        );
+            this->getModuleConditionVariable().wait(
+                    register_file_lock,
+                    [this] {
+                        return this->is_write_register_set && this->is_write_data_set && this->is_reg_write_signal_set;
+                    }
+            );
+
+            this->logger->log(Stage::ID, "[RegisterFile] Write items set.");
+
+            this->writeDataToRegisterFile();
+            this->logger->log(Stage::ID, "[RegisterFile] Write items set. Waiting on barrier.");
+
+            this->stage_synchronizer->conditionalArriveSingleStage();
+        } else {
+            std::thread write_register_thread (&RegisterFile::writeDataToRegisterFile, this);
+            std::thread pass_data_thread (&RegisterFile::passReadRegisterDataToIDEXStageRegister, this);
+
+            write_register_thread.detach();
+            pass_data_thread.detach();
+
+            this->getModuleConditionVariable().wait(
+                    register_file_lock,
+                    [this] {
+                        return !this->is_write_register_set && !this->is_write_data_set &&
+                               !(this->is_single_read_register_set || this->is_double_read_register_set);
+                    }
+            );
+        }
 
         this->is_write_register_set = false;
         this->is_reg_write_signal_set = false;
         this->is_single_read_register_set = false;
         this->is_double_read_register_set = false;
         this->is_write_thread_finished = false;
+
     }
 }
 
@@ -173,14 +192,14 @@ void RegisterFile::setRegWriteSignal(bool is_asserted) {
     this->notifyModuleConditionVariable();
 }
 
-void RegisterFile::setWriteData(unsigned long value) {
+void RegisterFile::setWriteData(const std::bitset<WORD_BIT_COUNT> &value) {
     this->logger->log(Stage::ID, "[RegisterFile] setWriteData waiting to acquire lock.");
 
     std::unique_lock<std::mutex> load_lock (this->write_load_mutex);
 
     this->logger->log(Stage::ID, "[RegisterFile] setWriteData acquired lock. Updating value.");
 
-    this->write_data = std::bitset<WORD_BIT_COUNT>(value);
+    this->write_data = value;
     this->is_write_data_set = true;
 
     this->logger->log(Stage::ID, "[RegisterFile] setWriteData updated value.");
@@ -271,13 +290,11 @@ void RegisterFile::resetState() {
     this->is_reg_write_signal_asserted = false;
 }
 
-void RegisterFile::writeRegisterFileContentsToOutputFile() {
+void RegisterFile::writeRegisterFileContentsToOutputFile(int cycle_count) {
     std::ofstream output_file (this->output_file_path, std::ios::app);
-
-    for (const std::bitset<RegisterFile::WORD_BIT_COUNT> &data: this->registers) {
+    output_file << "State of RF after executing cycle:\t" << cycle_count << std::endl;
+    for (const std::bitset<WORD_BIT_COUNT> &data: this->registers) {
         output_file << data.to_string() << std::endl;
     }
-
-    output_file << std::endl << std::string(20, '-') << std::endl << std::endl;
     output_file.close();
 }

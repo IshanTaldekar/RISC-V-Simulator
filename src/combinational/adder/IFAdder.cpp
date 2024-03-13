@@ -51,9 +51,10 @@ void IFAdder::run() {
     }
 }
 
-void IFAdder::setInput(AdderInputType type, unsigned long value) {
-    if (!std::holds_alternative<IFAdderInputType>(type)) {
-        throw std::runtime_error("AdderInputType passed in IFAdder not compatible with IFAdderInputTypes");
+void IFAdder::setInput(const AdderInputType &type, const AdderInputDataType &value) {
+    if (!std::holds_alternative<IFAdderInputType>(type) ||
+            !std::holds_alternative<unsigned long>(value)) {
+        throw std::runtime_error("IFAdder::setInput: incompatible type passed.");
     }
 
     this->logger->log(Stage::IF, "[IFAdder] setInput waiting to acquire lock and update values.");
@@ -61,7 +62,7 @@ void IFAdder::setInput(AdderInputType type, unsigned long value) {
     std::unique_lock<std::mutex> adder_lock(this->getModuleMutex());
 
     if (std::get<IFAdderInputType>(type) == IFAdderInputType::PCValue) {
-        this->program_counter = value;
+        this->program_counter = std::get<unsigned long>(value);
         this->is_program_counter_set = true;
 
         this->logger->log(Stage::IF, "[IFAdder] setInput program counter set.");

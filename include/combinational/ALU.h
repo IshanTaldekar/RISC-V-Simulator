@@ -4,6 +4,7 @@
 #include <bitset>
 
 #include "../common/Module.h"
+#include "../common/BitwiseOperations.h"
 #include "../common/Control.h"
 #include "../common/Logger.h"
 
@@ -14,9 +15,9 @@ public:
     static constexpr int ALU_OP_BIT_COUNT = 4;
 
 private:
-    unsigned long input1;
-    unsigned long input2;
-    unsigned long result;
+    std::bitset<WORD_BIT_COUNT> input1;
+    std::bitset<WORD_BIT_COUNT> input2;
+    std::bitset<WORD_BIT_COUNT> result;
 
     bool is_result_zero;
     bool is_input1_set;
@@ -38,8 +39,8 @@ public:
 
     void run() override;
 
-    void setInput1(unsigned long value);
-    void setInput2(unsigned long value);
+    void setInput1(const std::bitset<WORD_BIT_COUNT> &value);
+    void setInput2(const std::bitset<WORD_BIT_COUNT> &value);
 
     void setALUOp(const std::bitset<ALU_OP_BIT_COUNT> &value);
 

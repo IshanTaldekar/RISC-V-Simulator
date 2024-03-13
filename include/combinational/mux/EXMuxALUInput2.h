@@ -12,8 +12,8 @@ class MuxBase;
 class ALUInput2ForwardingMux;
 
 class EXMuxALUInput2: public MuxBase {
-    unsigned long immediate;
-    unsigned long read_data_2;
+    std::bitset<WORD_BIT_COUNT> immediate;
+    std::bitset<WORD_BIT_COUNT> read_data_2;
 
     bool is_immediate_set;
     bool is_read_data_2_set;
@@ -34,7 +34,7 @@ public:
     static EXMuxALUInput2 *init();
 
     void run() override;
-    void setInput(MuxInputType type, unsigned long value) override;
+    void setInput(const MuxInputType &type, const MuxInputDataType &value) override;
     void assertControlSignal(bool is_asserted) override;
     void assertJALCustomControlSignal(bool is_asserted);
 

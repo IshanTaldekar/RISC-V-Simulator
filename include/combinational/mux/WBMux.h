@@ -13,8 +13,8 @@ class RegisterFile;
 class Logger;
 
 class WBMux: public MuxBase {
-    unsigned int read_data;
-    unsigned int alu_result;
+    std::bitset<WORD_BIT_COUNT> read_data;
+    std::bitset<WORD_BIT_COUNT> alu_result;
 
     bool is_mem_to_reg_asserted;
 
@@ -36,7 +36,7 @@ public:
     static WBMux *init();
 
     void run() override;
-    void setInput(MuxInputType type, unsigned long value) override;
+    void setInput(const MuxInputType &type, const MuxInputDataType &value) override;
     void assertControlSignal(bool is_asserted) override;
 
 protected:

@@ -24,7 +24,7 @@ public:
     static IFAdder *init();
 
     void run() override;
-    void setInput(AdderInputType type, unsigned long value) override;
+    void setInput(const AdderInputType &type, const AdderInputDataType &value) override;
 
 private:
     void passProgramCounterToIFMux();

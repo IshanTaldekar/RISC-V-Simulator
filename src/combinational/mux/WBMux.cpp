@@ -4,8 +4,8 @@ WBMux *WBMux::current_instance = nullptr;
 std::mutex WBMux::initialization_mutex;
 
 WBMux::WBMux() {
-    this->read_data = 0UL;
-    this->alu_result = 0UL;
+    this->read_data = std::bitset<WORD_BIT_COUNT>(std::string(32, '0'));
+    this->alu_result = std::bitset<WORD_BIT_COUNT>(std::string(32, '0'));
 
     this->is_mem_to_reg_asserted = false;
 
@@ -68,7 +68,7 @@ void WBMux::run() {
     }
 }
 
-void WBMux::setInput(MuxInputType type, unsigned long value) {
+void WBMux::setInput(const MuxInputType &type, const MuxInputDataType &value) {
     if (!std::holds_alternative<WBStageMuxInputType>(type)) {
         throw std::runtime_error("Incorrect MuxInputType passed to EXMuxALUInput2");
     }
@@ -78,10 +78,10 @@ void WBMux::setInput(MuxInputType type, unsigned long value) {
     std::lock_guard<std::mutex> ex_mux_lock (this->getModuleMutex());
 
     if (std::get<WBStageMuxInputType>(type) == WBStageMuxInputType::ALUResult) {
-        this->alu_result = value;
+        this->alu_result = std::get<std::bitset<WORD_BIT_COUNT>>(value);
         this->is_alu_result_set = true;
     } else if (std::get<WBStageMuxInputType>(type) == WBStageMuxInputType::ReadData) {
-        this->read_data = value;
+        this->read_data = std::get<std::bitset<WORD_BIT_COUNT>>(value);
         this->is_read_data_set = true;
     }
 

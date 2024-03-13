@@ -1,6 +1,8 @@
 #ifndef RISC_V_SIMULATOR_EXMUXALUINPUT1_H
 #define RISC_V_SIMULATOR_EXMUXALUINPUT1_H
 
+#include <bitset>
+
 #include "MuxBase.h"
 #include "forwarding/ALUInput1ForwardingMux.h"
 #include "../../common/Logger.h"
@@ -10,8 +12,8 @@ class ALUInput1ForwardingMux;
 class Logger;
 
 class EXMuxALUInput1: public MuxBase {
-    unsigned long program_counter;
-    unsigned long read_data_1;
+    std::bitset<WORD_BIT_COUNT> program_counter;
+    std::bitset<WORD_BIT_COUNT> read_data_1;
 
     bool is_program_counter_set;
     bool is_read_data_1_set;
@@ -31,7 +33,7 @@ public:
     static EXMuxALUInput1 *init();
 
     void run() override;
-    void setInput(MuxInputType type, unsigned long value) override;
+    void setInput(const MuxInputType &type, const MuxInputDataType &value) override;
     void assertControlSignal(bool is_asserted) override;
     void assertJALCustomControlSignal(bool is_asserted);
 

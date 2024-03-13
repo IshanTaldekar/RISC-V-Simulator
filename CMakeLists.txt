@@ -37,4 +37,6 @@ add_executable(RISC_V_Simulator
         src/combinational/mux/EXMuxALUInput1.cpp
         include/common/Logger.h
         src/common/Logger.cpp
+        include/common/BitwiseOperations.h
+        src/common/BitwiseOperations.cpp
 )

@@ -420,25 +420,25 @@ void IDEXStageRegisters::passProgramCounterToEXMuxALUInput1() {
 
 void IDEXStageRegisters::passReadData1ToExMuxALUInput1() {
     this->logger->log(Stage::ID, "[IDEXStageRegisters] Passing read data 1 to EXMuxALUInput1.");
-    this->ex_mux_alu_input_1->setInput(EXStageMuxALUInput1InputType::ReadData1, this->read_data_1.to_ulong());
+    this->ex_mux_alu_input_1->setInput(EXStageMuxALUInput1InputType::ReadData1, this->read_data_1);
     this->logger->log(Stage::ID, "[IDEXStageRegisters] Passed read data 1 to EXMuxALUInput1.");
 }
 
 void IDEXStageRegisters::passReadData2ToExMuxALUInput2() {
     this->logger->log(Stage::ID, "[IDEXStageRegisters] Passing read data 2 to EXMuxALUInput2.");
-    this->ex_mux_alu_input_2->setInput(EXStageMuxALUInput2InputType::ReadData2, this->read_data_2.to_ulong());
+    this->ex_mux_alu_input_2->setInput(EXStageMuxALUInput2InputType::ReadData2, this->read_data_2);
     this->logger->log(Stage::ID, "[IDEXStageRegisters] Passed read data 2 to EXMuxALUInput2.");
 }
 
 void IDEXStageRegisters::passImmediateToEXMuxALUInput2() {
     this->logger->log(Stage::ID, "[IDEXStageRegisters] Passing immediate to EXMuxALUInput2.");
-    this->ex_mux_alu_input_2->setInput(EXStageMuxALUInput2InputType::ImmediateValue, this->immediate.to_ulong());
+    this->ex_mux_alu_input_2->setInput(EXStageMuxALUInput2InputType::ImmediateValue, this->immediate);
     this->logger->log(Stage::ID, "[IDEXStageRegisters] Passed immediate to EXMuxALUInput2.");
 }
 
 void IDEXStageRegisters::passImmediateToEXAdder() {
     this->logger->log(Stage::ID, "[IDEXStageRegisters] Passing immediate to EXAdder.");
-    this->ex_adder->setInput(EXAdderInputType::ImmediateValue, this->immediate.to_ulong());
+    this->ex_adder->setInput(EXAdderInputType::ImmediateValue, this->immediate);
     this->logger->log(Stage::ID, "[IDEXStageRegisters] Passed immediate to EXAdder.");
 }
 
@@ -450,7 +450,7 @@ void IDEXStageRegisters::passRegisterDestinationToEXMEMStageRegisters() {
 
 void IDEXStageRegisters::passReadData2ToEXMEMStageRegisters() {
     this->logger->log(Stage::ID, "[IDEXStageRegisters] Passing read data 2 to EXMEMStageRegisters.");
-    this->ex_mem_stage_register->setReadData2(this->read_data_2.to_ulong());
+    this->ex_mem_stage_register->setReadData2(this->read_data_2);
     this->logger->log(Stage::ID, "[IDEXStageRegisters] Passed read data 2 to EXMEMStageRegisters.");
 }
 

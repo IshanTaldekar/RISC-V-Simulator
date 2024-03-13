@@ -19,6 +19,7 @@ class Control;
 class RegisterFile;
 class ImmediateGenerator;
 class StageSynchronizer;
+class IDEXStageRegisters;
 class Logger;
 
 class IFIDStageRegisters: public Module {

@@ -57,9 +57,9 @@ void EXAdder::run() {
     }
 }
 
-void EXAdder::setInput(AdderInputType type, unsigned long value) {
+void EXAdder::setInput(const AdderInputType &type, const AdderInputDataType &value) {
     if (!std::holds_alternative<EXAdderInputType>(type)) {
-        throw std::runtime_error("Incorrect AdderInputType passed to EXAdder");
+        throw std::runtime_error("EXAdder::setInput: incompatible data types passed");
     }
 
     this->logger->log(Stage::EX, "[EXAdder] setInput waiting to acquire lock.");
@@ -69,10 +69,10 @@ void EXAdder::setInput(AdderInputType type, unsigned long value) {
     this->logger->log(Stage::EX, "[EXAdder] setInput acquired lock and updating value.");
 
     if (std::get<EXAdderInputType>(type) == EXAdderInputType::PCValue) {
-        this->program_counter = value;
+        this->program_counter = std::get<unsigned long>(value);
         this->is_program_counter_set = true;
     } else if (std::get<EXAdderInputType>(type) == EXAdderInputType::ImmediateValue) {
-        this->immediate = value;
+        this->immediate = std::get<std::bitset<WORD_BIT_COUNT>>(value);
         this->is_immediate_set = true;
     }
 
@@ -81,7 +81,11 @@ void EXAdder::setInput(AdderInputType type, unsigned long value) {
 }
 
 void EXAdder::computeResult() {
-    this->result = this->program_counter + this->immediate;
+    this->result = BitwiseOperations::addInputs(
+            std::bitset<WORD_BIT_COUNT>(this->program_counter),
+            this->immediate
+    ).to_ulong();
+
     this->logger->log(Stage::EX, "[EXAdder] Computed adder result.");
 }
 

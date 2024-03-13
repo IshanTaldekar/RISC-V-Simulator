@@ -63,9 +63,9 @@ void IFMux::run() {
     }
 }
 
-void IFMux::setInput(MuxInputType type, unsigned long value) {
+void IFMux::setInput(const MuxInputType &type, const MuxInputDataType &value) {
     if (!std::holds_alternative<IFStageMuxInputType>(type)) {
-        throw std::runtime_error("MuxInputType passed to IFMux not compatible with IFStageMuxInputTypes");
+        throw std::runtime_error("IFMux::setInput: incompatible data types passed.");
     }
 
     this->logger->log(Stage::IF, "[IFMux] setInput waiting to acquire lock");
@@ -75,12 +75,12 @@ void IFMux::setInput(MuxInputType type, unsigned long value) {
     this->logger->log(Stage::IF, "[IFMux] setInput acquired lock. Updating values.");
 
     if (std::get<IFStageMuxInputType>(type) == IFStageMuxInputType::IncrementedPc) {
-        this->incremented_pc = value;
+        this->incremented_pc = std::get<unsigned long>(value);
         this->is_incremented_pc_set = true;
 
         this->logger->log(Stage::IF, "[IFMux] incremented PC value set");
     } else if (std::get<IFStageMuxInputType>(type) == IFStageMuxInputType::BranchedPc) {
-        this->branched_pc = value;
+        this->branched_pc = std::get<unsigned long>(value);
         this->is_branched_pc_set = true;
 
         this->logger->log(Stage::IF, "[IFMux] branched PC value set");

@@ -77,20 +77,20 @@ void ImmediateGenerator::loadImmediateToIDEXStageRegisters() {
 
         if (current_immediate[Instruction::GENERAL_IMMEDIATE_BIT_COUNT - 1]) {
             result.set();
+        }
 
-            for (int i = 0; i < Instruction::GENERAL_IMMEDIATE_BIT_COUNT; ++i) {
-                result[i] = current_immediate[i];
-            }
+        for (int i = 0; i < Instruction::GENERAL_IMMEDIATE_BIT_COUNT; ++i) {
+            result[i] = current_immediate[i];
         }
     } else if (type == InstructionType::J) {
         std::bitset<Instruction::J_TYPE_IMMEDIATE_BIT_COUNT> current_immediate = this->instruction->getImmediateJ();
 
         if (current_immediate[Instruction::J_TYPE_IMMEDIATE_BIT_COUNT - 1]) {
             result.set();
+        }
 
-            for (int i = 0; i < Instruction::J_TYPE_IMMEDIATE_BIT_COUNT; ++i) {
-                result[i] = current_immediate[i];
-            }
+        for (int i = 0; i < Instruction::J_TYPE_IMMEDIATE_BIT_COUNT; ++i) {
+            result[i] = current_immediate[i];
         }
     }
 
