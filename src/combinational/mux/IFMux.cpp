@@ -63,7 +63,7 @@ void IFMux::run() {
     }
 }
 
-void IFMux::setInput(const MuxInputType &type, const MuxInputDataType &value) {
+void IFMux::setInput(MuxInputType type, MuxInputDataType value) {
     if (!std::holds_alternative<IFStageMuxInputType>(type)) {
         throw std::runtime_error("IFMux::setInput: incompatible data types passed.");
     }

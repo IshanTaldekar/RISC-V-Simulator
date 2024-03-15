@@ -20,6 +20,7 @@ class Driver: public Module {
     bool is_nop_asserted;
     bool is_reset_flag_set;
     bool is_pause_flag_set;
+    bool is_nop_flag_set;
 
     InstructionMemory *instruction_memory;
     IFIDStageRegisters *if_id_stage_registers;
@@ -30,6 +31,9 @@ class Driver: public Module {
     static Driver *current_instance;
     static std::mutex initialization_mutex;
 
+    static constexpr int REQUIRED_NOP_FLAG_SET_OPERATIONS = 2;
+    int current_nop_set_operations;
+
 public:
     Driver();
     void setProgramCounter(unsigned long value);
@@ -37,19 +41,23 @@ public:
     static Driver *init();
 
     void run() override;
-    void assertNop();
+    void setNop(bool is_asserted);
+    void assertSystemEnabledNop();
     void reset();
     void changeStageAndReset(PipelineType new_stage);
     void pause();
     void resume();
 
 private:
-    void passProgramCounterToInstructionMemory();
-    void passProgramCounterToIFAdder();
-    void passProgramCounterToIFIDStageRegisters();
+    void passProgramCounterToInstructionMemory(unsigned long pc);
+    void passProgramCounterToIFAdder(unsigned long pc);
+    void passProgramCounterToIFIDStageRegisters(unsigned long pc);
+    void passNopToIFIDStageRegisters(bool is_asserted);
 
     void resetStage();
     void initDependencies() override;
+
+    void delayUpdateUntilNopFlagSet();
 };
 
 #endif //RISC_V_SIMULATOR_DRIVER_H

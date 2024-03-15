@@ -10,6 +10,8 @@ EXMuxALUInput1::EXMuxALUInput1() {
     this->is_program_counter_set = false;
     this->is_read_data_1_set = false;
 
+    this->is_reset_flag_set = false;
+
     this->is_pass_program_counter_flag_asserted = false;
     this->is_pass_program_counter_flag_set = false;
 
@@ -43,13 +45,23 @@ void EXMuxALUInput1::run() {
                 ex_mux_lock,
                 [this] {
                     return (this->is_program_counter_set && this->is_read_data_1_set &&
-                        this->is_pass_program_counter_flag_set) || this->isKilled();
+                        this->is_pass_program_counter_flag_set) || this->is_reset_flag_set || this->isKilled();
                 }
         );
 
         if  (this->isKilled()) {
             this->logger->log(Stage::EX, "[EXMuxALUInput1] Killed.");
             break;
+        }
+
+        if (this->is_reset_flag_set) {
+            this->logger->log(Stage::EX, "[EXMuxALUInput1] Resetting stage.");
+
+            this->resetState();
+            this->is_reset_flag_set = false;
+
+            this->logger->log(Stage::EX, "[EXMuxALUInput1] Reset.");
+            continue;
         }
 
         this->logger->log(Stage::EX, "[EXMuxALUInput1] Woken up and acquired lock.");
@@ -62,7 +74,7 @@ void EXMuxALUInput1::run() {
     }
 }
 
-void EXMuxALUInput1::setInput(const MuxInputType &type, const MuxInputDataType &value) {
+void EXMuxALUInput1::setInput(MuxInputType type, MuxInputDataType value) {
     if (!std::holds_alternative<EXStageMuxALUInput1InputType>(type)) {
         throw std::runtime_error("EXMuxALUInput1::setInput: incompatible data types passed.");
     }
@@ -77,7 +89,7 @@ void EXMuxALUInput1::setInput(const MuxInputType &type, const MuxInputDataType &
         this->program_counter = std::bitset<WORD_BIT_COUNT>(std::get<unsigned long>(value));
         this->is_program_counter_set = true;
     } else if (std::get<EXStageMuxALUInput1InputType>(type) == EXStageMuxALUInput1InputType::ReadData1) {
-        this->read_data_1 = std::get<std::bitset<WORD_BIT_COUNT>>(value);
+        this->read_data_1 = std::bitset<WORD_BIT_COUNT>(std::get<std::bitset<WORD_BIT_COUNT>>(value));
         this->is_read_data_1_set = true;
     }
 
@@ -115,4 +127,20 @@ void EXMuxALUInput1::assertJALCustomControlSignal(bool is_asserted) {
 
     this->logger->log(Stage::EX, "[EXMuxALUInput1] assertJALCustomControlSignal value updated.");
     this->notifyModuleConditionVariable();
+}
+
+void EXMuxALUInput1::reset() {
+    std::lock_guard<std::mutex> ex_mux_alu_input_1_lock (this->getModuleMutex());
+
+    this->is_reset_flag_set = true;
+    this->notifyModuleConditionVariable();
+}
+
+void EXMuxALUInput1::resetState() {
+    this->program_counter = std::bitset<WORD_BIT_COUNT>(std::string(32, '0'));
+    this->read_data_1 = std::bitset<WORD_BIT_COUNT>(std::string(32, '0'));
+    this->is_pass_program_counter_flag_asserted = false;
+    this->is_program_counter_set = false;
+    this->is_read_data_1_set = false;
+    this->is_pass_program_counter_flag_set = false;
 }

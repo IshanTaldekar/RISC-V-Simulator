@@ -11,6 +11,7 @@ InstructionMemory::InstructionMemory() {
     this->is_new_program_counter_set = false;
 
     this->if_id_stage_registers = nullptr;
+    this->driver = nullptr;
     this->logger = nullptr;
 }
 
@@ -33,6 +34,7 @@ void InstructionMemory::initDependencies() {
 
     this->if_id_stage_registers = IFIDStageRegisters::init();
     this->logger = Logger::init();
+    this->driver = Driver::init();
 }
 
 void InstructionMemory::run() {
@@ -63,8 +65,15 @@ void InstructionMemory::run() {
 
         this->fetchInstructionFromMemory();
 
+        std::thread pass_nop_thread (
+                &InstructionMemory::passNopToDriver,
+                this,
+                this->getPipelineType() == PipelineType::Five && this->program_counter >= this->data.size()
+        );
         std::thread pass_instruction_thread (&InstructionMemory::passInstructionIntoIFIDStageRegisters, this);
+
         pass_instruction_thread.join();
+        pass_nop_thread.join();
 
         this->is_new_program_counter_set = false;
     }
@@ -84,6 +93,7 @@ void InstructionMemory::setInstructionMemoryInputFilePath(const std::string &fil
     this->readInstructionMemoryFile();
 
     this->logger->log(Stage::IF, "[InstructionMemory] setInstructionMemoryInputFilePath has finished.");
+    this->notifyModuleConditionVariable();
 }
 
 void InstructionMemory::setProgramCounter(unsigned long value) {
@@ -102,15 +112,13 @@ void InstructionMemory::setProgramCounter(unsigned long value) {
 
 void InstructionMemory::fetchInstructionFromMemory() {
     this->logger->log(Stage::IF, "[InstructionMemory] Fetching instruction from data_memory.");
-
     this->instruction.clear();
 
     for (unsigned long i = this->program_counter; i < this->program_counter + 4; ++i) {
         try {
             this->instruction += this->data.at(i);
         } catch (const std::out_of_range &e) {
-            std::cerr << "Error: " << e.what() << std::endl;
-            throw std::runtime_error("Program counter to fetch index in InstructionMemory out of bounds");
+            this->instruction = std::string(32, '0');
         }
     }
 
@@ -139,4 +147,8 @@ void InstructionMemory::passInstructionIntoIFIDStageRegisters() {
 
     this->if_id_stage_registers->setInput(this->instruction);
     this->logger->log(Stage::IF, "[InstructionMemory] Passed instruction to IFIDStageRegisters.");
+}
+
+void InstructionMemory::passNopToDriver(bool is_asserted) {
+    this->driver->setNop(is_asserted);
 }

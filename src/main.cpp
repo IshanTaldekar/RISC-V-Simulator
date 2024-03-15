@@ -22,6 +22,7 @@ class DataMemory;
 class Driver;
 class InstructionMemory;
 class RegisterFile;
+class HazardDetectionUnit;
 
 struct Pipeline {
     EXAdder *ex_adder = nullptr;
@@ -45,6 +46,7 @@ struct Pipeline {
     Driver *driver = nullptr;
     InstructionMemory *instruction_memory = nullptr;
     RegisterFile *register_file = nullptr;
+    HazardDetectionUnit *hazard_detection_unit = nullptr;
 };
 
 struct ActiveThreads {
@@ -68,6 +70,7 @@ struct ActiveThreads {
     std::thread driver_thread;
     std::thread instruction_memory_thread;
     std::thread register_file_thread;
+    std::thread hazard_detection_unit_thread;
 };
 
 void resetPipeline(Pipeline &pipeline) {
@@ -78,6 +81,15 @@ void resetPipeline(Pipeline &pipeline) {
     pipeline.driver->reset();
     pipeline.register_file->reset();
     pipeline.data_memory->reset();
+    pipeline.stage_synchronizer->reset();
+    pipeline.alu->reset();
+    pipeline.hazard_detection_unit->reset();
+    pipeline.forwarding_unit->reset();
+    pipeline.ex_mux_alu_input_1->reset();
+    pipeline.ex_mux_alu_input_2->reset();
+    pipeline.alu_input_1_forwarding_mux->reset();
+    pipeline.alu_input_2_forwarding_mux->reset();
+//    pipeline.ex_adder->reset();
 }
 
 void pausePipeline(Pipeline &pipeline) {
@@ -94,6 +106,8 @@ void resumePipeline(Pipeline &pipeline) {
     pipeline.if_id_stage_registers->resume();
     pipeline.mem_wb_stage_registers->resume();
     pipeline.driver->resume();
+    pipeline.register_file->resume();
+    pipeline.hazard_detection_unit->resume();
 }
 
 void changePipelineType(Pipeline &pipeline, const PipelineType &type) {
@@ -116,6 +130,8 @@ void changePipelineType(Pipeline &pipeline, const PipelineType &type) {
     pipeline.driver->setPipelineType(type);
     pipeline.instruction_memory->setPipelineType(type);
     pipeline.register_file->setPipelineType(type);
+    pipeline.hazard_detection_unit->setPipelineType(type);
+    pipeline.stage_synchronizer->setPipelineType(type);
 }
 
 void killPipeline(Pipeline &pipeline) {
@@ -139,6 +155,7 @@ void killPipeline(Pipeline &pipeline) {
     pipeline.driver->kill();
     pipeline.instruction_memory->kill();
     pipeline.register_file->kill();
+    pipeline.hazard_detection_unit->kill();
 }
 
 Pipeline initializePipeline() {
@@ -165,6 +182,7 @@ Pipeline initializePipeline() {
     pipeline.driver = Driver::init();
     pipeline.instruction_memory = InstructionMemory::init();
     pipeline.register_file = RegisterFile::init();
+    pipeline.hazard_detection_unit = HazardDetectionUnit::init();
 
     return pipeline;
 }
@@ -216,6 +234,7 @@ ActiveThreads runPipeline(const Pipeline &pipeline) {
     active_threads.driver_thread = std::thread(&Driver::run, pipeline.driver);
     active_threads.instruction_memory_thread = std::thread(&InstructionMemory::run, pipeline.instruction_memory);
     active_threads.register_file_thread = std::thread(&RegisterFile::run, pipeline.register_file);
+    active_threads.hazard_detection_unit_thread = std::thread(&HazardDetectionUnit::run, pipeline.hazard_detection_unit);
 
     active_threads.ex_adder_thread.detach();
     active_threads.if_adder_thread.detach();
@@ -236,6 +255,7 @@ ActiveThreads runPipeline(const Pipeline &pipeline) {
     active_threads.driver_thread.detach();
     active_threads.instruction_memory_thread.detach();
     active_threads.register_file_thread.detach();
+    active_threads.hazard_detection_unit_thread.detach();
 
     return active_threads;
 }
@@ -257,6 +277,20 @@ int main() {
     ActiveThreads active_threads = runPipeline(pipeline);
 
     while (true) {
-        sleep(1);
+        if (!pipeline.stage_synchronizer->isPaused()) {
+            sleep(1);
+        } else {
+            if (pipeline.driver->getPipelineType() == PipelineType::Single) {
+                sleep(2);
+                pausePipeline(pipeline);
+                changePipelineType(pipeline, PipelineType::Five);
+                resetPipeline(pipeline);
+                sleep(2);
+
+                resumePipeline(pipeline);
+            } else {
+                break;
+            }
+        }
     }
 }

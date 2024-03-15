@@ -54,22 +54,36 @@ private:
     bool is_branch_instruction;
     bool is_alu_result_zero;
     bool is_jal_instruction;
+    bool is_halt_instruction;
+    bool is_nop_asserted_flag;
 
     std::bitset<ALU_OP_BIT_COUNT> alu_op;
 
+    friend IDEXStageRegisters;
+    friend EXMEMStageRegisters;
+    friend MEMWBStageRegisters;
+
 public:
     explicit Control(Instruction *instruction);
+    static Control *deepCopy(Control *source);
 
     void setIsALUResultZero(bool is_result_zero);
+    void setNop(bool is_asserted);
 
     void toggleEXStageControlSignals();
     void toggleMEMStageControlSignals();
     void toggleWBStageControlSignals();
 
+    [[nodiscard]] bool isRegWriteAsserted() const;
+    [[nodiscard]] bool isMemReadAsserted() const;
+
 private:
     void generateSignals();
     void generateALUOpCode();
     void initDependencies();
+
+    void passNopToIFIDStageRegisters(bool is_signal_asserted);
+    void passNopToIDEXStageRegisters(bool is_signal_asserted);
 };
 
 #endif //RISC_V_SIMULATOR_CONTROL_H

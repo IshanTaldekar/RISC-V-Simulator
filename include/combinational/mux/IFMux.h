@@ -32,7 +32,7 @@ public:
     static IFMux *init();
 
     void run() override;
-    void setInput(const MuxInputType &type, const MuxInputDataType &value) override;
+    void setInput(MuxInputType type, MuxInputDataType value) override;
     void assertControlSignal(bool is_asserted) override;
 
 protected:

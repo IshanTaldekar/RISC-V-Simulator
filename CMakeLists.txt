@@ -39,4 +39,5 @@ add_executable(RISC_V_Simulator
         src/common/Logger.cpp
         include/common/BitwiseOperations.h
         src/common/BitwiseOperations.cpp
+        src/combinational/HazardDetectionUnit.cpp
 )

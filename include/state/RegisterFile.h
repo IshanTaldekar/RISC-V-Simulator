@@ -37,11 +37,7 @@ class RegisterFile: public Module {
     bool is_reg_write_signal_set;
     bool is_write_data_set;
     bool is_reset_flag_set;
-
-    std::mutex write_load_mutex;
-    std::condition_variable load_condition_variable;
-
-    bool is_write_thread_finished;
+    bool is_pause_flag_set;
 
     Logger *logger;
     IDEXStageRegisters *id_ex_stage_registers;
@@ -60,11 +56,13 @@ public:
     void setReadRegisters(unsigned long rs1, unsigned long rs2);
 
     void setWriteRegister(unsigned long rd);
-    void setWriteData(const std::bitset<WORD_BIT_COUNT> &value);
+    void setWriteData(std::bitset<WORD_BIT_COUNT> value);
 
     void setRegWriteSignal(bool is_asserted);
 
     void reset();
+    void pause();
+    void resume();
 
     void writeRegisterFileContentsToOutputFile(int cycle_count);
 

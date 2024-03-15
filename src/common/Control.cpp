@@ -13,6 +13,8 @@ Control::Control(Instruction *current_instruction) {
     this->is_branch_instruction = false;
     this->is_alu_result_zero = false;
     this->is_jal_instruction = false;
+    this->is_halt_instruction = false;
+    this->is_nop_asserted_flag = false;
 
     this->register_file = nullptr;
     this->if_mux = nullptr;
@@ -56,6 +58,11 @@ void Control::generateSignals() {
 
     if (type == InstructionType::S) {
         this->is_mem_write_asserted = true;
+    }
+
+    if (type == InstructionType::HALT) {
+        this->is_nop_asserted_flag = true;
+        this->is_halt_instruction = true;
     }
 }
 
@@ -102,9 +109,9 @@ void Control::toggleEXStageControlSignals() {
 
     this->alu->setALUOp(this->alu_op);
 
-    this->ex_mux_alu_input_2->assertControlSignal(this->is_alu_src_asserted);
-    this->ex_mux_alu_input_1->assertJALCustomControlSignal(this->is_jal_instruction);
-    this->ex_mux_alu_input_2->assertJALCustomControlSignal(this->is_jal_instruction);
+    this->ex_mux_alu_input_2->assertControlSignal(this->is_alu_src_asserted && !this->is_nop_asserted_flag);
+    this->ex_mux_alu_input_1->assertJALCustomControlSignal(this->is_jal_instruction && !this->is_nop_asserted_flag);
+    this->ex_mux_alu_input_2->assertJALCustomControlSignal(this->is_jal_instruction && !this->is_nop_asserted_flag);
 }
 
 void Control::toggleMEMStageControlSignals() {
@@ -112,17 +119,31 @@ void Control::toggleMEMStageControlSignals() {
         this->initDependencies();
     }
 
-    this->is_pc_src_asserted &= (this->is_alu_result_zero & this->is_branch_instruction);
+    this->is_pc_src_asserted = this->is_pc_src_asserted && this->is_alu_result_zero && this->is_branch_instruction &&
+            !this->is_nop_asserted_flag;
 
-    this->if_mux->assertControlSignal(this->is_pc_src_asserted);
-    this->data_memory->setMemWrite(this->is_mem_write_asserted);
-    this->data_memory->setMemRead(this->is_mem_read_asserted);
+    this->if_mux->assertControlSignal(this->is_pc_src_asserted && !this->is_nop_asserted_flag);
+    this->data_memory->setMemWrite(this->is_mem_write_asserted && !this->is_nop_asserted_flag);
+    this->data_memory->setMemRead(this->is_mem_read_asserted && !this->is_nop_asserted_flag);
 
-    if (this->is_pc_src_asserted || this->is_jal_instruction) {
-        this->if_id_stage_registers->assertNop();
-        this->id_ex_stage_registers->assertNop();
-        this->ex_mem_stage_registers->assertNop();
+    std::thread pass_nop_if_id_registers_thread (
+            &Control::passNopToIFIDStageRegisters,
+            this,
+            (this->is_pc_src_asserted || this->is_jal_instruction) && !this->is_nop_asserted_flag
+    );
+
+    std::thread pass_nop_id_ex_registers_thread (
+            &Control::passNopToIDEXStageRegisters,
+            this,
+            (this->is_pc_src_asserted || this->is_jal_instruction) && !this->is_nop_asserted_flag
+    );
+
+    if ((this->is_pc_src_asserted || this->is_jal_instruction) && !this->is_nop_asserted_flag) {
+        this->ex_mem_stage_registers->assertSystemEnabledNop();
     }
+
+    pass_nop_if_id_registers_thread.detach();
+    pass_nop_id_ex_registers_thread.detach();
 }
 
 void Control::toggleWBStageControlSignals() {
@@ -130,13 +151,8 @@ void Control::toggleWBStageControlSignals() {
         this->initDependencies();
     }
 
-    this->register_file->setRegWriteSignal(this->is_reg_write_asserted);
-    this->wb_mux->assertControlSignal(this->is_mem_to_reg_asserted);
-
-    if (this->is_pc_src_asserted || this->is_jal_instruction) {
-        this->id_ex_stage_registers->assertNop();
-        this->ex_mem_stage_registers->assertNop();
-    }
+    this->register_file->setRegWriteSignal(this->is_reg_write_asserted && !this->is_nop_asserted_flag);
+    this->wb_mux->assertControlSignal(this->is_mem_to_reg_asserted && !this->is_nop_asserted_flag);
 }
 
 void Control::initDependencies() {
@@ -150,4 +166,38 @@ void Control::initDependencies() {
     this->if_id_stage_registers = IFIDStageRegisters::init();
     this->id_ex_stage_registers = IDEXStageRegisters::init();
     this->ex_mem_stage_registers = EXMEMStageRegisters::init();
+}
+
+void Control::setNop(bool is_asserted) {
+    this->is_nop_asserted_flag = is_asserted;
+}
+
+Control *Control::deepCopy(Control *source) {
+    if (!source) {
+        return nullptr;
+    }
+
+    auto *deep_copy = new Control(source->instruction);
+    if (source->is_nop_asserted_flag) {
+        deep_copy->is_nop_asserted_flag = true;
+    } else {
+        deep_copy->is_nop_asserted_flag = false;
+    }
+    return deep_copy;
+}
+
+bool Control::isRegWriteAsserted() const {
+    return this->is_reg_write_asserted && !this->is_nop_asserted_flag;
+}
+
+bool Control::isMemReadAsserted() const {
+    return this->is_mem_read_asserted && !this->is_nop_asserted_flag;
+}
+
+void Control::passNopToIFIDStageRegisters(bool is_signal_asserted) {
+    this->if_id_stage_registers->setNop(is_signal_asserted);
+}
+
+void Control::passNopToIDEXStageRegisters(bool is_signal_asserted) {
+    this->id_ex_stage_registers->setNop(is_signal_asserted);
 }

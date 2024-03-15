@@ -14,6 +14,9 @@ EXMuxALUInput2::EXMuxALUInput2() {
     this->is_read_data_2_set = false;
     this->is_pass_four_flag_set = false;
 
+    this->is_reset_flag_set = false;
+    this->is_control_signal_set = false;
+
     this->logger = nullptr;
     this->alu_input_2_forwarding_mux = nullptr;
 }
@@ -44,13 +47,23 @@ void EXMuxALUInput2::run() {
                 ex_mux_lock,
                 [this] {
                     return (this->is_immediate_set && this->is_read_data_2_set && this->is_control_signal_set
-                        && this->is_pass_four_flag_set) || this->isKilled();
+                        && this->is_pass_four_flag_set) || this->isKilled() || this->is_reset_flag_set;
                 }
         );
 
         if (this->isKilled()) {
             this->logger->log(Stage::EX, "[EXMuxALUInput2] Killed.");
             break;
+        }
+
+        if (this->is_reset_flag_set) {
+            this->logger->log(Stage::EX, "[EXMuxALUInput2] Resetting stage.");
+
+            this->resetState();
+            this->is_reset_flag_set = false;
+
+            this->logger->log(Stage::EX, "[EXMuxALUInput2] Reset.");
+            continue;
         }
 
         this->logger->log(Stage::EX, "[EXMuxALUInput2] Woken up and acquired lock.");
@@ -64,7 +77,7 @@ void EXMuxALUInput2::run() {
     }
 }
 
-void EXMuxALUInput2::setInput(const MuxInputType &type, const MuxInputDataType &value) {
+void EXMuxALUInput2::setInput(MuxInputType type, MuxInputDataType value) {
     if (!std::holds_alternative<EXStageMuxALUInput2InputType>(type) ||
             !std::holds_alternative<std::bitset<WORD_BIT_COUNT>>(value)) {
         throw std::runtime_error("EXMuxALUInput2::setInput: incompatible data types passed.");
@@ -77,10 +90,10 @@ void EXMuxALUInput2::setInput(const MuxInputType &type, const MuxInputDataType &
     this->logger->log(Stage::EX, "[EXMuxALUInput2] setInput Woken up and acquired lock. Updating value.");
 
     if (std::get<EXStageMuxALUInput2InputType>(type) == EXStageMuxALUInput2InputType::ReadData2) {
-        this->read_data_2 = std::get<std::bitset<WORD_BIT_COUNT>>(value);
+        this->read_data_2 = std::bitset<WORD_BIT_COUNT>(std::get<std::bitset<WORD_BIT_COUNT>>(value));
         this->is_read_data_2_set = true;
     } else if (std::get<EXStageMuxALUInput2InputType>(type) == EXStageMuxALUInput2InputType::ImmediateValue) {
-        this->immediate = std::get<std::bitset<WORD_BIT_COUNT>>(value);
+        this->immediate = std::bitset<WORD_BIT_COUNT>(std::get<std::bitset<WORD_BIT_COUNT>>(value));
         this->is_immediate_set = true;
     }
 
@@ -130,4 +143,23 @@ void EXMuxALUInput2::assertJALCustomControlSignal(bool is_asserted) {
 
     this->logger->log(Stage::EX, "[EXMuxALUInput2] assertJALCustomControlSignal updated control.");
     this->notifyModuleConditionVariable();
+}
+
+void EXMuxALUInput2::reset() {
+    std::lock_guard<std::mutex> ex_mux_alu_input_2_lock (this->getModuleMutex());
+
+    this->is_reset_flag_set = true;
+    this->notifyModuleConditionVariable();
+}
+
+void EXMuxALUInput2::resetState() {
+    this->is_pass_four_flag_asserted = false;
+    this->is_alu_src_asserted = false;
+    this->immediate = std::bitset<WORD_BIT_COUNT>(std::string(32, '0'));
+    this->read_data_2 = std::bitset<WORD_BIT_COUNT>(std::string(32, '0'));
+
+    this->is_immediate_set = false;
+    this->is_read_data_2_set = false;
+    this->is_pass_four_flag_set = false;
+    this->is_control_signal_set = false;
 }

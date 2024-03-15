@@ -68,7 +68,7 @@ void WBMux::run() {
     }
 }
 
-void WBMux::setInput(const MuxInputType &type, const MuxInputDataType &value) {
+void WBMux::setInput(MuxInputType type, MuxInputDataType value) {
     if (!std::holds_alternative<WBStageMuxInputType>(type)) {
         throw std::runtime_error("Incorrect MuxInputType passed to EXMuxALUInput2");
     }
@@ -78,10 +78,10 @@ void WBMux::setInput(const MuxInputType &type, const MuxInputDataType &value) {
     std::lock_guard<std::mutex> ex_mux_lock (this->getModuleMutex());
 
     if (std::get<WBStageMuxInputType>(type) == WBStageMuxInputType::ALUResult) {
-        this->alu_result = std::get<std::bitset<WORD_BIT_COUNT>>(value);
+        this->alu_result = std::bitset<WORD_BIT_COUNT>(std::get<std::bitset<WORD_BIT_COUNT>>(value));
         this->is_alu_result_set = true;
     } else if (std::get<WBStageMuxInputType>(type) == WBStageMuxInputType::ReadData) {
-        this->read_data = std::get<std::bitset<WORD_BIT_COUNT>>(value);
+        this->read_data = std::bitset<WORD_BIT_COUNT>(std::get<std::bitset<WORD_BIT_COUNT>>(value));
         this->is_read_data_set = true;
     }
 
@@ -90,6 +90,10 @@ void WBMux::setInput(const MuxInputType &type, const MuxInputDataType &value) {
 }
 
 void WBMux::assertControlSignal(bool is_asserted) {
+    if (!this->logger) {
+        this->initDependencies();
+    }
+
     this->logger->log(Stage::WB, "[WBMux] assertControlSignal waiting to acquire lock.");
 
     std::lock_guard<std::mutex> wb_mux_lock (this->getModuleMutex());

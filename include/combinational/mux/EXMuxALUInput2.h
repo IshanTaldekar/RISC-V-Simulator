@@ -22,6 +22,8 @@ class EXMuxALUInput2: public MuxBase {
     bool is_alu_src_asserted;
     bool is_pass_four_flag_asserted;
 
+    bool is_reset_flag_set;
+
     ALUInput2ForwardingMux *alu_input_2_forwarding_mux;
     Logger *logger;
 
@@ -34,13 +36,17 @@ public:
     static EXMuxALUInput2 *init();
 
     void run() override;
-    void setInput(const MuxInputType &type, const MuxInputDataType &value) override;
+    void setInput(MuxInputType type, MuxInputDataType value) override;
     void assertControlSignal(bool is_asserted) override;
     void assertJALCustomControlSignal(bool is_asserted);
+
+    void reset();
 
 protected:
     void passOutput() override;
     void initDependencies() override;
+
+    void resetState();
 };
 
 #endif //RISC_V_SIMULATOR_EXMUXALUINPUT2_H

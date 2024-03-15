@@ -5,10 +5,13 @@
 
 #include "../common/Module.h"
 #include "../common/BitwiseOperations.h"
+#include "../common/StageSynchronizer.h"
 #include "../common/Control.h"
 #include "../common/Logger.h"
 
 class EXMEMStageRegisters;
+class Logger;
+class StageSynchronizer;
 
 class ALU: public Module {
 public:
@@ -24,6 +27,8 @@ private:
     bool is_input2_set;
     bool is_alu_op_set;
 
+    bool is_reset_flag_set;
+
     std::bitset<ALU_OP_BIT_COUNT> alu_op;
 
     static ALU *current_instance;
@@ -31,6 +36,7 @@ private:
 
     EXMEMStageRegisters *ex_mem_stage_registers;
     Logger *logger;
+    StageSynchronizer *stage_synchronizer;
 
 public:
     ALU();
@@ -39,16 +45,20 @@ public:
 
     void run() override;
 
-    void setInput1(const std::bitset<WORD_BIT_COUNT> &value);
-    void setInput2(const std::bitset<WORD_BIT_COUNT> &value);
+    void reset();
 
-    void setALUOp(const std::bitset<ALU_OP_BIT_COUNT> &value);
+    void setInput1(std::bitset<WORD_BIT_COUNT> value);
+    void setInput2(std::bitset<WORD_BIT_COUNT> value);
+
+    void setALUOp(std::bitset<ALU_OP_BIT_COUNT> value);
 
 private:
     void computeResult();
-    void passZeroFlagToEXMEMStageRegisters();
-    void passResultToEXMEMStageRegisters();
+    void passZeroFlagToEXMEMStageRegisters(bool is_flag_asserted);
+    void passResultToEXMEMStageRegisters(std::bitset<WORD_BIT_COUNT> data);
     void initDependencies() override;
+
+    void resetState();
 };
 
 #endif //RISC_V_SIMULATOR_ALU_H

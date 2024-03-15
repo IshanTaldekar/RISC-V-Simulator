@@ -14,6 +14,9 @@ MEMWBStageRegisters::MEMWBStageRegisters() {
     this->is_control_set = false;
     this->is_reset_flag_set = false;
     this->is_pause_flag_set = false;
+    this->is_nop_asserted = false;
+    this->is_nop_passed_flag_set = false;
+    this->is_nop_passed_flag_asserted = false;
 
     this->control = nullptr;
 
@@ -35,15 +38,21 @@ void MEMWBStageRegisters::resetStage() {
         this->is_alu_result_set = false;
         this->is_register_destination_set = false;
         this->is_control_set = false;
+        this->is_nop_passed_flag_set = false;
+        this->is_nop_passed_flag_asserted = false;
     } else {
         this->is_read_data_set = true;
         this->is_alu_result_set = true;
         this->is_register_destination_set = true;
         this->is_control_set = true;
+        this->is_nop_passed_flag_set = true;
+        this->is_nop_passed_flag_asserted = true;
     }
 
-    this->read_data = 0UL;
-    this->alu_result = 0UL;
+    this->is_nop_asserted = false;
+
+    this->read_data = std::bitset<WORD_BIT_COUNT>(std::string(32, '0'));
+    this->alu_result = std::bitset<WORD_BIT_COUNT>(std::string(32, '0'));
     this->register_destination = 0L;
 
     this->control = new Control(new Instruction(std::string(32, '0')));
@@ -89,7 +98,8 @@ void MEMWBStageRegisters::run() {
                 mem_wb_stage_registers_lock,
                 [this] {
                     return (this->is_read_data_set && this->is_alu_result_set && this->is_register_destination_set &&
-                            this->is_control_set && !this->is_pause_flag_set) || this->is_reset_flag_set || this->isKilled();
+                            this->is_control_set && !this->is_pause_flag_set && this->is_nop_passed_flag_set) ||
+                           this->is_reset_flag_set || this->isKilled();
                 }
         );
 
@@ -110,23 +120,33 @@ void MEMWBStageRegisters::run() {
 
         this->logger->log(Stage::MEM, "[MEMWBStageRegisters] Woken up and acquired lock.");
 
+        this->control->setNop(this->is_nop_passed_flag_asserted);
         this->control->toggleWBStageControlSignals();
 
         this->passReadDataToWBMux();
         this->passALUResultToWBMux();
-        this->passRegisterDestinationToForwardingUnit();
-        this->passRegisterDestinationToRegisterFile();
+
+        std::thread pass_register_destination_register_file (&MEMWBStageRegisters::passRegisterDestinationToRegisterFile, this);
+        std::thread pass_register_destination_forwarding_unit (&MEMWBStageRegisters::passRegisterDestinationToForwardingUnit, this);
+        std::thread pass_reg_write_forwarding_unit (&MEMWBStageRegisters::passRegWriteToForwardingUnit, this);
+
+        pass_register_destination_register_file.join();
+        pass_register_destination_forwarding_unit.join();
+        pass_reg_write_forwarding_unit.join();
 
         this->is_read_data_set = false;
         this->is_alu_result_set = false;
         this->is_register_destination_set = false;
         this->is_control_set = false;
+        this->is_nop_asserted = false;
+        this->is_nop_passed_flag_set = false;
+        this->is_nop_passed_flag_asserted = false;
 
         this->stage_synchronizer->conditionalArriveSingleStage();
     }
 }
 
-void MEMWBStageRegisters::setReadData(const std::bitset<WORD_BIT_COUNT> &value) {
+void MEMWBStageRegisters::setReadData(std::bitset<WORD_BIT_COUNT> value) {
     this->stage_synchronizer->conditionalArriveFiveStage();
 
     this->logger->log(Stage::MEM, "[MEMWBStageRegisters] setReadData waiting to acquire lock.");
@@ -142,7 +162,7 @@ void MEMWBStageRegisters::setReadData(const std::bitset<WORD_BIT_COUNT> &value) 
     this->notifyModuleConditionVariable();
 }
 
-void MEMWBStageRegisters::setALUResult(const std::bitset<WORD_BIT_COUNT> &value) {
+void MEMWBStageRegisters::setALUResult(std::bitset<WORD_BIT_COUNT> value) {
     this->stage_synchronizer->conditionalArriveFiveStage();
 
     this->logger->log(Stage::MEM, "[MEMWBStageRegisters] setALUResult waiting to acquire lock.");
@@ -190,6 +210,22 @@ void MEMWBStageRegisters::setControl(Control *new_control) {
     this->notifyModuleConditionVariable();
 }
 
+void MEMWBStageRegisters::setPassedNop(bool is_asserted) {
+    this->stage_synchronizer->conditionalArriveFiveStage();
+
+    this->logger->log(Stage::MEM, "[MEMWBStageRegisters] setPassedNop waiting to acquire lock.");
+
+    std::lock_guard<std::mutex> if_id_stage_registers_lock (this->getModuleMutex());
+
+    this->logger->log(Stage::MEM, "[MEMWBStageRegisters] setPassedNop acquired lock.");
+
+    this->is_nop_passed_flag_asserted = is_asserted;
+    this->is_nop_passed_flag_set = true;
+
+    this->logger->log(Stage::MEM, "[MEMWBStageRegisters] setPassedNop updated value.");
+    this->notifyModuleConditionVariable();
+}
+
 void MEMWBStageRegisters::passALUResultToWBMux() {
     this->logger->log(Stage::MEM, "[MEMWBStageRegisters] Passing ALU result to WBMux.");
     this->wb_mux->setInput(WBStageMuxInputType::ALUResult, this->alu_result);
@@ -212,4 +248,18 @@ void MEMWBStageRegisters::passRegisterDestinationToForwardingUnit() {
     this->logger->log(Stage::MEM, "[MEMWBStageRegisters] Passing register destination to ForwardingUnit.");
     this->forwarding_unit->setMEMWBStageRegisterDestination(this->register_destination);
     this->logger->log(Stage::MEM, "[MEMWBStageRegisters] Passed register destination to ForwardingUnit.");
+}
+
+void MEMWBStageRegisters::passRegWriteToForwardingUnit() {
+    this->logger->log(Stage::MEM, "[MEMWBStageRegisters] Passing reg write to ForwardingUnit.");
+    this->forwarding_unit->setMEMWBStageRegisterRegWrite(this->control->isRegWriteAsserted());
+    this->logger->log(Stage::MEM, "[MEMWBStageRegisters] Passed reg write to ForwardingUnit.");
+}
+
+bool MEMWBStageRegisters::isExecutingHaltInstruction() {
+    return this->control->is_halt_instruction;
+}
+
+void MEMWBStageRegisters::assertNop() {
+    this->is_nop_asserted = true;
 }

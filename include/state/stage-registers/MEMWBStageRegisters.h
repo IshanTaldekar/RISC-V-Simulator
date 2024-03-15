@@ -27,6 +27,9 @@ class MEMWBStageRegisters: public Module {
     bool is_control_set;
     bool is_reset_flag_set;
     bool is_pause_flag_set;
+    bool is_nop_asserted;
+    bool is_nop_passed_flag_set;
+    bool is_nop_passed_flag_asserted{};
 
     static MEMWBStageRegisters *current_instance;
     static std::mutex initialization_mutex;
@@ -39,6 +42,8 @@ class MEMWBStageRegisters: public Module {
     ForwardingUnit *forwarding_unit;
     Logger *logger;
 
+    friend StageSynchronizer;
+
 public:
     MEMWBStageRegisters();
 
@@ -46,10 +51,13 @@ public:
 
     void run() override;
 
-    void setReadData(const std::bitset<WORD_BIT_COUNT> &value);
-    void setALUResult(const std::bitset<WORD_BIT_COUNT> &value);
+    void setReadData(std::bitset<WORD_BIT_COUNT> value);
+    void setALUResult(std::bitset<WORD_BIT_COUNT> value);
     void setRegisterDestination(unsigned long value);
     void setControl(Control *new_control);
+    void setPassedNop(bool is_asserted);
+    bool isExecutingHaltInstruction();
+    void assertNop();
 
     void reset();
     void pause();
@@ -60,6 +68,7 @@ private:
     void passALUResultToWBMux();
     void passRegisterDestinationToRegisterFile();
     void passRegisterDestinationToForwardingUnit();
+    void passRegWriteToForwardingUnit();
 
     void resetStage();
     void initDependencies() override;

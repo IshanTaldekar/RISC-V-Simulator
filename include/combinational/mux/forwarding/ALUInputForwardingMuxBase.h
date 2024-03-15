@@ -23,6 +23,8 @@ protected:
     bool is_ex_mem_stage_registers_value_set;
     bool is_mem_wb_stage_registers_value_set;
 
+    bool is_reset_flag_set;
+
     ALU *alu;
     Logger *logger;
 
@@ -31,12 +33,16 @@ public:
 
     void run() override;
 
-    void setInput(const MuxInputType &type, const MuxInputDataType &value) override;
+    void setInput(MuxInputType type, MuxInputDataType value) override;
     void setMuxControlSignal(ALUInputMuxControlSignals new_signal);
+
+    void reset();
 
 protected:
     virtual std::string getModuleTag() = 0;
+
     void initDependencies() override;
+    void resetState();
 };
 
 #endif //RISC_V_SIMULATOR_ALUINPUTFORWARDINGMUXBASE_H

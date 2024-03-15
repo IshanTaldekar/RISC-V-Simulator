@@ -9,7 +9,7 @@ class Module;
 
 class MuxBase: public Module {
 public:
-    virtual void setInput(const MuxInputType &type, const MuxInputDataType &value) = 0;
+    virtual void setInput(MuxInputType type, MuxInputDataType value) = 0;
     virtual void assertControlSignal(bool is_asserted);
 
 protected:

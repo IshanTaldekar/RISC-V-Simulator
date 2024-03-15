@@ -5,15 +5,14 @@ std::mutex DataMemory::initialization_mutex;
 
 DataMemory::DataMemory() {
     this->address = 0UL;
-    this->write_data = 0UL;
-    this->read_data = 0UL;
+    this->write_data = std::bitset<WORD_BIT_COUNT>(std::string(32, '0'));
+    this->read_data = std::bitset<WORD_BIT_COUNT>(std::string(32, '0'));
 
     this->is_mem_write_asserted = false;
     this->is_mem_read_asserted = false;
 
     this->is_address_set = false;
     this->is_write_data_set = false;
-    this->is_read_data_set = false;
     this->is_mem_write_flag_set = false;
     this->is_mem_read_flag_set = false;
     this->is_input_file_read = false;
@@ -22,8 +21,8 @@ DataMemory::DataMemory() {
     this->mem_wb_stage_registers = nullptr;
     this->logger = nullptr;
 
-    this->output_file_path = "../output/DataMemory.out";
-    std::ofstream output_file (this->output_file_path, std::ios::out);
+    this->output_file_path = "../output/DataMemory";
+    std::ofstream output_file (this->output_file_path + "-SS.log", std::ios::out);
     output_file.close();
 }
 
@@ -46,16 +45,17 @@ void DataMemory::run() {
     this->initDependencies();
 
     this->logger->log(Stage::MEM, "[DataMemory] Waiting for data memory file to be set and acquire lock.");
-
-    std::unique_lock<std::mutex> data_memory_lock (this->getModuleMutex());
-    this->getModuleConditionVariable().wait(
-            data_memory_lock,
-            [this] { return !this->data_memory_file_path.empty(); }
-    );
+    {
+        std::unique_lock<std::mutex> data_memory_lock (this->getModuleMutex());
+        this->getModuleConditionVariable().wait(
+                data_memory_lock,
+                [this] { return !this->data_memory_file_path.empty(); }
+        );
+    }
 
     while (this->isAlive()) {
         this->logger->log(Stage::MEM, "[DataMemory] Waiting to be woken up and acquire lock.");
-
+        std::unique_lock<std::mutex> data_memory_lock (this->getModuleMutex());
         this->getModuleConditionVariable().wait(
                 data_memory_lock,
                 [this] {
@@ -82,13 +82,14 @@ void DataMemory::run() {
 
         this->logger->log(Stage::MEM, "[DataMemory] Woken up and acquired lock.");
 
-        this->readData();
         this->writeData();
-        this->passReadData();
+        this->readData();
+
+        std::thread pass_read_data_thread (&DataMemory::passReadData, this, this->read_data);
+        pass_read_data_thread.detach();
 
         this->is_address_set = false;
         this->is_write_data_set = false;
-        this->is_read_data_set = false;
         this->is_mem_write_flag_set = false;
         this->is_mem_read_flag_set =  false;
     }
@@ -126,7 +127,7 @@ void DataMemory::setAddress(unsigned long value) {
     this->notifyModuleConditionVariable();
 }
 
-void DataMemory::setWriteData(const std::bitset<WORD_BIT_COUNT> &value) {
+void DataMemory::setWriteData(std::bitset<WORD_BIT_COUNT> value) {
     this->logger->log(Stage::MEM, "[DataMemory] setWriteData waiting to acquire lock.");
 
     std::lock_guard<std::mutex> data_memory_guard (this->getModuleMutex());
@@ -172,7 +173,7 @@ void DataMemory::readDataMemoryFile() {
     std::ifstream data_memory_file (this->data_memory_file_path);
     std::string byte_instruction;
 
-    this->data_memory = std::vector<std::string> {};
+    this->data_memory.clear();
 
     while (std::getline(data_memory_file, byte_instruction)) {
         this->data_memory.push_back(byte_instruction);
@@ -190,14 +191,14 @@ void DataMemory::readDataMemoryFile() {
     this->logger->log(Stage::MEM, "[DataMemory] Data memory file read.");
 }
 
-void DataMemory::passReadData() {
+void DataMemory::passReadData(std::bitset<WORD_BIT_COUNT> data) {
     this->logger->log(Stage::MEM, "[DataMemory] Passing read data to MEMWBStageRegisters.");
-    this->mem_wb_stage_registers->setReadData(this->read_data);
+    this->mem_wb_stage_registers->setReadData(data);
     this->logger->log(Stage::MEM, "[DataMemory] Passing read data to MEMWBStageRegisters.");
 }
 
 void DataMemory::readData() {
-    this->read_data = 0UL;
+    this->read_data = std::bitset<WORD_BIT_COUNT>(std::string(32, '0'));
 
     if (this->is_mem_read_asserted) {
         std::string word;
@@ -236,18 +237,30 @@ void DataMemory::reset() {
 void DataMemory::resetState() {
     this->readDataMemoryFile();
 
-    this->is_mem_write_asserted = false;
-    this->is_mem_read_asserted = false;
+    this->address = 0UL;
+    this->write_data = std::bitset<WORD_BIT_COUNT>(std::string(32, '0'));
+    this->read_data = std::bitset<WORD_BIT_COUNT>(std::string(32, '0'));
+
     this->is_address_set = false;
     this->is_write_data_set = false;
-    this->is_read_data_set = false;
     this->is_mem_write_flag_set = false;
     this->is_mem_read_flag_set = false;
-    this->is_input_file_read = false;
+    this->is_mem_write_asserted = false;
+    this->is_mem_read_asserted = false;
+    this->is_input_file_read = true;
+
+    std::ofstream output_file (
+            this->output_file_path + (this->getPipelineType() == PipelineType::Single ?  "-SS.log" : "-FS.log"),
+            std::ios::out
+    );
+    output_file.close();
 }
 
 void DataMemory::writeDataMemoryContentsToOutput() {
-    std::ofstream output_file (this->output_file_path, std::ios::app);
+    std::ofstream output_file (
+            this->output_file_path + (this->getPipelineType() == PipelineType::Single ?  "-SS.log" : "-FS.log"),
+            std::ios::app
+    );
 
     for (const std::string &data: this->data_memory) {
         output_file << data << std::endl;

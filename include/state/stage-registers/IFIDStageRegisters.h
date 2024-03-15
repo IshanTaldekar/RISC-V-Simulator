@@ -9,6 +9,7 @@
 #include "../../common/Control.h"
 #include "../../state/RegisterFile.h"
 #include "../../combinational/ImmediateGenerator.h"
+#include "../../combinational/HazardDetectionUnit.h"
 #include "../../common/StageSynchronizer.h"
 
 #include <bitset>
@@ -21,6 +22,7 @@ class ImmediateGenerator;
 class StageSynchronizer;
 class IDEXStageRegisters;
 class Logger;
+class HazardDetectionUnit;
 
 class IFIDStageRegisters: public Module {
     static constexpr int WORD_BIT_COUNT = 32;
@@ -37,9 +39,13 @@ class IFIDStageRegisters: public Module {
     ImmediateGenerator *immediate_generator;
     StageSynchronizer *stage_synchronizer;
     Logger *logger;
+    HazardDetectionUnit *hazard_detection_unit;
 
     bool is_program_counter_set;
     bool is_instruction_set;
+    bool is_nop_flag_set;
+    bool is_nop_passed_flag_asserted;
+    bool is_nop_passed_flag_set;
 
     bool is_nop_asserted;
     bool is_reset_flag_set;
@@ -48,6 +54,9 @@ class IFIDStageRegisters: public Module {
     static IFIDStageRegisters *current_instance;
     static std::mutex initialization_mutex;
 
+    static constexpr int REQUIRED_NOP_FLAG_SET_OPERATIONS = 2;
+    int current_nop_set_operations;
+
 public:
     IFIDStageRegisters();
 
@@ -55,8 +64,10 @@ public:
 
     void run() override;
 
-    void setInput(const std::variant<unsigned long, std::string> &input);
-    void assertNop();
+    void setInput(std::variant<unsigned long, std::string> input);
+    void assertSystemEnabledNop();  // System asserted NOP
+    void setNop(bool is_asserted);
+    void setPassedNop(bool is_asserted);  // NOP passed from previous stage
 
     void reset();
     void pause();
@@ -66,17 +77,21 @@ public:
     Instruction *getInstruction();
 
 private:
-    void passProgramCounterToIDEXStageRegisters();
-    void passControlToIDEXStageRegisters();
-    void passReadRegistersToRegisterFile();
-    void passInstructionToImmediateGenerator();
-    void passRegisterDestinationToIDEXStageRegisters();
-    void passRegisterSource1ToIDEXStageRegisters();
-    void passRegisterSource2ToIDEXStageRegisters();
-    void passInstructionToIDEXStageRegisters();
+    void passProgramCounterToIDEXStageRegisters(unsigned long pc);
+    void passControlToIDEXStageRegisters(Control *new_control);
+    void passReadRegistersToRegisterFile(Instruction *current_instruction);
+    void passInstructionToImmediateGenerator(Instruction *current_instruction);
+    void passRegisterDestinationToIDEXStageRegisters(Instruction *instruction);
+    void passRegisterSource1ToIDEXStageRegisters(Instruction *instruction);
+    void passRegisterSource2ToIDEXStageRegisters(Instruction *instruction);
+    void passInstructionToIDEXStageRegisters(Instruction *instruction);
+    void passNopToIDEXStageRegisters(bool is_asserted);
+    void passInstructionToHazardDetectionUnit(Instruction *next_instruction);
 
     void resetStage();
     void initDependencies() override;
+
+    void delayUpdateUntilNopFlagSet();
 };
 
 #endif //RISC_V_SIMULATOR_IFIDSTAGEREGISTERS_H

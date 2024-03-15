@@ -9,9 +9,12 @@
 
 #include "../common/Module.h"
 #include "../common/Logger.h"
+#include "../common/StageSynchronizer.h"
 #include "../state/stage-registers/MEMWBStageRegisters.h"
 
 class MEMWBStageRegisters;
+class StageSynchronizer;
+class Logger;
 
 class DataMemory: public Module {
     static constexpr int WORD_BIT_COUNT = 32;
@@ -30,7 +33,6 @@ class DataMemory: public Module {
 
     bool is_address_set;
     bool is_write_data_set;
-    bool is_read_data_set;
     bool is_mem_write_flag_set;
     bool is_mem_read_flag_set;
     bool is_input_file_read;
@@ -54,7 +56,7 @@ public:
     void setDataMemoryInputFilePath(const std::string &file_path);
 
     void setAddress(unsigned long value);
-    void setWriteData(const std::bitset<WORD_BIT_COUNT> &value);
+    void setWriteData(std::bitset<WORD_BIT_COUNT> value);
     void setMemWrite(bool is_asserted);
     void setMemRead(bool is_asserted);
 
@@ -65,7 +67,7 @@ private:
     void readDataMemoryFile();
     void writeData();
     void readData();
-    void passReadData();
+    void passReadData(std::bitset<WORD_BIT_COUNT> data);
     void resetState();
     void initDependencies() override;
 };

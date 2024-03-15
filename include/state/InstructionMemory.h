@@ -9,8 +9,12 @@
 #include "stage-registers/IFIDStageRegisters.h"
 #include "../common/Module.h"
 #include "../common/Logger.h"
+#include "../state/Driver.h"
 
 class IFIDStageRegisters;
+class Logger;
+class IFIDStageRegisters;
+class Driver;
 
 class InstructionMemory: public Module {
     std::string instruction_memory_file_path;
@@ -25,6 +29,7 @@ class InstructionMemory: public Module {
 
     IFIDStageRegisters *if_id_stage_registers;
     Logger *logger;
+    Driver *driver;
 
     static InstructionMemory *current_instance;
     static std::mutex initialization_mutex;
@@ -44,6 +49,8 @@ private:
     void readInstructionMemoryFile();
 
     void passInstructionIntoIFIDStageRegisters();
+    void passNopToDriver(bool is_asserted);
+
     void initDependencies() override;
 };
 

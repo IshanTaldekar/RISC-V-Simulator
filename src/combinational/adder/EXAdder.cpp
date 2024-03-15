@@ -39,7 +39,9 @@ void EXAdder::run() {
         std::unique_lock<std::mutex> ex_adder_lock (this->getModuleMutex());
         this->getModuleConditionVariable().wait(
                 ex_adder_lock,
-                [this] { return (this->is_program_counter_set && this->is_immediate_set) || this->isKilled(); }
+                [this] {
+                    return (this->is_program_counter_set && this->is_immediate_set) || this->isKilled();
+                }
         );
 
         if (this->isKilled()) {
@@ -94,3 +96,4 @@ void EXAdder::passBranchAddressToEXMEMStageRegisters() {
     this->ex_mem_stage_registers->setBranchedProgramCounter(this->result);
     this->logger->log(Stage::EX, "[EXAdder] Passed adder result to EXMEMStageRegisters.");
 }
+

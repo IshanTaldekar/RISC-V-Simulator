@@ -37,9 +37,11 @@ class EXMEMStageRegisters: public Module {
     bool is_register_destination_set;
     bool is_alu_result_zero_flag_set;
     bool is_control_set;
-    bool is_nop_asserted;
+    bool is_nop_flag_asserted;
+    bool is_nop_passed_flag_asserted;
     bool is_reset_flag_set;
     bool is_pause_flag_set;
+    bool is_nop_passed_flag_set;
 
     Control *control;
     DataMemory *data_memory;
@@ -54,6 +56,9 @@ class EXMEMStageRegisters: public Module {
     static EXMEMStageRegisters *current_instance;
     static std::mutex initialization_mutex;
 
+    static constexpr int REQUIRED_NOP_FLAG_SET_OPERATIONS = 1;
+    int current_nop_set_operations;
+
 public:
     EXMEMStageRegisters();
 
@@ -62,28 +67,31 @@ public:
     void run() override;
 
     void setBranchedProgramCounter(unsigned long value);
-    void setALUResult(const std::bitset<WORD_BIT_COUNT> &value);
+    void setALUResult(std::bitset<WORD_BIT_COUNT> value);
     void setIsResultZeroFlag(bool asserted);
-    void setReadData2(const std::bitset<WORD_BIT_COUNT> &value);
+    void setReadData2(std::bitset<WORD_BIT_COUNT> value);
     void setRegisterDestination(unsigned long value);
     void setControl(Control *new_control);
 
-    void assertNop();
+    void assertSystemEnabledNop();  // Nop set by system
     void reset();
     void pause();
     void resume();
     void changeStageAndReset(PipelineType new_pipeline_type);
+    void setPassedNop(bool is_asserted);  // Passing Nop between stages
 
 private:
-    void passALUResultToDataMemory();
-    void passALUResultToALUInput1ForwardingMux();
-    void passALUResultToALUInput2ForwardingMux();
-    void passALUResultToMEMWBStageRegisters();
-    void passWriteDataToDataMemory();
-    void passRegisterDestinationToMEMWBStageRegisters();
-    void passRegisterDestinationToForwardingUnit();
-    void passBranchedAddressToIFMux();
-    void passControlToMEMWBStageRegisters();
+    void passALUResultToDataMemory(std::bitset<WORD_BIT_COUNT> data);
+    void passALUResultToALUInput1ForwardingMux(std::bitset<WORD_BIT_COUNT> data);
+    void passALUResultToALUInput2ForwardingMux(std::bitset<WORD_BIT_COUNT> data);
+    void passALUResultToMEMWBStageRegisters(std::bitset<WORD_BIT_COUNT> data);
+    void passWriteDataToDataMemory(std::bitset<WORD_BIT_COUNT> data);
+    void passRegisterDestinationToMEMWBStageRegisters(unsigned long rd);
+    void passRegisterDestinationToForwardingUnit(unsigned long rd);
+    void passRegWriteToForwardingUnit(bool is_signal_asserted);
+    void passBranchedAddressToIFMux(unsigned long branched_address);
+    void passControlToMEMWBStageRegisters(Control *control);
+    void passNopToMEMWBStageRegisters(bool is_signal_asserted);
 
     void resetStage();
     void initDependencies() override;

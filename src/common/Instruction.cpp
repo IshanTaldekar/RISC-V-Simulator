@@ -1,7 +1,7 @@
 #include "../../include/common/Instruction.h"
 
 Instruction::Instruction(std::string instruction) {
-    this->instruction = instruction;
+    this->instruction = std::move(instruction);
 
     this->opcode_to_type_mapping = std::unordered_map<std::string, InstructionType>{
             {"0110011", InstructionType::R},
@@ -82,4 +82,12 @@ InstructionType Instruction::getType() const {
     }
 
     return element_iterator->second;
+}
+
+Instruction *Instruction::deepCopy(const Instruction *source) {
+    if (!source) {
+        return nullptr;
+    }
+
+    return new Instruction(source->instruction);
 }

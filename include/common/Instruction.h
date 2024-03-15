@@ -48,6 +48,7 @@ public:
     std::bitset<J_TYPE_IMMEDIATE_BIT_COUNT> getImmediateJ() const;
 
     InstructionType getType() const;
+    static Instruction *deepCopy(const Instruction *source);
 };
 
 #endif //RISC_V_SIMULATOR_INSTRUCTION_H

@@ -7,6 +7,8 @@
 #include "../combinational/mux/forwarding/ALUInput1ForwardingMux.h"
 #include "../combinational/mux/forwarding/ALUInput2ForwardingMux.h"
 
+#include <iostream>
+
 class ALUInput1ForwardingMux;
 class ALUInput2ForwardingMux;
 class Logger;
@@ -21,6 +23,13 @@ class ForwardingUnit: public Module {
     bool is_double_register_source_set;
     bool is_ex_mem_stage_register_destination_set;
     bool is_mem_wb_stage_register_destination_set;
+
+    bool is_ex_mem_reg_write_asserted;
+    bool is_mem_wb_reg_write_asserted;
+
+    bool is_ex_mem_reg_write_set;
+    bool is_mem_wb_reg_write_set;
+
     bool is_reset_flag_set;
 
     static ForwardingUnit *current_instance;
@@ -45,6 +54,8 @@ public:
     void setDoubleRegisterSource(unsigned long rs1, unsigned long rs2);
     void setEXMEMStageRegisterDestination(unsigned long rd);
     void setMEMWBStageRegisterDestination(unsigned long rd);
+    void setEXMEMStageRegisterRegWrite(bool is_asserted);
+    void setMEMWBStageRegisterRegWrite(bool is_asserted);
 
     void reset();
 

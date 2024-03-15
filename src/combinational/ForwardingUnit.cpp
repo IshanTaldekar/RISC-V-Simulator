@@ -13,6 +13,13 @@ ForwardingUnit::ForwardingUnit() {
     this->is_double_register_source_set = false;
     this->is_ex_mem_stage_register_destination_set = false;
     this->is_mem_wb_stage_register_destination_set = false;
+
+    this->is_ex_mem_reg_write_asserted = false;
+    this->is_mem_wb_reg_write_asserted = false;
+
+    this->is_ex_mem_reg_write_set = false;
+    this->is_mem_wb_reg_write_set = false;
+
     this->is_reset_flag_set = false;
 
     this->alu_input_1_mux_control_signal = ALUInputMuxControlSignals::IDEXStageRegisters;
@@ -50,9 +57,10 @@ void ForwardingUnit::run() {
                 forwarding_unit_lock,
                 [this] {
                     return ((this->is_single_register_source_set || this->is_double_register_source_set) &&
-                        (this->getPipelineType() == PipelineType::Single || (this->is_ex_mem_stage_register_destination_set &&
-                                                                             this->is_mem_wb_stage_register_destination_set)))
-                                                                      || this->is_reset_flag_set || this->isKilled();
+                        (this->getPipelineType() == PipelineType::Single ||
+                        (this->is_ex_mem_stage_register_destination_set && this->is_ex_mem_reg_write_set &&
+                        this->is_mem_wb_stage_register_destination_set && this->is_mem_wb_reg_write_set))) ||
+                        this->is_reset_flag_set || this->isKilled();
                 }
         );
 
@@ -63,7 +71,10 @@ void ForwardingUnit::run() {
 
         if (this->is_reset_flag_set) {
             this->logger->log(Stage::EX, "[ForwardingUnit] Resetting.");
+
             this->resetState();
+            this->is_reset_flag_set = false;
+
             this->logger->log(Stage::EX, "[ForwardingUnit] Reset.");
             continue;
         }
@@ -89,6 +100,10 @@ void ForwardingUnit::run() {
         this->is_double_register_source_set = false;
         this->is_ex_mem_stage_register_destination_set = false;
         this->is_mem_wb_stage_register_destination_set = false;
+        this->is_ex_mem_reg_write_set = false;
+        this->is_mem_wb_reg_write_set = false;
+        this->is_ex_mem_reg_write_asserted = false;
+        this->is_mem_wb_reg_write_asserted = false;
     }
 }
 
@@ -134,7 +149,6 @@ void ForwardingUnit::setEXMEMStageRegisterDestination(unsigned long rd) {
 
     this->logger->log(Stage::EX, "[ForwardingUnit] setEXMEMStageRegisterDestination value updated.");
     this->notifyModuleConditionVariable();
-
 }
 
 void ForwardingUnit::setMEMWBStageRegisterDestination(unsigned long rd) {
@@ -151,7 +165,39 @@ void ForwardingUnit::setMEMWBStageRegisterDestination(unsigned long rd) {
     this->notifyModuleConditionVariable();
 }
 
+void ForwardingUnit::setEXMEMStageRegisterRegWrite(bool is_asserted) {
+    this->logger->log(Stage::EX, "[ForwardingUnit] setEXMEMStageRegisterRegWrite waiting to acquire lock.");
+
+    std::lock_guard<std::mutex> forwarding_unit_lock (this->getModuleMutex());
+
+    this->logger->log(Stage::EX, "[ForwardingUnit] setEXMEMStageRegisterRegWrite acquired lock. Updating value.");
+
+    this->is_ex_mem_reg_write_asserted = is_asserted;
+    this->is_ex_mem_reg_write_set = true;
+
+    this->logger->log(Stage::EX, "[ForwardingUnit] setEXMEMStageRegisterRegWrite values updated.");
+    this->notifyModuleConditionVariable();
+}
+
+void ForwardingUnit::setMEMWBStageRegisterRegWrite(bool is_asserted) {
+    this->logger->log(Stage::EX, "[ForwardingUnit] setEXMEMStageRegisterRegWrite waiting to acquire lock.");
+
+    std::lock_guard<std::mutex> forwarding_unit_lock (this->getModuleMutex());
+
+    this->logger->log(Stage::EX, "[ForwardingUnit] setEXMEMStageRegisterRegWrite acquired lock. Updating value.");
+
+    this->is_mem_wb_reg_write_asserted = is_asserted;
+    this->is_mem_wb_reg_write_set = true;
+
+    this->logger->log(Stage::EX, "[ForwardingUnit] setEXMEMStageRegisterRegWrite values updated.");
+    this->notifyModuleConditionVariable();
+}
+
 void ForwardingUnit::reset() {
+    if (!this->logger) {
+        this->initDependencies();
+    }
+
     this->logger->log(Stage::EX, "[ForwardingUnit] reset flag set.");
     this->is_reset_flag_set = true;
     this->notifyModuleConditionVariable();
@@ -162,7 +208,16 @@ void ForwardingUnit::resetState() {
     this->is_double_register_source_set = false;
     this->is_ex_mem_stage_register_destination_set = false;
     this->is_mem_wb_stage_register_destination_set = false;
-    this->is_reset_flag_set = false;
+    this->is_ex_mem_reg_write_set = false;
+    this->is_mem_wb_reg_write_set = false;
+
+    this->is_ex_mem_reg_write_asserted = false;
+    this->is_mem_wb_reg_write_asserted = false;
+
+    this->register_source1 = 0UL;
+    this->register_source2 = 0UL;
+    this->ex_mem_stage_register_destination = 0UL;
+    this->mem_wb_stage_register_destination = 0UL;
 }
 
 void ForwardingUnit::computeControlSignals() {
@@ -175,16 +230,16 @@ void ForwardingUnit::computeControlSignals() {
         this->alu_input_1_mux_control_signal = ALUInputMuxControlSignals::IDEXStageRegisters;
         this->alu_input_2_mux_control_signal = ALUInputMuxControlSignals::IDEXStageRegisters;
 
-        if (this->register_source1 == this->ex_mem_stage_register_destination) {
+        if (this->register_source1 == this->ex_mem_stage_register_destination && this->is_ex_mem_reg_write_asserted) {
             this->alu_input_1_mux_control_signal = ALUInputMuxControlSignals::EXMEMStageRegisters;
-        } else if (this->register_source1 == this->mem_wb_stage_register_destination) {
+        } else if (this->register_source1 == this->mem_wb_stage_register_destination && this->is_mem_wb_reg_write_set) {
             this->alu_input_1_mux_control_signal = ALUInputMuxControlSignals::MEMWBStageRegisters;
         }
 
         if (this->is_double_register_source_set) {
-            if (this->register_source2 == this->ex_mem_stage_register_destination) {
+            if (this->register_source2 == this->ex_mem_stage_register_destination && this->is_ex_mem_reg_write_asserted) {
                 this->alu_input_2_mux_control_signal = ALUInputMuxControlSignals::EXMEMStageRegisters;
-            } else if (this->register_source1 == this->mem_wb_stage_register_destination) {
+            } else if (this->register_source2 == this->mem_wb_stage_register_destination && this->is_mem_wb_reg_write_asserted) {
                 this->alu_input_2_mux_control_signal = ALUInputMuxControlSignals::MEMWBStageRegisters;
             }
         }
