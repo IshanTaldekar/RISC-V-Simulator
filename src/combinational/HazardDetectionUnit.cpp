@@ -22,18 +22,24 @@ HazardDetectionUnit::HazardDetectionUnit() {
 }
 
 void HazardDetectionUnit::pause() {
-    this->logger->log(Stage::ID, "[HazardDetectionUnit] Paused.");
+    this->log("Paused.");
     this->is_pause_flag_set = true;
 }
 
 void HazardDetectionUnit::resume() {
-    this->logger->log(Stage::ID, "[HazardDetectionUnit] Resumed.");
+    this->log("Resumed.");
     this->is_pause_flag_set = false;
     this->notifyModuleConditionVariable();
 }
 
 
 void HazardDetectionUnit::initDependencies() {
+    std::unique_lock<std::mutex> hazard_detection_unit_lock (this->getModuleMutex());
+
+    if (this->logger && this->driver && this->if_id_stage_registers && this->id_ex_stage_registers) {
+        return;
+    }
+
     this->logger = Logger::init();
     this->driver = Driver::init();
     this->if_id_stage_registers = IFIDStageRegisters::init();
@@ -54,7 +60,7 @@ void HazardDetectionUnit::run() {
     this->initDependencies();
 
     while (this->isAlive()) {
-        this->logger->log(Stage::ID, "[HazardDetectionUnit] Waiting to be woken up and acquire lock.");
+        this->log("Waiting to be woken up and acquire lock.");
 
         std::unique_lock<std::mutex> hazard_detection_unit_lock (this->getModuleMutex());
         this->getModuleConditionVariable().wait(
@@ -67,21 +73,21 @@ void HazardDetectionUnit::run() {
         );
 
         if (this->isKilled()) {
-            this->logger->log(Stage::ID, "[HazardDetectionUnit] Killed.");
+            this->log("Killed.");
             break;
         }
 
         if (this->is_reset_flag_set) {
-            this->logger->log(Stage::ID, "[HazardDetectionUnit] Resetting state.");
+            this->log("Resetting state.");
 
             this->resetState();
             this->is_reset_flag_set = false;
 
-            this->logger->log(Stage::ID, "[HazardDetectionUnit] Reset.");
+            this->log("Reset.");
             continue;
         }
 
-        this->logger->log(Stage::ID, "[HazardDetectionUnit] Woken up and acquired lock.");
+        this->log("Woken up and acquired lock.");
 
         if (this->getPipelineType() == PipelineType::Five && this->is_id_ex_mem_read_asserted &&
             (this->instruction->getRs1().to_ulong() == this->id_ex_register_destination ||
@@ -106,16 +112,16 @@ void HazardDetectionUnit::run() {
 }
 
 void HazardDetectionUnit::setIDEXRegisterDestination(unsigned long rd) {
-    this->logger->log(Stage::ID, "[HazardDetectionUnit] setIDEXRegisterDestination waiting to acquire lock.");
+    this->log("setIDEXRegisterDestination waiting to acquire lock.");
 
     std::lock_guard<std::mutex> hazard_detection_unit_lock (this->getModuleMutex());
 
-    this->logger->log(Stage::ID, "[HazardDetectionUnit] setIDEXRegisterDestination acquired lock. Updating value.");
+    this->log("setIDEXRegisterDestination acquired lock. Updating value.");
 
     this->id_ex_register_destination = rd;
     this->is_id_ex_register_destination_set = true;
 
-    this->logger->log(Stage::ID, "[HazardDetectionUnit] setIDEXRegisterDestination value updated.");
+    this->log("setIDEXRegisterDestination value updated.");
     this->notifyModuleConditionVariable();
 }
 
@@ -124,49 +130,49 @@ void HazardDetectionUnit::setInstruction(Instruction *new_instruction) {
         this->initDependencies();
     }
 
-    this->logger->log(Stage::ID, "[HazardDetectionUnit] setInstruction waiting to acquire lock.");
+    this->log("setInstruction waiting to acquire lock.");
 
     std::lock_guard<std::mutex> hazard_detection_unit_lock (this->getModuleMutex());
 
-    this->logger->log(Stage::ID, "[HazardDetectionUnit] setInstruction acquired lock. Updating value.");
+    this->log("setInstruction acquired lock. Updating value.");
 
     this->instruction = new_instruction;
     this->is_instruction_set = true;
 
-    this->logger->log(Stage::ID, "[HazardDetectionUnit] setInstruction value updated.");
+    this->log("setInstruction value updated.");
     this->notifyModuleConditionVariable();
 }
 
 void HazardDetectionUnit::setIDEXMemRead(bool is_asserted) {
-    this->logger->log(Stage::ID, "[HazardDetectionUnit] setIDEXMemRead waiting to acquire lock.");
+    this->log("setIDEXMemRead waiting to acquire lock.");
 
     std::lock_guard<std::mutex> hazard_detection_unit_lock (this->getModuleMutex());
 
-    this->logger->log(Stage::ID, "[HazardDetectionUnit] setIDEXMemRead acquired lock. Updating value.");
+    this->log("setIDEXMemRead acquired lock. Updating value.");
 
     this->is_id_ex_mem_read_asserted = is_asserted;
     this->is_id_ex_mem_read_set = true;
 
-    this->logger->log(Stage::ID, "[HazardDetectionUnit] setIDEXMemRead value updated.");
+    this->log("setIDEXMemRead value updated.");
     this->notifyModuleConditionVariable();
 }
 
 void HazardDetectionUnit::passHazardDetectedFlagToDriver() {
-    this->logger->log(Stage::ID, "[HazardDetectionUnit] Passing hazard detected flag to Driver.");
+    this->log("Passing hazard detected flag to Driver.");
     this->driver->setNop(this->is_hazard_detected_flag_asserted);
-    this->logger->log(Stage::ID, "[HazardDetectionUnit] Passed hazard detected flag to Driver.");
+    this->log("Passed hazard detected flag to Driver.");
 }
 
 void HazardDetectionUnit::passHazardDetectedFlagToIFIDStageRegisters() {
-    this->logger->log(Stage::ID, "[HazardDetectionUnit] Passing hazard detected flag to IFIDStageRegisters.");
+    this->log("Passing hazard detected flag to IFIDStageRegisters.");
     this->if_id_stage_registers->setNop(this->is_hazard_detected_flag_asserted);
-    this->logger->log(Stage::ID, "[HazardDetectionUnit] Passed hazard detected flag to IFIDStageRegisters.");
+    this->log("Passed hazard detected flag to IFIDStageRegisters.");
 }
 
 void HazardDetectionUnit::passHazardDetectedFlagToIDEXStageRegisters() {
-    this->logger->log(Stage::ID, "[HazardDetectionUnit] Passing hazard detected flag to IDEXStageRegisters.");
+    this->log("Passing hazard detected flag to IDEXStageRegisters.");
     this->id_ex_stage_registers->setNop(this->is_hazard_detected_flag_asserted);
-    this->logger->log(Stage::ID, "[HazardDetectionUnit] Passed hazard detected flag to IDEXStageRegisters.");
+    this->log("Passed hazard detected flag to IDEXStageRegisters.");
 }
 
 void HazardDetectionUnit::reset() {
@@ -184,4 +190,12 @@ void HazardDetectionUnit::resetState() {
     this->is_id_ex_mem_read_asserted = false;
     this->instruction = new Instruction(std::string(32, '0'));
     this->id_ex_register_destination = 0UL;
+}
+
+std::string HazardDetectionUnit::getModuleTag() {
+    return "HazardDetectionUnit";
+}
+
+Stage HazardDetectionUnit::getModuleStage() {
+    return Stage::ID;
 }

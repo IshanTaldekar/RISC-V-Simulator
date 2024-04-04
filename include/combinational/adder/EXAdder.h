@@ -22,7 +22,6 @@ class EXAdder: public AdderBase {
     bool is_immediate_set;
 
     EXMEMStageRegisters *ex_mem_stage_registers;
-    Logger *logger;
 
     static EXAdder *current_instance;
     static std::mutex initialization_mutex;
@@ -38,6 +37,9 @@ private:
     void computeResult();
     void passBranchAddressToEXMEMStageRegisters();
     void initDependencies() override;
+
+    std::string getModuleTag() override;
+    Stage getModuleStage() override;
 };
 
 #endif //RISC_V_SIMULATOR_EXADDER_H

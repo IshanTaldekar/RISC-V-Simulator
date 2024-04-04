@@ -13,7 +13,6 @@ IFIDStageRegisters::IFIDStageRegisters() {
     this->is_reset_flag_set = false;
     this->is_pause_flag_set = false;
     this->is_nop_flag_set = true;
-//    this->is_hazard_detected_flag_set = true;
     this->is_nop_passed_flag_asserted = false;
     this->is_nop_passed_flag_set = false;
 
@@ -34,7 +33,7 @@ void IFIDStageRegisters::changeStageAndReset(PipelineType new_stage) {
     {  // Limit lock guard scope to avoid deadlock
         std::lock_guard<std::mutex> if_id_stage_registers_lock (this->getModuleMutex());
 
-        this->logger->log(Stage::IF, "[IFIDStageRegisters] PipelineType change.");
+        this->log("PipelineType change.");
         this->setPipelineType(new_stage);
     }
 
@@ -48,7 +47,7 @@ void IFIDStageRegisters::reset() {
 
     std::lock_guard<std::mutex> if_id_stage_registers_lock (this->getModuleMutex());
 
-    this->logger->log(Stage::IF, "[IFIDStageRegisters] Reset flag set.");
+    this->log("Reset flag set.");
 
     this->is_reset_flag_set = true;
     this->notifyModuleConditionVariable();
@@ -59,14 +58,12 @@ void IFIDStageRegisters::resetStage() {
         this->is_program_counter_set = false;
         this->is_instruction_set = false;
         this->is_nop_flag_set = true;
-//        this->is_hazard_detected_flag_set = false;
         this->is_nop_asserted = false;
         this->is_nop_passed_flag_set = false;
     } else {
         this->is_program_counter_set = true;
         this->is_instruction_set = true;
         this->is_nop_flag_set = true;
-//        this->is_hazard_detected_flag_set = true;
         this->is_nop_asserted = true;
         this->is_nop_passed_flag_set = true;
     }
@@ -81,12 +78,12 @@ void IFIDStageRegisters::resetStage() {
 }
 
 void IFIDStageRegisters::pause() {
-    this->logger->log(Stage::IF, "[IFIDStageRegisters] Paused.");
+    this->log("Paused.");
     this->is_pause_flag_set = true;
 }
 
 void IFIDStageRegisters::resume() {
-    this->logger->log(Stage::IF, "[IFIDStageRegisters] Resumed.");
+    this->log("Resumed.");
     this->is_pause_flag_set = false;
     this->notifyModuleConditionVariable();
 }
@@ -102,6 +99,13 @@ IFIDStageRegisters *IFIDStageRegisters::init() {
 }
 
 void IFIDStageRegisters::initDependencies() {
+    std::unique_lock<std::mutex> if_id_stage_registers_lock (this->getModuleMutex());
+
+    if (this->instruction && this->control && this->register_file && this->id_ex_stage_registers &&
+        this->immediate_generator && this->stage_synchronizer && this->logger && this->hazard_detection_unit) {
+        return;
+    }
+
     this->instruction = new Instruction(std::string(32, '0'));
     this->control = new Control(this->instruction);
 
@@ -117,7 +121,7 @@ void IFIDStageRegisters::run() {
     this->initDependencies();
 
     while (this->isAlive()) {
-        this->logger->log(Stage::IF, "[IFIDStageRegisters] Waiting to be woken up and acquire lock.");
+        this->log("Waiting to be woken up and acquire lock.");
 
         std::unique_lock<std::mutex> if_id_stage_registers_lock (this->getModuleMutex());
         this->getModuleConditionVariable().wait(
@@ -130,21 +134,21 @@ void IFIDStageRegisters::run() {
         );
 
         if (this->isKilled()) {
-            this->logger->log(Stage::IF, "[IFIDStageRegisters] Killed.");
+            this->log("Killed.");
             break;
         }
 
         if (this->is_reset_flag_set) {
-            this->logger->log(Stage::IF, "[IFIDStageRegisters] Resetting stage.");
+            this->log("Resetting stage.");
 
             this->resetStage();
             this->is_reset_flag_set = false;
 
-            this->logger->log(Stage::IF, "[IFIDStageRegisters] Resetting stage.");
+            this->log("Resetting stage.");
             continue;
         }
 
-        this->logger->log(Stage::IF, "[IFIDStageRegisters] Woken up and acquired lock.");
+        this->log("Woken up and acquired lock.");
 
         this->instruction = new Instruction(this->instruction_bits);
         this->control = new Control(this->instruction);
@@ -243,27 +247,27 @@ void IFIDStageRegisters::setInput(std::variant<unsigned long, std::string> input
         this->delayUpdateUntilNopFlagSet();
     }
 
-    this->logger->log(Stage::IF, "[IFIDStageRegisters] setInput waiting to acquire lock.");
+    this->log("setInput waiting to acquire lock.");
 
     std::unique_lock<std::mutex> if_id_stage_registers_lock (this->getModuleMutex());
 
-    this->logger->log(Stage::IF, "[IFIDStageRegisters] setInput acquired lock. Updating value.");
+    this->log("setInput acquired lock. Updating value.");
 
     if (std::holds_alternative<unsigned long>(input)) {
         if (!this->is_nop_asserted) {
             this->program_counter = std::get<unsigned long>(input);
-            this->logger->log(Stage::IF, "[IFIDStageRegisters] setInput updated value.");
+            this->log("setInput updated value.");
         } else {
-            this->logger->log(Stage::IF, "[IFIDStageRegisters] setInput update skipped. NOP asserted.");
+            this->log("setInput update skipped. NOP asserted.");
         }
 
         this->is_program_counter_set = true;
     } else if (std::holds_alternative<std::string>(input)) {
         if (!this->is_nop_asserted) {
             this->instruction_bits = std::string(std::get<std::string>(input));
-            this->logger->log(Stage::IF, "[IFIDStageRegisters] setInput updated value.");
+            this->log("setInput updated value.");
         } else {
-            this->logger->log(Stage::IF, "[IFIDStageRegisters] setInput update skipped. NOP asserted.");
+            this->log("setInput update skipped. NOP asserted.");
         }
 
         this->is_instruction_set = true;
@@ -276,17 +280,13 @@ void IFIDStageRegisters::setInput(std::variant<unsigned long, std::string> input
 
 
 void IFIDStageRegisters::setNop(bool is_asserted) {
-    if (!this->logger) {
-        this->initDependencies();
-    }
-
     this->stage_synchronizer->conditionalArriveFiveStage();
 
-    this->logger->log(Stage::IF, "[IFIDStageRegisters] setPassedNop waiting to acquire lock.");
+    this->log("setPassedNop waiting to acquire lock.");
 
     std::lock_guard<std::mutex> if_id_stage_registers_lock (this->getModuleMutex());
 
-    this->logger->log(Stage::IF, "[IFIDStageRegisters] setPassedNop acquired lock.");
+    this->log("setPassedNop acquired lock.");
 
     this->is_nop_asserted |= is_asserted;
 
@@ -297,19 +297,19 @@ void IFIDStageRegisters::setNop(bool is_asserted) {
 }
 
 void IFIDStageRegisters::passProgramCounterToIDEXStageRegisters(unsigned long pc) {
-    this->logger->log(Stage::IF, "[IFIDStageRegisters] Passing program counter to IDEXStageRegisters.");
+    this->log("Passing program counter to IDEXStageRegisters.");
     this->id_ex_stage_registers->setProgramCounter(pc);
-    this->logger->log(Stage::IF, "[IFIDStageRegisters] Passed program counter to IDEXStageRegisters.");
+    this->log("Passed program counter to IDEXStageRegisters.");
 }
 
 void IFIDStageRegisters::passControlToIDEXStageRegisters(Control *new_control) {
-    this->logger->log(Stage::IF, "[IFIDStageRegisters] Passing control to IDEXStageRegisters.");
+    this->log("Passing control to IDEXStageRegisters.");
     this->id_ex_stage_registers->setControlModule(new_control);
-    this->logger->log(Stage::IF, "[IFIDStageRegisters] Passed control to IDEXStageRegisters.");
+    this->log("Passed control to IDEXStageRegisters.");
 }
 
 void IFIDStageRegisters::passReadRegistersToRegisterFile(Instruction *current_instruction) {
-    this->logger->log(Stage::IF, "[IFIDStageRegisters] Passing read registers to RegisterFile.");
+    this->log("Passing read registers to RegisterFile.");
 
     InstructionType type = current_instruction->getType();
 
@@ -319,49 +319,49 @@ void IFIDStageRegisters::passReadRegistersToRegisterFile(Instruction *current_in
         this->register_file->setReadRegisters(current_instruction->getRs1().to_ulong(), this->instruction->getRs2().to_ulong());
     }
 
-    this->logger->log(Stage::IF, "[IFIDStageRegisters] Passed read registers to RegisterFile.");
+    this->log("Passed read registers to RegisterFile.");
 }
 
 void IFIDStageRegisters::passInstructionToImmediateGenerator(Instruction *current_instruction) {
-    this->logger->log(Stage::IF, "[IFIDStageRegisters] Passing instruction to ImmediateGenerator.");
+    this->log("Passing instruction to ImmediateGenerator.");
     this->immediate_generator->setInstruction(current_instruction);
-    this->logger->log(Stage::IF, "[IFIDStageRegisters] Passed instruction to ImmediateGenerator.");
+    this->log("Passed instruction to ImmediateGenerator.");
 }
 
 void IFIDStageRegisters::passRegisterDestinationToIDEXStageRegisters(Instruction *current_instruction) {
-    this->logger->log(Stage::IF, "[IFIDStageRegisters] Passing register destination to IDEXStageRegisters.");
+    this->log("Passing register destination to IDEXStageRegisters.");
     this->id_ex_stage_registers->setRegisterDestination(current_instruction->getRd().to_ulong());
-    this->logger->log(Stage::IF, "[IFIDStageRegisters] Passed register destination to IDEXStageRegisters.");
+    this->log("Passed register destination to IDEXStageRegisters.");
 }
 
 void IFIDStageRegisters::passRegisterSource1ToIDEXStageRegisters(Instruction *current_instruction) {
-    this->logger->log(Stage::IF, "[IFIDStageRegisters] Passing register source 1 to IDEXStageRegisters.");
+    this->log("Passing register source 1 to IDEXStageRegisters.");
     this->id_ex_stage_registers->setRegisterSource1(current_instruction->getRs1().to_ulong());
-    this->logger->log(Stage::IF, "[IFIDStageRegisters] Passed register source 1 to IDEXStageRegisters.");
+    this->log("Passed register source 1 to IDEXStageRegisters.");
 }
 
 void IFIDStageRegisters::passRegisterSource2ToIDEXStageRegisters(Instruction *current_instruction) {
-    this->logger->log(Stage::IF, "[IFIDStageRegisters] Passing register source 2 to IDEXStageRegisters.");
+    this->log("Passing register source 2 to IDEXStageRegisters.");
     this->id_ex_stage_registers->setRegisterSource2(current_instruction->getRs2().to_ulong());
-    this->logger->log(Stage::IF, "[IFIDStageRegisters] Passed register source 2 to IDEXStageRegisters.");
+    this->log("Passed register source 2 to IDEXStageRegisters.");
 }
 
 void IFIDStageRegisters::passInstructionToIDEXStageRegisters(Instruction *current_instruction) {
-    this->logger->log(Stage::IF, "[IFIDStageRegisters] Passing instruction to IDEXStageRegisters.");
+    this->log("Passing instruction to IDEXStageRegisters.");
     this->id_ex_stage_registers->setInstruction(current_instruction);
-    this->logger->log(Stage::IF, "[IFIDStageRegisters] Passed instruction to IDEXStageRegisters.");
+    this->log("Passed instruction to IDEXStageRegisters.");
 }
 
 void IFIDStageRegisters::passNopToIDEXStageRegisters(bool is_asserted) {
-    this->logger->log(Stage::IF, "[IFIDStageRegisters] Passing NOP to IDEXStageRegisters.");
+    this->log("Passing NOP to IDEXStageRegisters.");
     this->id_ex_stage_registers->setPassedNop(is_asserted);
-    this->logger->log(Stage::IF, "[IFIDStageRegisters] Passed NOP to IDEXStageRegisters.");
+    this->log("Passed NOP to IDEXStageRegisters.");
 }
 
 void IFIDStageRegisters::passInstructionToHazardDetectionUnit(Instruction *current_instruction) {
-    this->logger->log(Stage::IF, "[IFIDStageRegisters] Passing instruction to hazard detection unit.");
+    this->log("Passing instruction to hazard detection unit.");
     this->hazard_detection_unit->setInstruction(current_instruction);
-    this->logger->log(Stage::IF, "[IFIDStageRegisters] Passed instruction to hazard detection unit.");
+    this->log("Passed instruction to hazard detection unit.");
 }
 
 Instruction *IFIDStageRegisters::getInstruction() {
@@ -381,16 +381,16 @@ void IFIDStageRegisters::delayUpdateUntilNopFlagSet() {
 void IFIDStageRegisters::setPassedNop(bool is_asserted) {
     this->stage_synchronizer->conditionalArriveFiveStage();
 
-    this->logger->log(Stage::IF, "[IFIDStageRegisters] setPassedNop waiting to acquire lock.");
+    this->log("setPassedNop waiting to acquire lock.");
 
     std::lock_guard<std::mutex> if_id_stage_registers_lock (this->getModuleMutex());
 
-    this->logger->log(Stage::IF, "[IFIDStageRegisters] setPassedNop acquired lock.");
+    this->log("setPassedNop acquired lock.");
 
     this->is_nop_passed_flag_asserted = is_asserted;
     this->is_nop_passed_flag_set = true;
 
-    this->logger->log(Stage::IF, "[IFIDStageRegisters] setPassedNop updated value.");
+    this->log("setPassedNop updated value.");
     this->notifyModuleConditionVariable();
 }
 
@@ -398,3 +398,10 @@ void IFIDStageRegisters::assertSystemEnabledNop() {
     this->is_nop_asserted = true;
 }
 
+std::string IFIDStageRegisters::getModuleTag() {
+    return "IFIDStageRegisters";
+}
+
+Stage IFIDStageRegisters::getModuleStage() {
+    return Stage::IF;
+}

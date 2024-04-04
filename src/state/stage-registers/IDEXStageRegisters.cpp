@@ -44,7 +44,7 @@ void IDEXStageRegisters::changeStageAndReset(PipelineType new_pipeline_type) {
     {  // Limit lock guard scope to avoid deadlock
         std::lock_guard<std::mutex> if_id_stage_registers_lock(this->getModuleMutex());
 
-        this->logger->log(Stage::ID, "[IDEXStageRegisters] PipelineType change.");
+        this->log("PipelineType change.");
         this->setPipelineType(new_pipeline_type);
     }
 
@@ -120,6 +120,11 @@ IDEXStageRegisters *IDEXStageRegisters::init() {
 void IDEXStageRegisters::initDependencies() {
     std::lock_guard<std::mutex> id_ex_stage_registers_lock (this->getModuleMutex());
 
+    if (this->ex_mux_alu_input_1 && this->ex_mux_alu_input_2 && this->ex_adder && this->forwarding_unit &&
+        this->ex_mem_stage_register && this->stage_synchronizer && this->logger && this->hazard_detection_unit) {
+        return;
+    }
+
     this->ex_mux_alu_input_1 = EXMuxALUInput1::init();
     this->ex_mux_alu_input_2 = EXMuxALUInput2::init();
     this->ex_adder = EXAdder::init();
@@ -134,7 +139,7 @@ void IDEXStageRegisters::run() {
     this->initDependencies();
 
     while (this->isAlive()) {
-        this->logger->log(Stage::ID, "[IDEXStageRegisters] Waiting to be woken up and acquire lock.");
+        this->log("Waiting to be woken up and acquire lock.");
 
         std::unique_lock<std::mutex> id_ex_stage_registers_lock (this->getModuleMutex());
         this->getModuleConditionVariable().wait(
@@ -150,21 +155,21 @@ void IDEXStageRegisters::run() {
         );
 
         if (this->isKilled()) {
-            this->logger->log(Stage::ID, "[IDEXStageRegisters] Killed.");
+            this->log("Killed.");
             break;
         }
 
         if (this->is_reset_flag_set) {
-            this->logger->log(Stage::ID, "[IDEXStageRegisters] Resetting.");
+            this->log("Resetting.");
 
             this->resetStage();
             this->is_reset_flag_set = false;
 
-            this->logger->log(Stage::ID, "[IDEXStageRegisters] Reset.");
+            this->log("Reset.");
             continue;
         }
 
-        this->logger->log(Stage::ID, "[IDEXStageRegisters] Woken up and acquired lock.");
+        this->log("Woken up and acquired lock.");
 
         if (!this->control || !this->instruction) {
             this->instruction = new Instruction(std::string(32, '0'));
@@ -294,21 +299,17 @@ void IDEXStageRegisters::setRegisterData(std::bitset<WORD_BIT_COUNT> reg_data1) 
         this->delayUpdateUntilNopFlagSet();
     }
 
-    if (!this->logger) {
-        this->initDependencies();
-    }
-
-    this->logger->log(Stage::ID, "[IDEXStageRegisters] setRegisterData waiting to acquire lock.");
+    this->log("setRegisterData waiting to acquire lock.");
 
     std::lock_guard<std::mutex> id_ex_stage_registers_lock (this->getModuleMutex());
 
-    this->logger->log(Stage::ID, "[IDEXStageRegisters] setRegisterData acquired lock. Updating value.");
+    this->log("setRegisterData acquired lock. Updating value.");
 
     if (!this->is_nop_asserted) {
         this->read_data_1 = reg_data1;
-        this->logger->log(Stage::ID, "[IDEXStageRegisters] setRegisterData value updated.");
+        this->log("setRegisterData value updated.");
     } else {
-        this->logger->log(Stage::ID, "[IDEXStageRegisters] setRegisterData update skipped. NOP asserted.");
+        this->log("setRegisterData update skipped. NOP asserted.");
     }
 
     this->is_single_read_register_data_set = true;
@@ -322,22 +323,18 @@ void IDEXStageRegisters::setRegisterData(std::bitset<WORD_BIT_COUNT> reg_data1, 
         this->delayUpdateUntilNopFlagSet();
     }
 
-    if (!this->logger) {
-        this->initDependencies();
-    }
-
-    this->logger->log(Stage::ID, "[IDEXStageRegisters] setRegisterData waiting to acquire lock.");
+    this->log("setRegisterData waiting to acquire lock.");
 
     std::lock_guard<std::mutex> id_ex_stage_registers_lock (this->getModuleMutex());
 
-    this->logger->log(Stage::ID, "[IDEXStageRegisters] setRegisterData acquired lock. Updating value.");
+    this->log("setRegisterData acquired lock. Updating value.");
 
     if (!this->is_nop_asserted) {
         this->read_data_1 = reg_data1;
         this->read_data_2 = reg_data2;
-        this->logger->log(Stage::ID, "[IDEXStageRegisters] setRegisterData value updated.");
+        this->log("setRegisterData value updated.");
     } else {
-        this->logger->log(Stage::ID, "[IDEXStageRegisters] setRegisterData update skipped. NOP asserted.");
+        this->log("setRegisterData update skipped. NOP asserted.");
     }
 
     this->is_double_read_register_data_set = true;
@@ -351,21 +348,17 @@ void IDEXStageRegisters::setImmediate(std::bitset<WORD_BIT_COUNT> imm) {
         this->delayUpdateUntilNopFlagSet();
     }
 
-    if (!this->logger) {
-        this->initDependencies();
-    }
-
-    this->logger->log(Stage::ID, "[IDEXStageRegisters] setImmediate waiting to acquire lock.");
+    this->log("setImmediate waiting to acquire lock.");
 
     std::lock_guard<std::mutex> id_ex_stage_registers_lock (this->getModuleMutex());
 
-    this->logger->log(Stage::ID, "[IDEXStageRegisters] setImmediate acquired lock. Updating value.");
+    this->log("setImmediate acquired lock. Updating value.");
 
     if (!this->is_nop_asserted) {
         this->immediate = imm;
-        this->logger->log(Stage::ID, "[IDEXStageRegisters] setImmediate value updated.");
+        this->log("setImmediate value updated.");
     } else {
-        this->logger->log(Stage::ID, "[IDEXStageRegisters] setImmediate update skipped. NOP asserted.");
+        this->log("setImmediate update skipped. NOP asserted.");
     }
 
     this->is_immediate_set = true;
@@ -379,21 +372,17 @@ void IDEXStageRegisters::setRegisterDestination(unsigned long rd) {
         this->delayUpdateUntilNopFlagSet();
     }
 
-    if (!this->logger) {
-        this->initDependencies();
-    }
-
-    this->logger->log(Stage::ID, "[IDEXStageRegisters] setRegisterDestination waiting to acquire lock.");
+    this->log("setRegisterDestination waiting to acquire lock.");
 
     std::lock_guard<std::mutex> id_ex_stage_registers_lock (this->getModuleMutex());
 
-    this->logger->log(Stage::ID, "[IDEXStageRegisters] setRegisterDestination acquired lock. Updating value.");
+    this->log("setRegisterDestination acquired lock. Updating value.");
 
     if (!this->is_nop_asserted) {
         this->register_destination = rd;
-        this->logger->log(Stage::ID, "[IDEXStageRegisters] setRegisterDestination value updated.");
+        this->log("setRegisterDestination value updated.");
     } else {
-        this->logger->log(Stage::ID, "[IDEXStageRegisters] setRegisterDestination update skipped. NOP asserted.");
+        this->log("setRegisterDestination update skipped. NOP asserted.");
     }
 
     this->is_register_destination_set = true;
@@ -407,21 +396,17 @@ void IDEXStageRegisters::setProgramCounter(unsigned long pc) {
         this->delayUpdateUntilNopFlagSet();
     }
 
-    if (!this->logger) {
-        this->initDependencies();
-    }
-
-    this->logger->log(Stage::ID, "[IDEXStageRegisters] setProgramCounter waiting to acquire lock.");
+    this->log("setProgramCounter waiting to acquire lock.");
 
     std::lock_guard<std::mutex> id_ex_stage_registers_lock (this->getModuleMutex());
 
-    this->logger->log(Stage::ID, "[IDEXStageRegisters] setProgramCounter acquired lock. Updating value.");
+    this->log("setProgramCounter acquired lock. Updating value.");
 
     if (!this->is_nop_asserted) {
         this->program_counter = pc;
-        this->logger->log(Stage::ID, "[IDEXStageRegisters] setProgramCounter value updated.");
+        this->log("setProgramCounter value updated.");
     } else {
-        this->logger->log(Stage::ID, "[IDEXStageRegisters] setProgramCounter update skipped. NOP asserted.");
+        this->log("setProgramCounter update skipped. NOP asserted.");
     }
 
     this->is_program_counter_set = true;
@@ -435,21 +420,17 @@ void IDEXStageRegisters::setControlModule(Control *new_control) {
         this->delayUpdateUntilNopFlagSet();
     }
 
-    if (!this->logger) {
-        this->initDependencies();
-    }
-
-    this->logger->log(Stage::ID, "[IDEXStageRegisters] setControlModule waiting to acquire lock.");
+    this->log("setControlModule waiting to acquire lock.");
 
     std::lock_guard<std::mutex> id_ex_stage_registers_lock (this->getModuleMutex());
 
-    this->logger->log(Stage::ID, "[IDEXStageRegisters] setControlModule acquired lock. Updating value.");
+    this->log("setControlModule acquired lock. Updating value.");
 
     if (this->is_nop_asserted) {
-        this->logger->log(Stage::ID, "[IDEXStageRegisters] setControlModule update skipped. NOP asserted.");
+        this->log("setControlModule update skipped. NOP asserted.");
     } else {
         this->control = new_control;
-        this->logger->log(Stage::ID, "[IDEXStageRegisters] setControlModule value updated.");
+        this->log("setControlModule value updated.");
     }
 
     this->is_control_set = true;
@@ -463,21 +444,17 @@ void IDEXStageRegisters::setInstruction(Instruction *current_instruction) {
         this->delayUpdateUntilNopFlagSet();
     }
 
-    if (!this->logger) {
-        this->initDependencies();
-    }
-
-    this->logger->log(Stage::ID, "[IDEXStageRegisters] setInstruction waiting to acquire lock.");
+    this->log("setInstruction waiting to acquire lock.");
 
     std::lock_guard<std::mutex> id_ex_stage_registers_lock (this->getModuleMutex());
 
-    this->logger->log(Stage::ID, "[IDEXStageRegisters] setInstruction acquired lock. Updating value.");
+    this->log("setInstruction acquired lock. Updating value.");
 
     if (!this->is_nop_asserted) {
         this->instruction = current_instruction;
-        this->logger->log(Stage::ID, "[IDEXStageRegisters] setInstruction acquired lock. Updating value.");
+        this->log("setInstruction acquired lock. Updating value.");
     } else {
-        this->logger->log(Stage::ID, "[IDEXStageRegisters] setInstruction update skipped. NOP asserted.");
+        this->log("setInstruction update skipped. NOP asserted.");
     }
 
     this->is_instruction_set = true;
@@ -491,21 +468,17 @@ void IDEXStageRegisters::setRegisterSource1(unsigned long rs1) {
         this->delayUpdateUntilNopFlagSet();
     }
 
-    if (!this->logger) {
-        this->initDependencies();
-    }
-
-    this->logger->log(Stage::ID, "[IDEXStageRegisters] setRegisterSource1 waiting to acquire lock.");
+    this->log("setRegisterSource1 waiting to acquire lock.");
 
     std::lock_guard<std::mutex> id_ex_stage_registers_lock (this->getModuleMutex());
 
-    this->logger->log(Stage::ID, "[IDEXStageRegisters] setRegisterSource1 acquired lock. Updating value.");
+    this->log("setRegisterSource1 acquired lock. Updating value.");
 
     if (!this->is_nop_asserted) {
         this->register_source1 = rs1;
-        this->logger->log(Stage::ID, "[IDEXStageRegisters] setRegisterSource1 value updated.");
+        this->log("setRegisterSource1 value updated.");
     } else {
-        this->logger->log(Stage::ID, "[IDEXStageRegisters] setRegisterSource1 update skipped. NOP asserted.");
+        this->log("setRegisterSource1 update skipped. NOP asserted.");
     }
 
     this->is_register_source1_set = true;
@@ -519,35 +492,27 @@ void IDEXStageRegisters::setPassedNop(bool is_asserted) {
         this->delayUpdateUntilNopFlagSet();
     }
 
-    if (!this->logger) {
-        this->initDependencies();
-    }
-
-    this->logger->log(Stage::ID, "[IDEXStageRegisters] setPassedNop waiting to acquire lock.");
+    this->log("setPassedNop waiting to acquire lock.");
 
     std::lock_guard<std::mutex> id_ex_stage_registers_lock (this->getModuleMutex());
 
-    this->logger->log(Stage::ID, "[IDEXStageRegisters] setPassedNop acquired lock. Updating value.");
+    this->log("setPassedNop acquired lock. Updating value.");
 
     this->is_nop_passed_flag_asserted = is_asserted;
     this->is_nop_passed_flag_set = true;
 
-    this->logger->log(Stage::ID, "[IDEXStageRegisters] setPassedNop updated value.");
+    this->log("setPassedNop updated value.");
     this->notifyModuleConditionVariable();
 }
 
 void IDEXStageRegisters::setNop(bool is_asserted) {
-    if (!this->logger) {
-        this->initDependencies();
-    }
-
     this->stage_synchronizer->conditionalArriveFiveStage();
 
-    this->logger->log(Stage::IF, "[IFIDStageRegisters] setPassedNop waiting to acquire lock.");
+    this->log("setPassedNop waiting to acquire lock.");
 
     std::lock_guard<std::mutex> id_ex_stage_registers_lock (this->getModuleMutex());
 
-    this->logger->log(Stage::IF, "[IFIDStageRegisters] setPassedNop acquired lock.");
+    this->log("setPassedNop acquired lock.");
 
     this->is_nop_asserted |= is_asserted;
 
@@ -568,17 +533,17 @@ void IDEXStageRegisters::setRegisterSource2(unsigned long rs2) {
         this->initDependencies();
     }
 
-    this->logger->log(Stage::ID, "[IDEXStageRegisters] setRegisterSource2 waiting to acquire lock.");
+    this->log("setRegisterSource2 waiting to acquire lock.");
 
     std::lock_guard<std::mutex> id_ex_stage_registers_lock (this->getModuleMutex());
 
-    this->logger->log(Stage::ID, "[IDEXStageRegisters] setRegisterSource2 acquired lock. Updating value.");
+    this->log("setRegisterSource2 acquired lock. Updating value.");
 
     if (!this->is_nop_asserted) {
         this->register_source2 = rs2;
-        this->logger->log(Stage::ID, "[IDEXStageRegisters] setRegisterSource2 value updated.");
+        this->log("setRegisterSource2 value updated.");
     } else {
-        this->logger->log(Stage::ID, "[IDEXStageRegisters] setRegisterSource2 update skipped. NOP asserted.");
+        this->log("setRegisterSource2 update skipped. NOP asserted.");
     }
 
     this->is_register_source2_set = true;
@@ -586,57 +551,57 @@ void IDEXStageRegisters::setRegisterSource2(unsigned long rs2) {
 }
 
 void IDEXStageRegisters::passProgramCounterToEXAdder(unsigned long pc) {
-    this->logger->log(Stage::ID, "[IDEXStageRegisters] Passing program counter to EXAdder.");
+    this->log("Passing program counter to EXAdder.");
     this->ex_adder->setInput(EXAdderInputType::PCValue, pc);
-    this->logger->log(Stage::ID, "[IDEXStageRegisters] Passed program counter to EXAdder.");
+    this->log("Passed program counter to EXAdder.");
 }
 
 void IDEXStageRegisters::passProgramCounterToEXMuxALUInput1(unsigned long pc) {
-    this->logger->log(Stage::ID, "[IDEXStageRegisters] Passing program counter to EXMuxALUInput1.");
+    this->log("Passing program counter to EXMuxALUInput1.");
     this->ex_mux_alu_input_1->setInput(EXStageMuxALUInput1InputType::ProgramCounter, pc);
-    this->logger->log(Stage::ID, "[IDEXStageRegisters] Passed program counter to EXMuxALUInput1.");
+    this->log("Passed program counter to EXMuxALUInput1.");
 }
 
 void IDEXStageRegisters::passReadData1ToExMuxALUInput1(std::bitset<WORD_BIT_COUNT> data) {
-    this->logger->log(Stage::ID, "[IDEXStageRegisters] Passing read data 1 to EXMuxALUInput1.");
+    this->log("Passing read data 1 to EXMuxALUInput1.");
     this->ex_mux_alu_input_1->setInput(EXStageMuxALUInput1InputType::ReadData1, data);
-    this->logger->log(Stage::ID, "[IDEXStageRegisters] Passed read data 1 to EXMuxALUInput1.");
+    this->log("Passed read data 1 to EXMuxALUInput1.");
 }
 
 void IDEXStageRegisters::passReadData2ToExMuxALUInput2(std::bitset<WORD_BIT_COUNT> data) {
-    this->logger->log(Stage::ID, "[IDEXStageRegisters] Passing read data 2 to EXMuxALUInput2.");
+    this->log("Passing read data 2 to EXMuxALUInput2.");
     this->ex_mux_alu_input_2->setInput(EXStageMuxALUInput2InputType::ReadData2, data);
-    this->logger->log(Stage::ID, "[IDEXStageRegisters] Passed read data 2 to EXMuxALUInput2.");
+    this->log("Passed read data 2 to EXMuxALUInput2.");
 }
 
 void IDEXStageRegisters::passImmediateToEXMuxALUInput2(std::bitset<WORD_BIT_COUNT> imm) {
-    this->logger->log(Stage::ID, "[IDEXStageRegisters] Passing immediate to EXMuxALUInput2.");
+    this->log("Passing immediate to EXMuxALUInput2.");
     this->ex_mux_alu_input_2->setInput(EXStageMuxALUInput2InputType::ImmediateValue, imm);
-    this->logger->log(Stage::ID, "[IDEXStageRegisters] Passed immediate to EXMuxALUInput2.");
+    this->log("Passed immediate to EXMuxALUInput2.");
 }
 
 void IDEXStageRegisters::passImmediateToEXAdder(std::bitset<WORD_BIT_COUNT> imm) {
-    this->logger->log(Stage::ID, "[IDEXStageRegisters] Passing immediate to EXAdder.");
+    this->log("Passing immediate to EXAdder.");
     this->ex_adder->setInput(EXAdderInputType::ImmediateValue, imm);
-    this->logger->log(Stage::ID, "[IDEXStageRegisters] Passed immediate to EXAdder.");
+    this->log("Passed immediate to EXAdder.");
 }
 
 void IDEXStageRegisters::passRegisterDestinationToEXMEMStageRegisters(unsigned long rd) {
-    this->logger->log(Stage::ID, "[IDEXStageRegisters] Passing register destination to EXMEMStageRegisters.");
+    this->log("Passing register destination to EXMEMStageRegisters.");
     this->ex_mem_stage_register->setRegisterDestination(rd);
-    this->logger->log(Stage::ID, "[IDEXStageRegisters] Passed register destination to EXMEMStageRegisters.");
+    this->log("Passed register destination to EXMEMStageRegisters.");
 }
 
 void IDEXStageRegisters::passReadData2ToEXMEMStageRegisters(std::bitset<WORD_BIT_COUNT> data) {
-    this->logger->log(Stage::ID, "[IDEXStageRegisters] Passing read data 2 to EXMEMStageRegisters.");
+    this->log("Passing read data 2 to EXMEMStageRegisters.");
     this->ex_mem_stage_register->setReadData2(data);
-    this->logger->log(Stage::ID, "[IDEXStageRegisters] Passed read data 2 to EXMEMStageRegisters.");
+    this->log("Passed read data 2 to EXMEMStageRegisters.");
 }
 
 void IDEXStageRegisters::passControlToEXMEMStageRegisters(Control *current_control) {
-    this->logger->log(Stage::ID, "[IDEXStageRegisters] Passing control to EXMEMStageRegisters.");
+    this->log("Passing control to EXMEMStageRegisters.");
     this->ex_mem_stage_register->setControl(current_control);
-    this->logger->log(Stage::ID, "[IDEXStageRegisters] Passed control to EXMEMStageRegisters.");
+    this->log("Passed control to EXMEMStageRegisters.");
 }
 
 void IDEXStageRegisters::assertSystemEnabledNop() {
@@ -646,7 +611,7 @@ void IDEXStageRegisters::assertSystemEnabledNop() {
 void IDEXStageRegisters::passRegisterSourceToForwardingUnit(bool is_single_register_used,
                                                             unsigned long rs1,
                                                             unsigned long rs2) {
-    this->logger->log(Stage::ID, "[IDEXStageRegisters] Passing register source to Forwarding Unit.");
+    this->log("Passing register source to Forwarding Unit.");
 
     if (is_single_register_used) {
         this->forwarding_unit->setSingleRegisterSource(rs1);
@@ -654,25 +619,25 @@ void IDEXStageRegisters::passRegisterSourceToForwardingUnit(bool is_single_regis
         this->forwarding_unit->setDoubleRegisterSource(rs1, rs2);
     }
 
-    this->logger->log(Stage::ID, "[IDEXStageRegisters] Passed register source to Forwarding Unit.");
+    this->log("Passed register source to Forwarding Unit.");
 }
 
 void IDEXStageRegisters::passNopToEXMEMStageRegisters(bool is_signal_asserted) {
-    this->logger->log(Stage::ID, "[IDEXStageRegisters] Passing NOP to EXMEMStageRegisters.");
+    this->log("Passing NOP to EXMEMStageRegisters.");
     this->ex_mem_stage_register->setPassedNop(is_signal_asserted);
-    this->logger->log(Stage::ID, "[IDEXStageRegisters] Passed NOP to EXMEMStageRegisters.");
+    this->log("Passed NOP to EXMEMStageRegisters.");
 }
 
 void IDEXStageRegisters::passMemReadToHazardDetectionUnit(bool is_signal_asserted) {
-    this->logger->log(Stage::ID, "[IDEXStageRegisters] Passing MemRead to HazardDetectionUnit.");
+    this->log("Passing MemRead to HazardDetectionUnit.");
     this->hazard_detection_unit->setIDEXMemRead(is_signal_asserted);
-    this->logger->log(Stage::ID, "[IDEXStageRegisters] Passed MemRead to HazardDetectionUnit.");
+    this->log("Passed MemRead to HazardDetectionUnit.");
 }
 
 void IDEXStageRegisters::passRegisterDestinationToHazardDetectionUnit(unsigned long rd) {
-    this->logger->log(Stage::ID, "[IDEXStageRegisters] Passing register destination to HazardDetectionUnit.");
+    this->log("Passing register destination to HazardDetectionUnit.");
     this->hazard_detection_unit->setIDEXRegisterDestination(rd);
-    this->logger->log(Stage::ID, "[IDEXStageRegisters] Passed register destination to HazardDetectionUnit.");
+    this->log("Passed register destination to HazardDetectionUnit.");
 }
 
 void IDEXStageRegisters::delayUpdateUntilNopFlagSet() {
@@ -683,4 +648,12 @@ void IDEXStageRegisters::delayUpdateUntilNopFlagSet() {
                 return this->is_nop_flag_set;
             }
     );
+}
+
+std::string IDEXStageRegisters::getModuleTag() {
+    return "IDEXStageRegisters";
+}
+
+Stage IDEXStageRegisters::getModuleStage() {
+    return Stage::ID;
 }

@@ -20,7 +20,6 @@ class ImmediateGenerator: public Module {
     const Instruction *instruction;
 
     IDEXStageRegisters *id_ex_stage_registers;
-    Logger *logger;
 
     bool is_instruction_set;
 
@@ -36,6 +35,9 @@ public:
 private:
     void loadImmediateToIDEXStageRegisters();
     void initDependencies() override;
+
+    std::string getModuleTag() override;
+    Stage getModuleStage() override;
 };
 
 #endif //RISC_V_SIMULATOR_IMMEDIATEGENERATOR_H

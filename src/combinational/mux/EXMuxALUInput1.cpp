@@ -30,6 +30,12 @@ EXMuxALUInput1 *EXMuxALUInput1::init() {
 }
 
 void EXMuxALUInput1::initDependencies() {
+    std::unique_lock<std::mutex> ex_mux_lock (this->getModuleMutex());
+
+    if (this->alu_input_1_forwarding_mux && this->logger) {
+        return;
+    }
+
     this->alu_input_1_forwarding_mux = ALUInput1ForwardingMux::init();
     this->logger = Logger::init();
 }
@@ -38,7 +44,7 @@ void EXMuxALUInput1::run() {
     this->initDependencies();
 
     while (this->isAlive()) {
-        this->logger->log(Stage::EX, "[EXMuxALUInput1] Waiting to be woken up and acquire lock.");
+        this->log("Waiting to be woken up and acquire lock.");
 
         std::unique_lock<std::mutex> ex_mux_lock (this->getModuleMutex());
         this->getModuleConditionVariable().wait(
@@ -50,21 +56,21 @@ void EXMuxALUInput1::run() {
         );
 
         if  (this->isKilled()) {
-            this->logger->log(Stage::EX, "[EXMuxALUInput1] Killed.");
+            this->log("Killed.");
             break;
         }
 
         if (this->is_reset_flag_set) {
-            this->logger->log(Stage::EX, "[EXMuxALUInput1] Resetting stage.");
+            this->log("Resetting stage.");
 
             this->resetState();
             this->is_reset_flag_set = false;
 
-            this->logger->log(Stage::EX, "[EXMuxALUInput1] Reset.");
+            this->log("Reset.");
             continue;
         }
 
-        this->logger->log(Stage::EX, "[EXMuxALUInput1] Woken up and acquired lock.");
+        this->log("Woken up and acquired lock.");
 
         this->passOutput();
 
@@ -79,11 +85,11 @@ void EXMuxALUInput1::setInput(MuxInputType type, MuxInputDataType value) {
         throw std::runtime_error("EXMuxALUInput1::setInput: incompatible data types passed.");
     }
 
-    this->logger->log(Stage::EX, "[EXMuxALUInput1] setInput waiting to be woken up and acquire lock.");
+    this->log("setInput waiting to be woken up and acquire lock.");
 
     std::lock_guard<std::mutex> ex_mux_lock (this->getModuleMutex());
 
-    this->logger->log(Stage::EX, "[EXMuxALUInput1] setInput Woken up and acquired lock. Updating value.");
+    this->log("setInput Woken up and acquired lock. Updating value.");
 
     if (std::get<EXStageMuxALUInput1InputType>(type) == EXStageMuxALUInput1InputType::ProgramCounter) {
         this->program_counter = std::bitset<WORD_BIT_COUNT>(std::get<unsigned long>(value));
@@ -93,7 +99,7 @@ void EXMuxALUInput1::setInput(MuxInputType type, MuxInputDataType value) {
         this->is_read_data_1_set = true;
     }
 
-    this->logger->log(Stage::EX, "[EXMuxALUInput1] setInput value updated.");
+    this->log("setInput value updated.");
     this->notifyModuleConditionVariable();
 }
 
@@ -102,7 +108,7 @@ void EXMuxALUInput1::assertControlSignal(bool is_asserted) {
 }
 
 void EXMuxALUInput1::passOutput() {
-    this->logger->log(Stage::EX, "[EXMuxALUInput1] Passing value to ALU input 1.");
+    this->log("Passing value to ALU input 1.");
 
     if (this->is_pass_program_counter_flag_asserted) {
         this->alu_input_1_forwarding_mux->setInput(ALUInputMuxInputTypes::IDEXStageRegisters, this->program_counter);
@@ -110,22 +116,20 @@ void EXMuxALUInput1::passOutput() {
         this->alu_input_1_forwarding_mux->setInput(ALUInputMuxInputTypes::IDEXStageRegisters, this->read_data_1);
     }
 
-    this->logger->log(Stage::EX, "[EXMuxALUInput1] Passed value to ALU input 1.");
+    this->log("Passed value to ALU input 1.");
 }
 
 void EXMuxALUInput1::assertJALCustomControlSignal(bool is_asserted) {
-    this->logger->log(Stage::EX, "[EXMuxALUInput1] assertJALCustomControlSignal waiting to be woken"
-                                 " up and acquire lock.");
+    this->log("assertJALCustomControlSignal waiting to be woken up and acquire lock.");
 
     std::lock_guard<std::mutex> ex_mux_lock (this->getModuleMutex());
 
-    this->logger->log(Stage::EX, "[EXMuxALUInput1] assertJALCustomControlSignal woken up and "
-                                 "acquired lock. Updating values.");
+    this->log("assertJALCustomControlSignal woken up and acquired lock. Updating values.");
 
     this->is_pass_program_counter_flag_asserted = is_asserted;
     this->is_pass_program_counter_flag_set = true;
 
-    this->logger->log(Stage::EX, "[EXMuxALUInput1] assertJALCustomControlSignal value updated.");
+    this->log("assertJALCustomControlSignal value updated.");
     this->notifyModuleConditionVariable();
 }
 
@@ -143,4 +147,13 @@ void EXMuxALUInput1::resetState() {
     this->is_program_counter_set = false;
     this->is_read_data_1_set = false;
     this->is_pass_program_counter_flag_set = false;
+}
+
+
+std::string EXMuxALUInput1::getModuleTag() {
+    return "EXMuxALUInput1";
+}
+
+Stage EXMuxALUInput1::getModuleStage() {
+    return Stage::EX;
 }

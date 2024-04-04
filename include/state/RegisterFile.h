@@ -39,7 +39,6 @@ class RegisterFile: public Module {
     bool is_reset_flag_set;
     bool is_pause_flag_set;
 
-    Logger *logger;
     IDEXStageRegisters *id_ex_stage_registers;
     StageSynchronizer *stage_synchronizer;
 
@@ -73,6 +72,9 @@ private:
 
     void initDependencies() override;
     void resetState();
+
+    std::string getModuleTag() override;
+    Stage getModuleStage() override;
 };
 
 #endif //RISC_V_SIMULATOR_REGISTERFILE_H

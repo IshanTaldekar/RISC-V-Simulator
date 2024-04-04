@@ -40,7 +40,6 @@ class MEMWBStageRegisters: public Module {
     WBMux *wb_mux;
     StageSynchronizer *stage_synchronizer;
     ForwardingUnit *forwarding_unit;
-    Logger *logger;
 
     friend StageSynchronizer;
 
@@ -72,6 +71,9 @@ private:
 
     void resetStage();
     void initDependencies() override;
+
+    std::string getModuleTag() override;
+    Stage getModuleStage() override;
 };
 
 #endif //RISC_V_SIMULATOR_MEMWBSTAGEREGISTERS_H

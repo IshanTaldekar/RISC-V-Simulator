@@ -26,7 +26,6 @@ protected:
     bool is_reset_flag_set;
 
     ALU *alu;
-    Logger *logger;
 
 public:
     ALUInputForwardingMuxBase();
@@ -39,10 +38,10 @@ public:
     void reset();
 
 protected:
-    virtual std::string getModuleTag() = 0;
-
     void initDependencies() override;
     void resetState();
+
+    Stage getModuleStage() override;
 };
 
 #endif //RISC_V_SIMULATOR_ALUINPUTFORWARDINGMUXBASE_H

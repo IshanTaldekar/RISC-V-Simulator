@@ -281,11 +281,11 @@ int main() {
             sleep(1);
         } else {
             if (pipeline.driver->getPipelineType() == PipelineType::Single) {
-                sleep(2);
+                sleep(5);
                 pausePipeline(pipeline);
                 changePipelineType(pipeline, PipelineType::Five);
                 resetPipeline(pipeline);
-                sleep(2);
+                sleep(5);
 
                 resumePipeline(pipeline);
             } else {

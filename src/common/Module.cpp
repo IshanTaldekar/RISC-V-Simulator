@@ -3,6 +3,7 @@
 Module::Module() {
     this->pipeline_type = PipelineType::Single;
     this->is_alive = true;
+    this->logger = nullptr;
 }
 
 void Module::kill() {
@@ -37,4 +38,12 @@ PipelineType Module::getPipelineType() {
 
 void Module::notifyModuleConditionVariable() {
     this->getModuleConditionVariable().notify_one();
+}
+
+void Module::log(const std::string &message) {
+    if (!this->logger) {
+        this->initDependencies();
+    }
+
+    this->logger->log(this->getModuleStage(), "[" + this->getModuleTag() + "] " + message);
 }

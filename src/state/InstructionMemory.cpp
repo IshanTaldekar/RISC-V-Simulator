@@ -28,7 +28,7 @@ InstructionMemory *InstructionMemory::init() {
 void InstructionMemory::initDependencies() {
     std::lock_guard<std::mutex> instruction_memory_lock (this->getModuleMutex());
 
-    if (this->if_id_stage_registers) {
+    if (this->if_id_stage_registers && this->logger && this->driver) {
         return;
     }
 
@@ -47,7 +47,7 @@ void InstructionMemory::run() {
     );
 
     while (this->isAlive()) {
-        this->logger->log(Stage::IF, "[InstructionMemory] Waiting to be woken up and acquire lock.");
+        this->log("Waiting to be woken up and acquire lock.");
 
         this->getModuleConditionVariable().wait(
                 instruction_memory_lock,
@@ -57,11 +57,11 @@ void InstructionMemory::run() {
         );
 
         if (this->isKilled()) {
-            this->logger->log(Stage::IF, "[InstructionMemory] Killed.");
+            this->log("Killed.");
             break;
         }
 
-        this->logger->log(Stage::IF, "[InstructionMemory] Woken up and acquired lock.");
+        this->log("Woken up and acquired lock.");
 
         this->fetchInstructionFromMemory();
 
@@ -80,11 +80,7 @@ void InstructionMemory::run() {
 }
 
 void InstructionMemory::setInstructionMemoryInputFilePath(const std::string &file_path) {
-    if (!this->logger) {
-        this->initDependencies();
-    }
-
-    this->logger->log(Stage::IF, "[InstructionMemory] setInstructionMemoryInputFilePath waiting to "
+    this->log("setInstructionMemoryInputFilePath waiting to "
                                  "acquire lock.");
 
     std::lock_guard<std::mutex> instruction_memory_lock(this->getModuleMutex());
@@ -92,26 +88,26 @@ void InstructionMemory::setInstructionMemoryInputFilePath(const std::string &fil
     this->instruction_memory_file_path = file_path;
     this->readInstructionMemoryFile();
 
-    this->logger->log(Stage::IF, "[InstructionMemory] setInstructionMemoryInputFilePath has finished.");
+    this->log("setInstructionMemoryInputFilePath has finished.");
     this->notifyModuleConditionVariable();
 }
 
 void InstructionMemory::setProgramCounter(unsigned long value) {
-    this->logger->log(Stage::IF, "[InstructionMemory] setProgramCounter waiting to acquire lock.");
+    this->log("setProgramCounter waiting to acquire lock.");
 
     std::lock_guard<std::mutex> instruction_memory_lock(this->getModuleMutex());
 
-    this->logger->log(Stage::IF, "[InstructionMemory] setProgramCounter acquired lock. Updating value.");
+    this->log("setProgramCounter acquired lock. Updating value.");
 
     this->program_counter = value;
     this->is_new_program_counter_set = true;
 
-    this->logger->log(Stage::IF, "[InstructionMemory] setProgramCounter value updated.");
+    this->log("setProgramCounter value updated.");
     this->notifyModuleConditionVariable();
 }
 
 void InstructionMemory::fetchInstructionFromMemory() {
-    this->logger->log(Stage::IF, "[InstructionMemory] Fetching instruction from data_memory.");
+    this->log("Fetching instruction from data_memory.");
     this->instruction.clear();
 
     for (unsigned long i = this->program_counter; i < this->program_counter + 4; ++i) {
@@ -122,11 +118,11 @@ void InstructionMemory::fetchInstructionFromMemory() {
         }
     }
 
-    this->logger->log(Stage::IF, "[InstructionMemory] Instruction fetched from data_memory.");
+    this->log("Instruction fetched from data_memory.");
 }
 
 void InstructionMemory::readInstructionMemoryFile() {
-    this->logger->log(Stage::IF, "[InstructionMemory] Reading instruction file.");
+    this->log("Reading instruction file.");
 
     std::ifstream instruction_memory_file (this->instruction_memory_file_path);
     std::string byte_instruction;
@@ -139,16 +135,24 @@ void InstructionMemory::readInstructionMemoryFile() {
 
     this->is_instruction_file_read = true;
 
-    this->logger->log(Stage::IF, "[InstructionMemory] Instruction file read.");
+    this->log("Instruction file read.");
 }
 
 void InstructionMemory::passInstructionIntoIFIDStageRegisters() {
-    this->logger->log(Stage::IF, "[InstructionMemory] Passing instruction to IFIDStageRegisters.");
+    this->log("Passing instruction to IFIDStageRegisters.");
 
     this->if_id_stage_registers->setInput(this->instruction);
-    this->logger->log(Stage::IF, "[InstructionMemory] Passed instruction to IFIDStageRegisters.");
+    this->log("Passed instruction to IFIDStageRegisters.");
 }
 
 void InstructionMemory::passNopToDriver(bool is_asserted) {
     this->driver->setNop(is_asserted);
+}
+
+std::string InstructionMemory::getModuleTag() {
+    return "InstructionMemory";
+}
+
+Stage InstructionMemory::getModuleStage() {
+    return Stage::IF;
 }

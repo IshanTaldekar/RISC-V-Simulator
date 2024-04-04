@@ -41,8 +41,6 @@ class ForwardingUnit: public Module {
     ALUInputMuxControlSignals alu_input_1_mux_control_signal;
     ALUInputMuxControlSignals alu_input_2_mux_control_signal;
 
-    Logger *logger;
-
 public:
     ForwardingUnit();
 
@@ -67,6 +65,9 @@ private:
     void computeControlSignals();
 
     void initDependencies() override;
+
+    std::string getModuleTag() override;
+    Stage getModuleStage() override;
 };
 
 #endif //RISC_V_SIMULATOR_FORWARDINGUNIT_H

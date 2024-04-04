@@ -40,46 +40,42 @@ void ALU::resetState() {
 }
 
 void ALU::setInput1(std::bitset<WORD_BIT_COUNT> value) {
-    this->logger->log(Stage::EX, "[ALU] setInput1 waiting to acquire lock.");
+    this->log("setInput1 waiting to acquire lock.");
 
     std::lock_guard<std::mutex> alu_lock (this->getModuleMutex());
 
-    this->logger->log(Stage::EX, "[ALU] setInput1 acquired lock. Updating value.");
+    this->log("setInput1 acquired lock. Updating value.");
 
     this->input1 = value;
     this->is_input1_set = true;
 
-    this->logger->log(Stage::EX, "[ALU] setInput1 updated value.");
+    this->log("setInput1 updated value.");
     this->notifyModuleConditionVariable();
 }
 
 void ALU::setInput2(std::bitset<WORD_BIT_COUNT> value) {
-    this->logger->log(Stage::EX, "[ALU] setInput2 waiting to acquire lock.");
+    this->log("setInput2 waiting to acquire lock.");
 
     std::lock_guard<std::mutex> alu_lock (this->getModuleMutex());
 
-    this->logger->log(Stage::EX, "[ALU] setInput2 acquired lock. Updating value.");
+    this->log("setInput2 acquired lock. Updating value.");
 
     this->input2 = value;
     this->is_input2_set = true;
 
-    this->logger->log(Stage::EX, "[ALU] setInput2 updated value.");
+    this->log("setInput2 updated value.");
     this->notifyModuleConditionVariable();
 }
 
 void ALU::setALUOp(std::bitset<ALU_OP_BIT_COUNT> value) {
     std::lock_guard<std::mutex> alu_lock (this->getModuleMutex());
 
-    if (!this->logger) {
-        this->initDependencies();
-    }
-
-    this->logger->log(Stage::EX, "[ALU] setALUOp acquired lock. Updating value.");
+    this->log("setALUOp acquired lock. Updating value.");
 
     this->alu_op = value;
     this->is_alu_op_set = true;
 
-    this->logger->log(Stage::EX, "[ALU] setALUOp updated value.");
+    this->log("setALUOp updated value.");
     this->notifyModuleConditionVariable();
 }
 
@@ -87,7 +83,7 @@ void ALU::run() {
     this->initDependencies();
 
     while (this->isAlive()) {
-        this->logger->log(Stage::EX, "[ALU] Waiting to be woken up and acquire lock.");
+        this->log("Waiting to be woken up and acquire lock.");
 
         std::unique_lock<std::mutex> alu_lock (this->getModuleMutex());
         this->getModuleConditionVariable().wait(
@@ -99,21 +95,21 @@ void ALU::run() {
         );
 
         if (this->is_reset_flag_set) {
-            this->logger->log(Stage::EX, "[ALU] Resetting stage.");
+            this->log("Resetting stage.");
 
             this->resetState();
             this->is_reset_flag_set = false;
 
-            this->logger->log(Stage::EX, "[ALU] Reset.");
+            this->log("Reset.");
             continue;
         }
 
         if (this->isKilled()) {
-            this->logger->log(Stage::EX, "[ALU] Killed.");
+            this->log("Killed.");
             break;
         }
 
-        this->logger->log(Stage::EX, "[ALU] Woken up and acquired lock.");
+        this->log("Woken up and acquired lock.");
 
         this->computeResult();
 
@@ -150,12 +146,18 @@ ALU *ALU::init() {
 }
 
 void ALU::initDependencies() {
+    std::unique_lock<std::mutex> alu_lock (this->getModuleMutex());
+
+    if (this->ex_mem_stage_registers && this->logger) {
+        return;
+    }
+
     this->ex_mem_stage_registers = EXMEMStageRegisters::init();
     this->logger = Logger::init();
 }
 
 void ALU::computeResult() {
-    this->logger->log(Stage::EX, "[ALU] Computing result.");
+    this->log("Computing result.");
 
     if (this->alu_op == std::bitset<ALU_OP_BIT_COUNT>("0000")) {  // Add
         this->result = BitwiseOperations::addInputs(this->input1, this->input2);
@@ -170,17 +172,25 @@ void ALU::computeResult() {
     }
 
     this->is_result_zero = this->result.to_ulong() == 0;
-    this->logger->log(Stage::EX, "[ALU] Result computed.");
+    this->log("Result computed.");
 }
 
 void ALU::passZeroFlagToEXMEMStageRegisters(bool is_flag_asserted) {
-    this->logger->log(Stage::EX, "[ALU] Passing zero flag to EXMEMStageRegisters.");
+    this->log("Passing zero flag to EXMEMStageRegisters.");
     this->ex_mem_stage_registers->setIsResultZeroFlag(is_flag_asserted);
-    this->logger->log(Stage::EX, "[ALU] Passed zero flag to EXMEMStageRegisters.");
+    this->log("Passed zero flag to EXMEMStageRegisters.");
 }
 
 void ALU::passResultToEXMEMStageRegisters(std::bitset<WORD_BIT_COUNT> data) {
-    this->logger->log(Stage::EX, "[ALU] Passing result to EXMEMStageRegisters.");
+    this->log("Passing result to EXMEMStageRegisters.");
     this->ex_mem_stage_registers->setALUResult(data);
-    this->logger->log(Stage::EX, "[ALU] Passed result to EXMEMStageRegisters.");
+    this->log("Passed result to EXMEMStageRegisters.");
+}
+
+std::string ALU::getModuleTag() {
+    return "ALU";
+}
+
+Stage ALU::getModuleStage() {
+    return Stage::EX;
 }

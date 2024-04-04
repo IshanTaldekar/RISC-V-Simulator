@@ -37,6 +37,12 @@ DataMemory *DataMemory::init() {
 }
 
 void DataMemory::initDependencies() {
+    std::unique_lock<std::mutex> data_memory_lock (this->getModuleMutex());
+
+    if (this->mem_wb_stage_registers && this->logger) {
+        return;
+    }
+
     this->mem_wb_stage_registers = MEMWBStageRegisters::init();
     this->logger = Logger::init();
 }
@@ -44,7 +50,7 @@ void DataMemory::initDependencies() {
 void DataMemory::run() {
     this->initDependencies();
 
-    this->logger->log(Stage::MEM, "[DataMemory] Waiting for data memory file to be set and acquire lock.");
+    this->log("Waiting for data memory file to be set and acquire lock.");
     {
         std::unique_lock<std::mutex> data_memory_lock (this->getModuleMutex());
         this->getModuleConditionVariable().wait(
@@ -54,7 +60,8 @@ void DataMemory::run() {
     }
 
     while (this->isAlive()) {
-        this->logger->log(Stage::MEM, "[DataMemory] Waiting to be woken up and acquire lock.");
+        this->log("Waiting to be woken up and acquire lock.");
+
         std::unique_lock<std::mutex> data_memory_lock (this->getModuleMutex());
         this->getModuleConditionVariable().wait(
                 data_memory_lock,
@@ -66,21 +73,21 @@ void DataMemory::run() {
         );
 
         if (this->is_reset_flag_set) {
-            this->logger->log(Stage::MEM, "[DataMemory] Resetting stage.");
+            this->log("Resetting stage.");
 
             this->resetState();
             this->is_reset_flag_set = false;
 
-            this->logger->log(Stage::MEM, "[DataMemory] Reset.");
+            this->log("Reset.");
             continue;
         }
 
         if (this->isKilled()) {
-            this->logger->log(Stage::MEM, "[DataMemory] Killed.");
+            this->log("Killed.");
             break;
         }
 
-        this->logger->log(Stage::MEM, "[DataMemory] Woken up and acquired lock.");
+        this->log("Woken up and acquired lock.");
 
         this->writeData();
         this->readData();
@@ -96,76 +103,72 @@ void DataMemory::run() {
 }
 
 void DataMemory::setDataMemoryInputFilePath(const std::string &file_path) {
-    if (!this->logger) {
-        this->initDependencies();
-    }
-
-    this->logger->log(Stage::MEM, "[DataMemory] setDataMemoryInputFilePath waiting to acquire lock.");
+    this->log("setDataMemoryInputFilePath waiting to acquire lock.");
 
     std::lock_guard<std::mutex> data_memory_lock (this->getModuleMutex());
 
-    this->logger->log(Stage::MEM, "[DataMemory] setDataMemoryInputFilePath acquired lock. Updating value.");
+    this->log("setDataMemoryInputFilePath acquired lock. Updating value.");
 
     this->data_memory_file_path = file_path;
     this->readDataMemoryFile();
 
-    this->logger->log(Stage::MEM, "[DataMemory] setDataMemoryInputFilePath updated value.");
+    this->log("setDataMemoryInputFilePath updated value.");
     this->notifyModuleConditionVariable();
 }
 
 void DataMemory::setAddress(unsigned long value) {
-    this->logger->log(Stage::MEM, "[DataMemory] setAddress waiting to acquire lock.");
+    this->log("setAddress waiting to acquire lock.");
 
     std::lock_guard<std::mutex> data_memory_guard (this->getModuleMutex());
 
-    this->logger->log(Stage::MEM, "[DataMemory] setAddress acquired lock. Updating value.");
+    this->log("setAddress acquired lock. Updating value.");
 
     this->address = value;
     this->is_address_set = true;
 
-    this->logger->log(Stage::MEM, "[DataMemory] setAddress updated value.");
+    this->log("setAddress updated value.");
     this->notifyModuleConditionVariable();
 }
 
 void DataMemory::setWriteData(std::bitset<WORD_BIT_COUNT> value) {
-    this->logger->log(Stage::MEM, "[DataMemory] setWriteData waiting to acquire lock.");
+    this->log("setWriteData waiting to acquire lock.");
 
     std::lock_guard<std::mutex> data_memory_guard (this->getModuleMutex());
 
-    this->logger->log(Stage::MEM, "[DataMemory] setWriteData acquired lock. Updating value.");
+    this->log("setWriteData acquired lock. Updating value.");
 
     this->write_data = value;
     this->is_write_data_set = true;
 
-    this->logger->log(Stage::MEM, "[DataMemory] setWriteData updated value.");
+    this->log("setWriteData updated value.");
     this->notifyModuleConditionVariable();
 }
 
 void DataMemory::setMemWrite(bool is_asserted) {
-    this->logger->log(Stage::MEM, "[DataMemory] setMemWrite waiting to acquire lock.");
+    this->log("setMemWrite waiting to acquire lock.");
 
     std::lock_guard<std::mutex> data_memory_guard (this->getModuleMutex());
 
-    this->logger->log(Stage::MEM, "[DataMemory] setMemWrite acquired lock. Updating value.");
+    this->log("setMemWrite acquired lock. Updating value.");
 
     this->is_mem_write_asserted = is_asserted;
     this->is_mem_write_flag_set = true;
 
-    this->logger->log(Stage::MEM, "[DataMemory] setMemWrite updated value.");
+    this->log("setMemWrite updated value.");
     this->notifyModuleConditionVariable();
 }
 
 void DataMemory::setMemRead(bool is_asserted) {
-    this->logger->log(Stage::MEM, "[DataMemory] setMemRead waiting to acquire lock.");
+    this->log("setMemRead waiting to acquire lock.");
 
     std::lock_guard<std::mutex> data_memory_guard (this->getModuleMutex());
 
-    this->logger->log(Stage::MEM, "[DataMemory] setMemRead acquired lock. Updating value.");
+    this->log("setMemRead acquired lock. Updating value.");
 
     this->is_mem_read_asserted = is_asserted;
     this->is_mem_read_flag_set = true;
 
-    this->logger->log(Stage::MEM, "[DataMemory] setMemRead updated value.");
+    this->log("setMemRead updated value.");
     this->notifyModuleConditionVariable();
 }
 
@@ -188,13 +191,13 @@ void DataMemory::readDataMemoryFile() {
     this->is_input_file_read = true;
     data_memory_file.close();
 
-    this->logger->log(Stage::MEM, "[DataMemory] Data memory file read.");
+    this->log("Data memory file read.");
 }
 
 void DataMemory::passReadData(std::bitset<WORD_BIT_COUNT> data) {
-    this->logger->log(Stage::MEM, "[DataMemory] Passing read data to MEMWBStageRegisters.");
+    this->log("Passing read data to MEMWBStageRegisters.");
     this->mem_wb_stage_registers->setReadData(data);
-    this->logger->log(Stage::MEM, "[DataMemory] Passing read data to MEMWBStageRegisters.");
+    this->log("Passing read data to MEMWBStageRegisters.");
 }
 
 void DataMemory::readData() {
@@ -212,7 +215,7 @@ void DataMemory::readData() {
         }
 
         this->read_data = std::bitset<WORD_BIT_COUNT>(word);
-        this->logger->log(Stage::MEM, "[DataMemory] Data memory read.");
+        this->log("Data memory read.");
     }
 }
 
@@ -224,7 +227,7 @@ void DataMemory::writeData() {
             this->data_memory.at(this->address + i) = word.substr(i * 8, 8);
         }
 
-        this->logger->log(Stage::MEM, "[DataMemory] Data memory written.");
+        this->log("Data memory written.");
     }
 }
 
@@ -267,4 +270,12 @@ void DataMemory::writeDataMemoryContentsToOutput() {
     }
 
     output_file.close();
+}
+
+std::string DataMemory::getModuleTag() {
+    return "DataMemory";
+}
+
+Stage DataMemory::getModuleStage() {
+    return Stage::MEM;
 }

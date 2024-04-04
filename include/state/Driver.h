@@ -25,7 +25,6 @@ class Driver: public Module {
     InstructionMemory *instruction_memory;
     IFIDStageRegisters *if_id_stage_registers;
     IFAdder *if_adder;
-    Logger *logger;
     StageSynchronizer *stage_synchronizer;
 
     static Driver *current_instance;
@@ -58,6 +57,9 @@ private:
     void initDependencies() override;
 
     void delayUpdateUntilNopFlagSet();
+
+    std::string getModuleTag() override;
+    Stage getModuleStage() override;
 };
 
 #endif //RISC_V_SIMULATOR_DRIVER_H

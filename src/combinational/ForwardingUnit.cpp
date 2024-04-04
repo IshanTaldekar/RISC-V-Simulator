@@ -41,6 +41,12 @@ ForwardingUnit *ForwardingUnit::init() {
 }
 
 void ForwardingUnit::initDependencies() {
+    std::unique_lock<std::mutex> forwarding_unit_lock (this->getModuleMutex());
+
+    if (this->alu_input_1_mux && this->alu_input_2_mux && this->logger) {
+        return;
+    }
+
     this->alu_input_1_mux = ALUInput1ForwardingMux::init();
     this->alu_input_2_mux = ALUInput2ForwardingMux::init();
     this->logger = Logger::init();
@@ -50,7 +56,7 @@ void ForwardingUnit::run() {
     this->initDependencies();
 
     while (this->isAlive()) {
-        this->logger->log(Stage::EX, "[ForwardingUnit] Waiting to be woken up and acquire lock.");
+        this->log("Waiting to be woken up and acquire lock.");
 
         std::unique_lock<std::mutex> forwarding_unit_lock (this->getModuleMutex());
         this->getModuleConditionVariable().wait(
@@ -65,21 +71,21 @@ void ForwardingUnit::run() {
         );
 
         if (this->isKilled()) {
-            this->logger->log(Stage::EX, "[ForwardingUnit] Killed.");
+            this->log("Killed.");
             break;
         }
 
         if (this->is_reset_flag_set) {
-            this->logger->log(Stage::EX, "[ForwardingUnit] Resetting.");
+            this->log("Resetting.");
 
             this->resetState();
             this->is_reset_flag_set = false;
 
-            this->logger->log(Stage::EX, "[ForwardingUnit] Reset.");
+            this->log("Reset.");
             continue;
         }
 
-        this->logger->log(Stage::EX, "[ForwardingUnit] Woken up and acquired lock.");
+        this->log("Woken up and acquired lock.");
 
         this->computeControlSignals();
 
@@ -108,88 +114,88 @@ void ForwardingUnit::run() {
 }
 
 void ForwardingUnit::setSingleRegisterSource(unsigned long rs1) {
-    this->logger->log(Stage::EX, "[ForwardingUnit] setSingleRegisterSource waiting to acquire lock.");
+    this->log("setSingleRegisterSource waiting to acquire lock.");
 
     std::lock_guard<std::mutex> forwarding_unit_lock (this->getModuleMutex());
 
-    this->logger->log(Stage::EX, "[ForwardingUnit] setSingleRegisterSource acquired lock. Updating value.");
+    this->log("setSingleRegisterSource acquired lock. Updating value.");
 
     this->register_source1 = rs1;
     this->is_single_register_source_set = true;
 
-    this->logger->log(Stage::EX, "[ForwardingUnit] setSingleRegisterSource value updated.");
+    this->log("setSingleRegisterSource value updated.");
     this->notifyModuleConditionVariable();
 }
 
 void ForwardingUnit::setDoubleRegisterSource(unsigned long rs1, unsigned long rs2) {
-    this->logger->log(Stage::EX, "[ForwardingUnit] setDoubleRegisterSource waiting to acquire lock.");
+    this->log("setDoubleRegisterSource waiting to acquire lock.");
 
     std::lock_guard<std::mutex> forwarding_unit_lock (this->getModuleMutex());
 
-    this->logger->log(Stage::EX, "[ForwardingUnit] setDoubleRegisterSource acquired lock. Updating values.");
+    this->log("setDoubleRegisterSource acquired lock. Updating values.");
 
     this->register_source1 = rs1;
     this->register_source2 = rs2;
     this->is_double_register_source_set = true;
 
-    this->logger->log(Stage::EX, "[ForwardingUnit] setDoubleRegisterSource values updated.");
+    this->log("setDoubleRegisterSource values updated.");
     this->notifyModuleConditionVariable();
 
 }
 
 void ForwardingUnit::setEXMEMStageRegisterDestination(unsigned long rd) {
-    this->logger->log(Stage::EX, "[ForwardingUnit] setEXMEMStageRegisterDestination waiting to acquire lock.");
+    this->log("setEXMEMStageRegisterDestination waiting to acquire lock.");
 
     std::lock_guard<std::mutex> forwarding_unit_lock (this->getModuleMutex());
 
-    this->logger->log(Stage::EX, "[ForwardingUnit] setEXMEMStageRegisterDestination acquired lock. Updating value.");
+    this->log("setEXMEMStageRegisterDestination acquired lock. Updating value.");
 
     this->ex_mem_stage_register_destination = rd;
     this->is_ex_mem_stage_register_destination_set = true;
 
-    this->logger->log(Stage::EX, "[ForwardingUnit] setEXMEMStageRegisterDestination value updated.");
+    this->log("setEXMEMStageRegisterDestination value updated.");
     this->notifyModuleConditionVariable();
 }
 
 void ForwardingUnit::setMEMWBStageRegisterDestination(unsigned long rd) {
-    this->logger->log(Stage::EX, "[ForwardingUnit] setMEMWBStageRegisterDestination waiting to acquire lock.");
+    this->log("setMEMWBStageRegisterDestination waiting to acquire lock.");
 
     std::lock_guard<std::mutex> forwarding_unit_lock (this->getModuleMutex());
 
-    this->logger->log(Stage::EX, "[ForwardingUnit] setMEMWBStageRegisterDestination acquired lock. Updating value.");
+    this->log("setMEMWBStageRegisterDestination acquired lock. Updating value.");
 
     this->mem_wb_stage_register_destination = rd;
     this->is_mem_wb_stage_register_destination_set = true;
 
-    this->logger->log(Stage::EX, "[ForwardingUnit] setMEMWBStageRegisterDestination values updated.");
+    this->log("setMEMWBStageRegisterDestination values updated.");
     this->notifyModuleConditionVariable();
 }
 
 void ForwardingUnit::setEXMEMStageRegisterRegWrite(bool is_asserted) {
-    this->logger->log(Stage::EX, "[ForwardingUnit] setEXMEMStageRegisterRegWrite waiting to acquire lock.");
+    this->log("setEXMEMStageRegisterRegWrite waiting to acquire lock.");
 
     std::lock_guard<std::mutex> forwarding_unit_lock (this->getModuleMutex());
 
-    this->logger->log(Stage::EX, "[ForwardingUnit] setEXMEMStageRegisterRegWrite acquired lock. Updating value.");
+    this->log("setEXMEMStageRegisterRegWrite acquired lock. Updating value.");
 
     this->is_ex_mem_reg_write_asserted = is_asserted;
     this->is_ex_mem_reg_write_set = true;
 
-    this->logger->log(Stage::EX, "[ForwardingUnit] setEXMEMStageRegisterRegWrite values updated.");
+    this->log("setEXMEMStageRegisterRegWrite values updated.");
     this->notifyModuleConditionVariable();
 }
 
 void ForwardingUnit::setMEMWBStageRegisterRegWrite(bool is_asserted) {
-    this->logger->log(Stage::EX, "[ForwardingUnit] setEXMEMStageRegisterRegWrite waiting to acquire lock.");
+    this->log("setEXMEMStageRegisterRegWrite waiting to acquire lock.");
 
     std::lock_guard<std::mutex> forwarding_unit_lock (this->getModuleMutex());
 
-    this->logger->log(Stage::EX, "[ForwardingUnit] setEXMEMStageRegisterRegWrite acquired lock. Updating value.");
+    this->log("setEXMEMStageRegisterRegWrite acquired lock. Updating value.");
 
     this->is_mem_wb_reg_write_asserted = is_asserted;
     this->is_mem_wb_reg_write_set = true;
 
-    this->logger->log(Stage::EX, "[ForwardingUnit] setEXMEMStageRegisterRegWrite values updated.");
+    this->log("setEXMEMStageRegisterRegWrite values updated.");
     this->notifyModuleConditionVariable();
 }
 
@@ -198,7 +204,7 @@ void ForwardingUnit::reset() {
         this->initDependencies();
     }
 
-    this->logger->log(Stage::EX, "[ForwardingUnit] reset flag set.");
+    this->log("reset flag set.");
     this->is_reset_flag_set = true;
     this->notifyModuleConditionVariable();
 }
@@ -221,7 +227,7 @@ void ForwardingUnit::resetState() {
 }
 
 void ForwardingUnit::computeControlSignals() {
-    this->logger->log(Stage::EX, "[ForwardingUnit] Computing control signals.");
+    this->log("Computing control signals.");
 
     if (this->getPipelineType() == PipelineType::Single) {
         this->alu_input_1_mux_control_signal = ALUInputMuxControlSignals::IDEXStageRegisters;
@@ -245,18 +251,25 @@ void ForwardingUnit::computeControlSignals() {
         }
     }
 
-    this->logger->log(Stage::EX, "[ForwardingUnit] Control signals computed.");
+    this->log("Control signals computed.");
 }
 
 void ForwardingUnit::passControlSignalToALUInput1ForwardingMux() {
-    this->logger->log(Stage::EX, "[ForwardingUnit] Passing input to ALUInput1ForwardingMux.");
+    this->log("Passing input to ALUInput1ForwardingMux.");
     this->alu_input_1_mux->setMuxControlSignal(this->alu_input_1_mux_control_signal);
-    this->logger->log(Stage::EX, "[ForwardingUnit] Passed input to ALUInput1ForwardingMux.");
+    this->log("Passed input to ALUInput1ForwardingMux.");
 }
 
 void ForwardingUnit::passControlSignalToALUInput2ForwardingMux() {
-    this->logger->log(Stage::EX, "[ForwardingUnit] Passing input to ALUInput2ForwardingMux.");
+    this->log("Passing input to ALUInput2ForwardingMux.");
     this->alu_input_2_mux->setMuxControlSignal(this->alu_input_2_mux_control_signal);
-    this->logger->log(Stage::EX, "[ForwardingUnit] Passing input to ALUInput2ForwardingMux.");
+    this->log("Passing input to ALUInput2ForwardingMux.");
 }
 
+std::string ForwardingUnit::getModuleTag() {
+    return "ForwardingUnit";
+}
+
+Stage ForwardingUnit::getModuleStage() {
+    return Stage::EX;
+}

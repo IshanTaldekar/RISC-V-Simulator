@@ -29,6 +29,12 @@ WBMux *WBMux::init() {
 }
 
 void WBMux::initDependencies() {
+    std::unique_lock<std::mutex> wb_mux_lock (this->getModuleMutex());
+
+    if (this->register_file && this->alu_input_1_forwarding_mux && this->alu_input_2_forwarding_mux && this->logger) {
+        return;
+    }
+
     this->register_file = RegisterFile::init();
     this->alu_input_1_forwarding_mux = ALUInput1ForwardingMux::init();
     this->alu_input_2_forwarding_mux = ALUInput2ForwardingMux::init();
@@ -39,7 +45,7 @@ void WBMux::run() {
     this->initDependencies();
 
     while (this->isAlive()) {
-        this->logger->log(Stage::WB, "[WBMux] Waiting to be woken up and acquire lock.");
+        this->log("Waiting to be woken up and acquire lock.");
 
         std::unique_lock<std::mutex> wb_mux_lock (this->getModuleMutex());
         this->getModuleConditionVariable().wait(
@@ -51,11 +57,11 @@ void WBMux::run() {
         );
 
         if (this->isKilled()) {
-            this->logger->log(Stage::WB, "[WBMux] Killed.");
+            this->log("Killed.");
             break;
         }
 
-        this->logger->log(Stage::WB, "[WBMux] Woken up and acquired lock.");
+        this->log("Woken up and acquired lock.");
 
         std::thread pass_output_to_forwarding_unit (&WBMux::passOutputToForwardingMuxes, this);
         this->passOutput();
@@ -73,7 +79,7 @@ void WBMux::setInput(MuxInputType type, MuxInputDataType value) {
         throw std::runtime_error("Incorrect MuxInputType passed to EXMuxALUInput2");
     }
 
-    this->logger->log(Stage::WB, "[WBMux] setInput waiting to acquire lock.");
+    this->log("setInput waiting to acquire lock.");
 
     std::lock_guard<std::mutex> ex_mux_lock (this->getModuleMutex());
 
@@ -85,28 +91,24 @@ void WBMux::setInput(MuxInputType type, MuxInputDataType value) {
         this->is_read_data_set = true;
     }
 
-    this->logger->log(Stage::WB, "[WBMux] setInput value updated.");
+    this->log("setInput value updated.");
     this->notifyModuleConditionVariable();
 }
 
 void WBMux::assertControlSignal(bool is_asserted) {
-    if (!this->logger) {
-        this->initDependencies();
-    }
-
-    this->logger->log(Stage::WB, "[WBMux] assertControlSignal waiting to acquire lock.");
+    this->log("assertControlSignal waiting to acquire lock.");
 
     std::lock_guard<std::mutex> wb_mux_lock (this->getModuleMutex());
 
     this->is_mem_to_reg_asserted = is_asserted;
     this->is_control_signal_set = true;
 
-    this->logger->log(Stage::WB, "[WBMux] assertControlSignal updated control.");
+    this->log("assertControlSignal updated control.");
     this->notifyModuleConditionVariable();
 }
 
 void WBMux::passOutput() {
-    this->logger->log(Stage::WB, "[WBMux] Passing output to register file.");
+    this->log("Passing output to register file.");
 
     if (this->is_mem_to_reg_asserted) {
         this->register_file->setWriteData(this->read_data);
@@ -114,11 +116,11 @@ void WBMux::passOutput() {
         this->register_file->setWriteData(this->alu_result);
     }
 
-    this->logger->log(Stage::WB, "[WBMux] Passed output to register file.");
+    this->log("Passed output to register file.");
 }
 
 void WBMux::passOutputToForwardingMuxes() {
-    this->logger->log(Stage::WB, "[WBMux] Passing values to forwarding muxes.");
+    this->log("Passing values to forwarding muxes.");
 
     if (this->is_mem_to_reg_asserted) {
         this->alu_input_1_forwarding_mux->setInput(ALUInputMuxInputTypes::MEMWBStageRegisters, this->read_data);
@@ -128,5 +130,13 @@ void WBMux::passOutputToForwardingMuxes() {
         this->alu_input_2_forwarding_mux->setInput(ALUInputMuxInputTypes::MEMWBStageRegisters, this->alu_result);
     }
 
-    this->logger->log(Stage::WB, "[WBMux] Passed values to forwarding muxes.");
+    this->log("Passed values to forwarding muxes.");
+}
+
+std::string WBMux::getModuleTag() {
+    return "WBMux";
+}
+
+Stage WBMux::getModuleStage() {
+    return Stage::WB;
 }

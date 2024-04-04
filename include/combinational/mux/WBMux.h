@@ -26,7 +26,6 @@ class WBMux: public MuxBase {
 
     RegisterFile *register_file;
 
-    Logger *logger;
     ALUInput1ForwardingMux *alu_input_1_forwarding_mux;
     ALUInput2ForwardingMux *alu_input_2_forwarding_mux;
 
@@ -43,6 +42,9 @@ protected:
     void passOutput() override;
     void passOutputToForwardingMuxes();
     void initDependencies() override;
+
+    std::string getModuleTag() override;
+    Stage getModuleStage() override;
 };
 
 #endif //RISC_V_SIMULATOR_WBMUX_H

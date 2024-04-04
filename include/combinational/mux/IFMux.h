@@ -21,7 +21,6 @@ class IFMux: public MuxBase {
     bool is_pc_src_signal_asserted;
 
     Driver *driver;
-    Logger *logger;
 
     static IFMux *current_instance;
     static std::mutex initialization_mutex;
@@ -38,6 +37,9 @@ public:
 protected:
     void passOutput() override;
     void initDependencies() override;
+
+    std::string getModuleTag() override;
+    Stage getModuleStage() override;
 };
 
 #endif //RISC_V_SIMULATOR_IFMUX_H

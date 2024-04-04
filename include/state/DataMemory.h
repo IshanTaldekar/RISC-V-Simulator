@@ -42,7 +42,6 @@ class DataMemory: public Module {
     static std::mutex initialization_mutex;
 
     MEMWBStageRegisters *mem_wb_stage_registers;
-    Logger *logger;
 
     std::string output_file_path;
 
@@ -70,6 +69,9 @@ private:
     void passReadData(std::bitset<WORD_BIT_COUNT> data);
     void resetState();
     void initDependencies() override;
+
+    std::string getModuleTag() override;
+    Stage getModuleStage() override;
 };
 
 #endif //RISC_V_SIMULATOR_DATAMEMORY_H

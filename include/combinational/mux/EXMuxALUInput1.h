@@ -24,7 +24,6 @@ class EXMuxALUInput1: public MuxBase {
     bool is_reset_flag_set;
 
     ALUInput1ForwardingMux *alu_input_1_forwarding_mux;
-    Logger *logger;
 
     static EXMuxALUInput1 *current_instance;
     static std::mutex initialization_mutex;
@@ -47,6 +46,9 @@ protected:
     void initDependencies() override;
 
     void resetState();
+
+    std::string getModuleTag() override;
+    Stage getModuleStage() override;
 };
 
 #endif //RISC_V_SIMULATOR_EXMUXALUINPUT1_H

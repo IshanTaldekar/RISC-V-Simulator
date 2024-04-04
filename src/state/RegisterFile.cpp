@@ -40,18 +40,24 @@ RegisterFile *RegisterFile::init() {
 }
 
 void RegisterFile::initDependencies() {
+    std::unique_lock<std::mutex> register_file_lock (this->getModuleMutex());
+
+    if (this->logger && this->id_ex_stage_registers && this->stage_synchronizer) {
+        return;
+    }
+
     this->logger = Logger::init();
     this->id_ex_stage_registers = IDEXStageRegisters::init();
     this->stage_synchronizer = StageSynchronizer::init();
 }
 
 void RegisterFile::pause() {
-    this->logger->log(Stage::IF, "[IFIDStageRegisters] Paused.");
+    this->log("Paused.");
     this->is_pause_flag_set = true;
 }
 
 void RegisterFile::resume() {
-    this->logger->log(Stage::IF, "[IFIDStageRegisters] Resumed.");
+    this->log("Resumed.");
     this->is_pause_flag_set = false;
     this->notifyModuleConditionVariable();
 }
@@ -62,7 +68,7 @@ void RegisterFile::run() {
     this->resetRegisterFileContents();
 
     while (this->isAlive()) {
-        this->logger->log(Stage::ID, "[RegisterFile] Waiting to be woken up and acquire lock.");
+        this->log("Waiting to be woken up and acquire lock.");
 
         std::unique_lock<std::mutex> register_file_lock (this->getModuleMutex());
         this->getModuleConditionVariable().wait(
@@ -76,28 +82,28 @@ void RegisterFile::run() {
         );
 
         if (this->isKilled()) {
-            this->logger->log(Stage::ID, "[RegisterFile] Killed.");
+            this->log("Killed.");
             break;
         }
 
         if (this->is_reset_flag_set) {
-            this->logger->log(Stage::ID, "[RegisterFile] Resetting stage.");
+            this->log("Resetting stage.");
 
             this->resetState();
             this->resetRegisterFileContents();
 
             this->is_reset_flag_set = false;
 
-            this->logger->log(Stage::ID, "[RegisterFile] Reset.");
+            this->log("Reset.");
             continue;
         }
 
-        this->logger->log(Stage::ID, "[RegisterFile] Woken up and acquired lock.");
+        this->log("Woken up and acquired lock.");
 
         if (this->getPipelineType() == PipelineType::Single) {
             this->passReadRegisterDataToIDEXStageRegister();
 
-            this->logger->log(Stage::ID, "[RegisterFile] Waiting for write items.");
+            this->log("Waiting for write items.");
 
             this->getModuleConditionVariable().wait(
                     register_file_lock,
@@ -106,10 +112,10 @@ void RegisterFile::run() {
                     }
             );
 
-            this->logger->log(Stage::ID, "[RegisterFile] Write items set.");
+            this->log("Write items set.");
 
             this->writeDataToRegisterFile();
-            this->logger->log(Stage::ID, "[RegisterFile] Write items set. Waiting on barrier.");
+            this->log("Write items set. Waiting on barrier.");
 
             this->stage_synchronizer->conditionalArriveSingleStage();
         } else {
@@ -133,83 +139,82 @@ void RegisterFile::reset() {
 }
 
 void RegisterFile::setReadRegister(unsigned long rs1) {
-    this->logger->log(Stage::ID, "[RegisterFile] setReadRegister waiting to acquire lock.");
+    this->log("setReadRegister waiting to acquire lock.");
 
     std::lock_guard<std::mutex> register_file_lock (this->getModuleMutex());
 
-    this->logger->log(Stage::ID, "[RegisterFile] setReadRegister acquired lock. Updating value.");
+    this->log("setReadRegister acquired lock. Updating value.");
 
     this->register_source1 = rs1;
     this->register_source2 = 0UL;
 
     this->is_single_read_register_set = true;
 
-    this->logger->log(Stage::ID, "[RegisterFile] setReadRegister updated value.");
+    this->log("setReadRegister updated value.");
 
     this->notifyModuleConditionVariable();
 }
 
 void RegisterFile::setReadRegisters(unsigned long rs1, unsigned long rs2) {
-    this->logger->log(Stage::ID, "[RegisterFile] setReadRegister waiting to acquire lock.");
+    this->log("setReadRegister waiting to acquire lock.");
 
     std::lock_guard<std::mutex> register_file_lock (this->getModuleMutex());
 
-    this->logger->log(Stage::ID, "[RegisterFile] setReadRegister acquired lock. Updating values.");
+    this->log("setReadRegister acquired lock. Updating values.");
 
     this->register_source1 = rs1;
     this->register_source2 = rs2;
 
     this->is_double_read_register_set = true;
 
-    this->logger->log(Stage::ID, "[RegisterFile] setReadRegister updated values.");
+    this->log("setReadRegister updated values.");
     this->notifyModuleConditionVariable();
 }
 
 void RegisterFile::setWriteRegister(unsigned long rd) {
-    this->logger->log(Stage::ID, "[RegisterFile] setWriteRegister waiting to acquire lock.");
+    this->log("setWriteRegister waiting to acquire lock.");
 
     std::lock_guard<std::mutex> register_file_lock (this->getModuleMutex());
 
-    this->logger->log(Stage::ID, "[RegisterFile] setWriteRegister acquired lock. Updating value.");
+    this->log("setWriteRegister acquired lock. Updating value.");
 
     this->register_destination = rd;
     this->is_write_register_set = true;
 
-    this->logger->log(Stage::ID, "[RegisterFile] setWriteRegister updated value.");
+    this->log("setWriteRegister updated value.");
     this->notifyModuleConditionVariable();
 }
 
 void RegisterFile::setRegWriteSignal(bool is_asserted) {
-    this->logger->log(Stage::ID, "[RegisterFile] setRegWriteSignal waiting to acquire lock.");
+    this->log("setRegWriteSignal waiting to acquire lock.");
 
     std::lock_guard<std::mutex> register_file_lock (this->getModuleMutex());
 
-    this->logger->log(Stage::ID, "[RegisterFile] setRegWriteSignal acquired lock. Updating value.");
+    this->log("setRegWriteSignal acquired lock. Updating value.");
 
     this->is_reg_write_signal_asserted = is_asserted;
     this->is_reg_write_signal_set = true;
 
-    this->logger->log(Stage::ID, "[RegisterFile] setRegWriteSignal updated value.");
+    this->log("setRegWriteSignal updated value.");
     this->notifyModuleConditionVariable();
 }
 
 void RegisterFile::setWriteData(std::bitset<WORD_BIT_COUNT> value) {
-    this->logger->log(Stage::ID, "[RegisterFile] setWriteData waiting to acquire lock.");
+    this->log("setWriteData waiting to acquire lock.");
 
     std::lock_guard<std::mutex> register_file_lock (this->getModuleMutex());
 
-    this->logger->log(Stage::ID, "[RegisterFile] setWriteData acquired lock. Updating value.");
+    this->log("setWriteData acquired lock. Updating value.");
 
     this->write_data = value;
     this->is_write_data_set = true;
 
-    this->logger->log(Stage::ID, "[RegisterFile] setWriteData updated value.");
+    this->log("setWriteData updated value.");
     this->notifyModuleConditionVariable();
 }
 
 void RegisterFile::passReadRegisterDataToIDEXStageRegister() {
-    this->logger->log(Stage::ID, "[RegisterFile] passReadRegisterDataToIDEXStageRegister waiting to pass values to "
-                                 "IDEXStageRegisters.");
+    this->log("passReadRegisterDataToIDEXStageRegister waiting to pass values to IDEXStageRegisters.");
 
     if (!this->is_single_read_register_set && !this->is_double_read_register_set) {
         throw std::runtime_error("[RegisterFile] no register read set for a cycle.");
@@ -227,17 +232,15 @@ void RegisterFile::passReadRegisterDataToIDEXStageRegister() {
     this->is_single_read_register_set = false;
     this->is_double_read_register_set = false;
 
-    this->logger->log(Stage::ID, "[RegisterFile] passReadRegisterDataToIDEXStageRegister Passed values to "
-                                 "IDEXStageRegisters.");
+    this->log("passReadRegisterDataToIDEXStageRegister Passed values to IDEXStageRegisters.");
 }
 
 void RegisterFile::writeDataToRegisterFile() {
-    this->logger->log(Stage::IF, "[RegisterFile] writeDataToRegisterFile Waiting to acquire lock to "
-                                 "write to register file.");
+    this->log("writeDataToRegisterFile Waiting to acquire lock to write to register file.");
 
     if (this->is_reg_write_signal_set && this->is_reg_write_signal_asserted && this->register_destination != 0) {
         this->registers.at(this->register_destination) = this->write_data;
-        this->logger->log(Stage::ID, "[RegisterFile] writeDataToRegisterFile Write complete.");
+        this->log("writeDataToRegisterFile Write complete.");
 
     }
 
@@ -245,8 +248,7 @@ void RegisterFile::writeDataToRegisterFile() {
     this->is_write_data_set = false;
     this->is_reg_write_signal_set = false;
 
-    this->logger->log(Stage::ID, "[RegisterFile] writeDataToRegisterFile Waking up thread to pass "
-                                 "values to IDEXStageRegister.");
+    this->log("writeDataToRegisterFile Waking up thread to pass values to IDEXStageRegister.");
 }
 
 void RegisterFile::resetRegisterFileContents() {
@@ -258,7 +260,7 @@ void RegisterFile::resetRegisterFileContents() {
         this->registers.emplace_back(empty_word);
     }
 
-    this->logger->log(Stage::ID, "[RegisterFile] Registers cleared.");
+    this->log("Registers cleared.");
 }
 
 void RegisterFile::resetState() {
@@ -283,8 +285,18 @@ void RegisterFile::writeRegisterFileContentsToOutputFile(int cycle_count) {
     );
 
     output_file << "State of RF after executing cycle:\t" << cycle_count << std::endl;
+
     for (const std::bitset<WORD_BIT_COUNT> &data: this->registers) {
         output_file << data.to_string() << std::endl;
     }
+
     output_file.close();
+}
+
+std::string RegisterFile::getModuleTag() {
+    return "RegisterFile";
+}
+
+Stage RegisterFile::getModuleStage() {
+    return Stage::ID;
 }

@@ -28,7 +28,6 @@ class InstructionMemory: public Module {
     std::string instruction;
 
     IFIDStageRegisters *if_id_stage_registers;
-    Logger *logger;
     Driver *driver;
 
     static InstructionMemory *current_instance;
@@ -52,6 +51,9 @@ private:
     void passNopToDriver(bool is_asserted);
 
     void initDependencies() override;
+
+    std::string getModuleTag() override;
+    Stage getModuleStage() override;
 };
 
 #endif //RISC_V_SIMULATOR_INSTRUCTIONMEMORY_H

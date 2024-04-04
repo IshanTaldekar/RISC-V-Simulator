@@ -29,7 +29,6 @@ class HazardDetectionUnit: public Module {
     static HazardDetectionUnit *current_instance;
     static std::mutex initialization_mutex;
 
-    Logger *logger;
     Driver *driver;
     IFIDStageRegisters *if_id_stage_registers;
     IDEXStageRegisters *id_ex_stage_registers;
@@ -56,6 +55,9 @@ private:
     void passHazardDetectedFlagToIDEXStageRegisters();
 
     void resetState();
+
+    std::string getModuleTag() override;
+    Stage getModuleStage() override;
 };
 
 #endif //RISC_V_SIMULATOR_HAZARDDETECTIONUNIT_H

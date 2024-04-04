@@ -28,6 +28,12 @@ IFMux *IFMux::init() {
 }
 
 void IFMux::initDependencies() {
+    std::unique_lock<std::mutex> mux_lock (this->getModuleMutex());
+
+    if (this->driver && this->logger) {
+        return;
+    }
+
     this->driver = Driver::init();
     this->logger = Logger::init();
 }
@@ -36,7 +42,7 @@ void IFMux::run() {
     this->initDependencies();
 
     while (this->isAlive()) {
-        this->logger->log(Stage::IF, "[IFMux] Waiting to be woken up and acquire lock.");
+        this->log("Waiting to be woken up and acquire lock.");
 
         std::unique_lock<std::mutex> mux_lock (this->getModuleMutex());
         this->getModuleConditionVariable().wait(
@@ -48,11 +54,11 @@ void IFMux::run() {
         );
 
         if (this->isKilled()) {
-            this->logger->log(Stage::IF, "[IFMux] Killed.");
+            this->log("Killed.");
             break;
         }
 
-        this->logger->log(Stage::IF, "[IFMux] Woken up and acquired lock.");
+        this->log("Woken up and acquired lock.");
 
         this->passOutput();
 
@@ -68,22 +74,22 @@ void IFMux::setInput(MuxInputType type, MuxInputDataType value) {
         throw std::runtime_error("IFMux::setInput: incompatible data types passed.");
     }
 
-    this->logger->log(Stage::IF, "[IFMux] setInput waiting to acquire lock");
+    this->log("setInput waiting to acquire lock");
 
     std::unique_lock<std::mutex> mux_lock (this->getModuleMutex());
 
-    this->logger->log(Stage::IF, "[IFMux] setInput acquired lock. Updating values.");
+    this->log("setInput acquired lock. Updating values.");
 
     if (std::get<IFStageMuxInputType>(type) == IFStageMuxInputType::IncrementedPc) {
         this->incremented_pc = std::get<unsigned long>(value);
         this->is_incremented_pc_set = true;
 
-        this->logger->log(Stage::IF, "[IFMux] incremented PC value set");
+        this->log("incremented PC value set");
     } else if (std::get<IFStageMuxInputType>(type) == IFStageMuxInputType::BranchedPc) {
         this->branched_pc = std::get<unsigned long>(value);
         this->is_branched_pc_set = true;
 
-        this->logger->log(Stage::IF, "[IFMux] branched PC value set");
+        this->log("branched PC value set");
     } else {
         throw std::runtime_error("IFMux::setInput did not match any input type.");
     }
@@ -92,14 +98,14 @@ void IFMux::setInput(MuxInputType type, MuxInputDataType value) {
 }
 
 void IFMux::assertControlSignal(bool is_asserted) {
-    this->logger->log(Stage::IF, "[IFMux] assertControlSignal waiting to acquire lock.");
+    this->log("assertControlSignal waiting to acquire lock.");
 
     std::lock_guard<std::mutex> if_mux_lock (this->getModuleMutex());
 
     this->is_pc_src_signal_asserted = is_asserted;
     this->is_control_signal_set = true;
 
-    this->logger->log(Stage::IF, "[IFMux] PCSrc asserted: " + std::to_string(this->is_pc_src_signal_asserted) + ".");
+    this->log("PCSrc asserted: " + std::to_string(this->is_pc_src_signal_asserted) + ".");
     this->notifyModuleConditionVariable();
 }
 
@@ -107,13 +113,21 @@ void IFMux::assertControlSignal(bool is_asserted) {
  * Loading output to the Driver.
  */
 void IFMux::passOutput() {
-    this->logger->log(Stage::IF, "[IFMux] Passing output to Driver.");
+    this->log("Passing output to Driver.");
 
     if (!this->is_pc_src_signal_asserted) {
         this->driver->setProgramCounter(this->incremented_pc);
-        this->logger->log(Stage::IF, "[IFMux] Passed PC to Driver.");
+        this->log("Passed PC to Driver.");
     } else {
         this->driver->setProgramCounter(this->branched_pc);
-        this->logger->log(Stage::IF, "[IFMux] Passed Branch Address to Driver.");
+        this->log("Passed Branch Address to Driver.");
     }
+}
+
+std::string IFMux::getModuleTag() {
+    return "IFMux";
+}
+
+Stage IFMux::getModuleStage() {
+    return Stage::IF;
 }

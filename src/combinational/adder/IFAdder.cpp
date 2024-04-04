@@ -8,7 +8,6 @@ IFAdder::IFAdder() {
     this->is_program_counter_set = false;
 
     this->if_mux = nullptr;
-    this->logger = nullptr;
 }
 
 IFAdder *IFAdder::init() {
@@ -22,6 +21,12 @@ IFAdder *IFAdder::init() {
 }
 
 void IFAdder::initDependencies() {
+    std::lock_guard<std::mutex> if_adder_lock (this->getModuleMutex());
+
+    if (this->if_mux && this->logger) {
+        return;
+    }
+
     this->if_mux = IFMux::init();
     this->logger = Logger::init();
 }
@@ -30,7 +35,7 @@ void IFAdder::run() {
     this->initDependencies();
 
     while (this->isAlive()) {
-        this->logger->log(Stage::IF, "[IFAdder] Waiting to acquire lock and wake up.");
+        this->log("Waiting to acquire lock and wake up.");
 
         std::unique_lock<std::mutex> adder_lock(this->getModuleMutex());
         this->getModuleConditionVariable().wait(
@@ -39,11 +44,11 @@ void IFAdder::run() {
         );
 
         if (this->isKilled()) {
-            this->logger->log(Stage::IF, "[IFAdder] Killed.");
+            this->log("Killed.");
             break;
         }
 
-        this->logger->log(Stage::IF, "[IFAdder] Woken up and acquired lock.");
+        this->log("Woken up and acquired lock.");
 
         this->passProgramCounterToIFMux();
 
@@ -57,7 +62,7 @@ void IFAdder::setInput(const AdderInputType &type, const AdderInputDataType &val
         throw std::runtime_error("IFAdder::setInput: incompatible type passed.");
     }
 
-    this->logger->log(Stage::IF, "[IFAdder] setInput waiting to acquire lock and update values.");
+    this->log("setInput waiting to acquire lock and update values.");
 
     std::unique_lock<std::mutex> adder_lock(this->getModuleMutex());
 
@@ -65,16 +70,24 @@ void IFAdder::setInput(const AdderInputType &type, const AdderInputDataType &val
         this->program_counter = std::get<unsigned long>(value);
         this->is_program_counter_set = true;
 
-        this->logger->log(Stage::IF, "[IFAdder] setInput program counter set.");
+        this->log("setInput program counter set.");
     } else {
-        this->logger->log(Stage::IF, "[IFAdder] setInput program counter update failed.");
+        this->log("setInput program counter update failed.");
     }
 
     this->notifyModuleConditionVariable();
 }
 
 void IFAdder::passProgramCounterToIFMux() {
-    this->logger->log(Stage::IF, "[IFAdder] Waiting to pass PCValue to IFMux.");
+    this->log("Waiting to pass PCValue to IFMux.");
     this->if_mux->setInput(IFStageMuxInputType::IncrementedPc, this->program_counter + 4);
-    this->logger->log(Stage::IF, "[IFAdder] PCValue passed to IFMux.");
+    this->log("PCValue passed to IFMux.");
+}
+
+std::string IFAdder::getModuleTag() {
+    return "IFAdder";
+}
+
+Stage IFAdder::getModuleStage() {
+    return Stage::IF;
 }

@@ -11,7 +11,6 @@
 
 class EXMEMStageRegisters;
 class Logger;
-class StageSynchronizer;
 
 class ALU: public Module {
 public:
@@ -35,8 +34,6 @@ private:
     static std::mutex initialization_mutex;
 
     EXMEMStageRegisters *ex_mem_stage_registers;
-    Logger *logger;
-    StageSynchronizer *stage_synchronizer;
 
 public:
     ALU();
@@ -59,6 +56,9 @@ private:
     void initDependencies() override;
 
     void resetState();
+
+    std::string getModuleTag() override;
+    Stage getModuleStage() override;
 };
 
 #endif //RISC_V_SIMULATOR_ALU_H

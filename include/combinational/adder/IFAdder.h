@@ -17,7 +17,6 @@ class IFAdder: public AdderBase {
     static std::mutex initialization_mutex;
 
     IFMux *if_mux;
-    Logger *logger;
 
 public:
     IFAdder();
@@ -29,6 +28,9 @@ public:
 private:
     void passProgramCounterToIFMux();
     void initDependencies() override;
+
+    std::string getModuleTag() override;
+    Stage getModuleStage() override;
 };
 
 #endif //RISC_V_SIMULATOR_IFADDER_H

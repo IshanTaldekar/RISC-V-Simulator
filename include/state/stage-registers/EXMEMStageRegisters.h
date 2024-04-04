@@ -51,7 +51,6 @@ class EXMEMStageRegisters: public Module {
     ALUInput1ForwardingMux *alu_input_1_forwarding_mux;
     ALUInput2ForwardingMux *alu_input_2_forwarding_mux;
     ForwardingUnit *forwarding_unit;
-    Logger *logger;
 
     static EXMEMStageRegisters *current_instance;
     static std::mutex initialization_mutex;
@@ -95,6 +94,9 @@ private:
 
     void resetStage();
     void initDependencies() override;
+
+    std::string getModuleTag() override;
+    Stage getModuleStage() override;
 };
 
 #endif //RISC_V_SIMULATOR_EXMEMSTAGEREGISTERS_H

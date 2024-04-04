@@ -65,7 +65,6 @@ class IDEXStageRegisters: public Module {
     EXMEMStageRegisters *ex_mem_stage_register;
     StageSynchronizer *stage_synchronizer;
     ForwardingUnit *forwarding_unit;
-    Logger *logger;
     HazardDetectionUnit *hazard_detection_unit;
 
     static constexpr int REQUIRED_NOP_FLAG_SET_OPERATIONS = 2;
@@ -115,6 +114,9 @@ private:
     void initDependencies() override;
 
     void delayUpdateUntilNopFlagSet();
+
+    std::string getModuleTag() override;
+    Stage getModuleStage() override;
 };
 
 #endif //RISC_V_SIMULATOR_IDEXSTAGEREGISTERS_H

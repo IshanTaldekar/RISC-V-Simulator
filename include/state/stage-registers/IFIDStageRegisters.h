@@ -38,7 +38,6 @@ class IFIDStageRegisters: public Module {
     RegisterFile *register_file;
     ImmediateGenerator *immediate_generator;
     StageSynchronizer *stage_synchronizer;
-    Logger *logger;
     HazardDetectionUnit *hazard_detection_unit;
 
     bool is_program_counter_set;
@@ -92,6 +91,9 @@ private:
     void initDependencies() override;
 
     void delayUpdateUntilNopFlagSet();
+
+    std::string getModuleTag() override;
+    Stage getModuleStage() override;
 };
 
 #endif //RISC_V_SIMULATOR_IFIDSTAGEREGISTERS_H

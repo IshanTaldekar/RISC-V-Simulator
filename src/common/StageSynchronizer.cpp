@@ -86,7 +86,14 @@ void StageSynchronizer::onCompletionSingleStage() {
 
     this->register_file->writeRegisterFileContentsToOutputFile(this->current_cycle++);
 
-    if (this->if_id_stage_registers->getInstruction()->getType() == InstructionType::HALT) {
+    if (this->mem_wb_stage_registers->isExecutingHaltInstruction()) {
+        if (!this->mem_wb_stage_registers->is_nop_asserted) {
+            this->halt_detected = true;
+        }
+    }
+
+
+    if (this->halt_detected) {
         this->driver->pause();
         this->hazard_detection_unit->pause();
 
@@ -102,6 +109,7 @@ void StageSynchronizer::setPipelineType(PipelineType new_pipeline_type) {
 void StageSynchronizer::reset() {
     this->current_cycle = 0;
     this->is_paused = false;
+    this->halt_detected = false;
 }
 
 bool StageSynchronizer::isPaused() const {

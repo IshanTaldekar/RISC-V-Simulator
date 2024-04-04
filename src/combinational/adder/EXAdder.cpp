@@ -26,6 +26,12 @@ EXAdder *EXAdder::init() {
 }
 
 void EXAdder::initDependencies() {
+    std::lock_guard<std::mutex> ex_adder_lock (this->getModuleMutex());
+
+    if (this->ex_mem_stage_registers && this->logger) {
+        return;
+    }
+
     this->ex_mem_stage_registers = EXMEMStageRegisters::init();
     this->logger = Logger::init();
 }
@@ -34,7 +40,7 @@ void EXAdder::run() {
     this->initDependencies();
 
     while (this->isAlive()) {
-        this->logger->log(Stage::EX, "[EXAdder] Waiting to be woken up and acquire lock.");
+        this->log("Waiting to be woken up and acquire lock.");
 
         std::unique_lock<std::mutex> ex_adder_lock (this->getModuleMutex());
         this->getModuleConditionVariable().wait(
@@ -45,11 +51,11 @@ void EXAdder::run() {
         );
 
         if (this->isKilled()) {
-            this->logger->log(Stage::EX, "[EXAdder] Killed.");
+            this->log("Killed.");
             break;
         }
 
-        this->logger->log(Stage::EX, "[EXAdder] Woken up and acquired lock. Computing result.");
+        this->log("Woken up and acquired lock. Computing result.");
 
         this->computeResult();
         this->passBranchAddressToEXMEMStageRegisters();
@@ -64,11 +70,11 @@ void EXAdder::setInput(const AdderInputType &type, const AdderInputDataType &val
         throw std::runtime_error("EXAdder::setInput: incompatible data types passed");
     }
 
-    this->logger->log(Stage::EX, "[EXAdder] setInput waiting to acquire lock.");
+    this->log("setInput waiting to acquire lock.");
 
     std::lock_guard<std::mutex> ex_adder_lock (this->getModuleMutex());
 
-    this->logger->log(Stage::EX, "[EXAdder] setInput acquired lock and updating value.");
+    this->log("setInput acquired lock and updating value.");
 
     if (std::get<EXAdderInputType>(type) == EXAdderInputType::PCValue) {
         this->program_counter = std::get<unsigned long>(value);
@@ -78,7 +84,7 @@ void EXAdder::setInput(const AdderInputType &type, const AdderInputDataType &val
         this->is_immediate_set = true;
     }
 
-    this->logger->log(Stage::EX, "[EXAdder] setInput value updated.");
+    this->log("setInput value updated.");
     this->notifyModuleConditionVariable();
 }
 
@@ -88,12 +94,19 @@ void EXAdder::computeResult() {
             this->immediate
     ).to_ulong();
 
-    this->logger->log(Stage::EX, "[EXAdder] Computed adder result.");
+    this->log("Computed adder result.");
 }
 
 void EXAdder::passBranchAddressToEXMEMStageRegisters() {
-    this->logger->log(Stage::EX, "[EXAdder] Passing adder result to EXMEMStageRegisters.");
+    this->log("Passing adder result to EXMEMStageRegisters.");
     this->ex_mem_stage_registers->setBranchedProgramCounter(this->result);
-    this->logger->log(Stage::EX, "[EXAdder] Passed adder result to EXMEMStageRegisters.");
+    this->log("Passed adder result to EXMEMStageRegisters.");
 }
 
+std::string EXAdder::getModuleTag() {
+    return "EXAdder";
+}
+
+Stage EXAdder::getModuleStage() {
+    return Stage::EX;
+}

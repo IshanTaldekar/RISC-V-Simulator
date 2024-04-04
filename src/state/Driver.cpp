@@ -25,7 +25,7 @@ void Driver::changeStageAndReset(PipelineType new_stage) {
     {  // Limit lock guard scope to avoid deadlock
         std::lock_guard<std::mutex> driver_lock_guard (this->getModuleMutex());
 
-        this->logger->log(Stage::IF, "[Driver] PipelineType change." );
+        this->log("PipelineType change." );
         this->setPipelineType(new_stage);
     }
 
@@ -48,13 +48,13 @@ void Driver::resetStage() {
 }
 
 void Driver::pause() {
-    this->logger->log(Stage::IF, "[Driver] Paused.");
+    this->log("Paused.");
 
     this->is_pause_flag_set = true;
 }
 
 void Driver::resume() {
-    this->logger->log(Stage::IF, "[Driver] Resumed.");
+    this->log("Resumed.");
 
     this->is_pause_flag_set = false;
     this->notifyModuleConditionVariable();
@@ -67,17 +67,17 @@ void Driver::setProgramCounter(unsigned long value) {
         this->delayUpdateUntilNopFlagSet();
     }
 
-    this->logger->log(Stage::IF, "[Driver] setProgramCounter waiting to acquire lock.");
+    this->log("setProgramCounter waiting to acquire lock.");
 
     std::unique_lock<std::mutex> driver_lock (this->getModuleMutex());
 
-    this->logger->log(Stage::IF, "[Driver] setProgramCounter acquired lock. Updating value.");
+    this->log("setProgramCounter acquired lock. Updating value.");
 
     if (!this->is_nop_asserted) {
         this->program_counter = value;
-        this->logger->log(Stage::IF, "[Driver] setProgramCounter updated value.");
+        this->log("setProgramCounter updated value.");
     } else {
-        this->logger->log(Stage::IF, "[Driver] setProgramCounter update skipped. NOP asserted.");
+        this->log("setProgramCounter update skipped. NOP asserted.");
     }
 
     this->is_new_program_counter_set = true;
@@ -95,6 +95,13 @@ Driver *Driver::init() {
 }
 
 void Driver::initDependencies() {
+    std::unique_lock<std::mutex> driver_lock (this->getModuleMutex());
+
+    if (this->instruction_memory && this->if_id_stage_registers && this->if_adder && this->logger &&
+        this->stage_synchronizer) {
+        return;
+    }
+
     this->instruction_memory = InstructionMemory::init();
     this->if_id_stage_registers = IFIDStageRegisters::init();
     this->if_adder = IFAdder::init();
@@ -106,7 +113,7 @@ void Driver::run() {
     this->initDependencies();
 
     while (this->isAlive()) {
-        this->logger->log(Stage::IF, "[Driver] Waiting to be woken up and acquire lock.");
+        this->log("Waiting to be woken up and acquire lock.");
 
         std::unique_lock<std::mutex> driver_lock (this->getModuleMutex());
         this->getModuleConditionVariable().wait(
@@ -118,21 +125,21 @@ void Driver::run() {
         );
 
         if (this->isKilled()) {
-            this->logger->log(Stage::IF, "[Driver] Killed.");
+            this->log("Killed.");
             break;
         }
 
         if (this->is_reset_flag_set) {
-            this->logger->log(Stage::IF, "[Driver] Resetting stage.");
+            this->log("Resetting stage.");
 
             this->resetStage();
             this->is_reset_flag_set = false;
 
-            this->logger->log(Stage::IF, "[Driver] Reset.");
+            this->log("Reset.");
             continue;
         }
 
-        this->logger->log(Stage::IF, "[Driver] Woken up and acquired lock.");
+        this->log("Woken up and acquired lock.");
 
         std::thread pass_program_counter_to_if_adder(&Driver::passProgramCounterToIFAdder, this, this->program_counter);
         std::thread pass_program_counter_to_instruction_memory(&Driver::passProgramCounterToInstructionMemory, this, this->program_counter);
@@ -155,35 +162,31 @@ void Driver::run() {
 }
 
 void Driver::passProgramCounterToInstructionMemory(unsigned long pc) {
-    this->logger->log(Stage::IF, "[Driver] Passing program counter to InstructionMemory.");
+    this->log("Passing program counter to InstructionMemory.");
     this->instruction_memory->setProgramCounter(pc);
-    this->logger->log(Stage::IF, "[Driver] Passed program counter to InstructionMemory.");
+    this->log("Passed program counter to InstructionMemory.");
 }
 
 void Driver::passProgramCounterToIFAdder(unsigned long pc) {
-    this->logger->log(Stage::IF, "[Driver] Passing program counter to IFAdder.");
+    this->log("Passing program counter to IFAdder.");
     this->if_adder->setInput(IFAdderInputType::PCValue, pc);
-    this->logger->log(Stage::IF, "[Driver] Passed program counter to IFAdder.");
+    this->log("Passed program counter to IFAdder.");
 }
 
 void Driver::passProgramCounterToIFIDStageRegisters(unsigned long pc) {
-    this->logger->log(Stage::IF, "[Driver] Passing program counter to IFIDStageRegisters.");
+    this->log("Passing program counter to IFIDStageRegisters.");
     this->if_id_stage_registers->setInput(pc);
-    this->logger->log(Stage::IF, "[Driver] Passed program counter to IFIDStageRegisters.");
+    this->log("Passed program counter to IFIDStageRegisters.");
 }
 
 void Driver::setNop(bool is_asserted) {
-    if (!this->logger) {
-        this->initDependencies();
-    }
-
     this->stage_synchronizer->conditionalArriveFiveStage();
 
-    this->logger->log(Stage::IF, "[Driver] setPassedNop waiting to acquire lock.");
+    this->log("setPassedNop waiting to acquire lock.");
 
     std::lock_guard<std::mutex> driver_lock (this->getModuleMutex());
 
-    this->logger->log(Stage::IF, "[Driver] setPassedNop acquired lock.");
+    this->log("setPassedNop acquired lock.");
 
     this->is_nop_asserted |= is_asserted;
 
@@ -194,9 +197,9 @@ void Driver::setNop(bool is_asserted) {
 }
 
 void Driver::passNopToIFIDStageRegisters(bool is_asserted) {
-    this->logger->log(Stage::IF, "[Driver] Passing NOP to IFIDStageRegisters.");
+    this->log("Passing NOP to IFIDStageRegisters.");
     this->if_id_stage_registers->setPassedNop(is_asserted);
-    this->logger->log(Stage::IF, "[Driver] Passed NOP to IFIDStageRegisters.");
+    this->log("Passed NOP to IFIDStageRegisters.");
 }
 
 void Driver::delayUpdateUntilNopFlagSet() {
@@ -211,4 +214,12 @@ void Driver::delayUpdateUntilNopFlagSet() {
 
 void Driver::assertSystemEnabledNop() {
     this->is_nop_asserted = true;
+}
+
+std::string Driver::getModuleTag() {
+    return "Driver";
+}
+
+Stage Driver::getModuleStage() {
+    return Stage::IF;
 }
