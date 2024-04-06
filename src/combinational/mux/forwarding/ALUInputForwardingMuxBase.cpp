@@ -18,7 +18,7 @@ ALUInputForwardingMuxBase::ALUInputForwardingMuxBase() {
 }
 
 void ALUInputForwardingMuxBase::initDependencies() {
-    std::lock_guard<std::mutex> mux_lock (this->getModuleMutex());
+    std::lock_guard<std::mutex> mux_lock (this->getModuleDependencyMutex());
 
     if (this->alu && this->logger) {
         return;

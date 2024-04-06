@@ -26,7 +26,7 @@ EXAdder *EXAdder::init() {
 }
 
 void EXAdder::initDependencies() {
-    std::lock_guard<std::mutex> ex_adder_lock (this->getModuleMutex());
+    std::lock_guard<std::mutex> ex_adder_lock (this->getModuleDependencyMutex());
 
     if (this->ex_mem_stage_registers && this->logger) {
         return;

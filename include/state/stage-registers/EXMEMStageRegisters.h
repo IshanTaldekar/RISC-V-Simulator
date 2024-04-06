@@ -43,6 +43,8 @@ class EXMEMStageRegisters: public Module {
     bool is_pause_flag_set;
     bool is_nop_passed_flag_set;
 
+    bool is_verbose_execution_flag_asserted;
+
     Control *control;
     DataMemory *data_memory;
     MEMWBStageRegisters *mem_wb_stage_registers;
@@ -54,9 +56,6 @@ class EXMEMStageRegisters: public Module {
 
     static EXMEMStageRegisters *current_instance;
     static std::mutex initialization_mutex;
-
-    static constexpr int REQUIRED_NOP_FLAG_SET_OPERATIONS = 1;
-    int current_nop_set_operations;
 
 public:
     EXMEMStageRegisters();
@@ -79,6 +78,8 @@ public:
     void changeStageAndReset(PipelineType new_pipeline_type);
     void setPassedNop(bool is_asserted);  // Passing Nop between stages
 
+    void assertVerboseExecutionFlag();
+
 private:
     void passALUResultToDataMemory(std::bitset<WORD_BIT_COUNT> data);
     void passALUResultToALUInput1ForwardingMux(std::bitset<WORD_BIT_COUNT> data);
@@ -97,6 +98,8 @@ private:
 
     std::string getModuleTag() override;
     Stage getModuleStage() override;
+
+    void printState();
 };
 
 #endif //RISC_V_SIMULATOR_EXMEMSTAGEREGISTERS_H

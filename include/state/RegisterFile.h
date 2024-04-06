@@ -39,6 +39,8 @@ class RegisterFile: public Module {
     bool is_reset_flag_set;
     bool is_pause_flag_set;
 
+    int cycle_count;
+
     IDEXStageRegisters *id_ex_stage_registers;
     StageSynchronizer *stage_synchronizer;
 
@@ -63,7 +65,8 @@ public:
     void pause();
     void resume();
 
-    void writeRegisterFileContentsToOutputFile(int cycle_count);
+    void writeRegisterFileContentsToOutputFile();
+    void clearRegisterFileOutputFile();
 
 private:
     void passReadRegisterDataToIDEXStageRegister();

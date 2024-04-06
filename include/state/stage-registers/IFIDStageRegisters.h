@@ -43,12 +43,15 @@ class IFIDStageRegisters: public Module {
     bool is_program_counter_set;
     bool is_instruction_set;
     bool is_nop_flag_set;
+
     bool is_nop_passed_flag_asserted;
     bool is_nop_passed_flag_set;
 
     bool is_nop_asserted;
     bool is_reset_flag_set;
     bool is_pause_flag_set;
+
+    bool is_verbose_execution_flag_asserted;
 
     static IFIDStageRegisters *current_instance;
     static std::mutex initialization_mutex;
@@ -73,7 +76,7 @@ public:
     void resume();
     void changeStageAndReset(PipelineType new_stage);
 
-    Instruction *getInstruction();
+    void assertVerboseExecutionFlag();
 
 private:
     void passProgramCounterToIDEXStageRegisters(unsigned long pc);
@@ -94,6 +97,8 @@ private:
 
     std::string getModuleTag() override;
     Stage getModuleStage() override;
+
+    void printState();
 };
 
 #endif //RISC_V_SIMULATOR_IFIDSTAGEREGISTERS_H

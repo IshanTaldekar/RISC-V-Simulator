@@ -11,6 +11,7 @@
 
 class EXMEMStageRegisters;
 class Logger;
+class StageSynchronizer;
 
 class ALU: public Module {
 public:
@@ -34,6 +35,7 @@ private:
     static std::mutex initialization_mutex;
 
     EXMEMStageRegisters *ex_mem_stage_registers;
+    StageSynchronizer *stage_synchronizer;
 
 public:
     ALU();

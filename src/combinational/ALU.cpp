@@ -18,6 +18,7 @@ ALU::ALU() {
 
     this->ex_mem_stage_registers = nullptr;
     this->logger = nullptr;
+    this->stage_synchronizer = nullptr;
 }
 
 void ALU::reset() {
@@ -100,6 +101,8 @@ void ALU::run() {
             this->resetState();
             this->is_reset_flag_set = false;
 
+            this->stage_synchronizer->arriveReset();
+
             this->log("Reset.");
             continue;
         }
@@ -146,7 +149,7 @@ ALU *ALU::init() {
 }
 
 void ALU::initDependencies() {
-    std::unique_lock<std::mutex> alu_lock (this->getModuleMutex());
+    std::unique_lock<std::mutex> alu_lock (this->getModuleDependencyMutex());
 
     if (this->ex_mem_stage_registers && this->logger) {
         return;
@@ -154,6 +157,7 @@ void ALU::initDependencies() {
 
     this->ex_mem_stage_registers = EXMEMStageRegisters::init();
     this->logger = Logger::init();
+    this->stage_synchronizer = StageSynchronizer::init();
 }
 
 void ALU::computeResult() {

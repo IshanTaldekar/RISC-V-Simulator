@@ -28,6 +28,7 @@ ForwardingUnit::ForwardingUnit() {
     this->alu_input_1_mux = nullptr;
     this->alu_input_2_mux = nullptr;
     this->logger = nullptr;
+    this->stage_synchronizer = nullptr;
 }
 
 ForwardingUnit *ForwardingUnit::init() {
@@ -41,7 +42,7 @@ ForwardingUnit *ForwardingUnit::init() {
 }
 
 void ForwardingUnit::initDependencies() {
-    std::unique_lock<std::mutex> forwarding_unit_lock (this->getModuleMutex());
+    std::unique_lock<std::mutex> forwarding_unit_lock (this->getModuleDependencyMutex());
 
     if (this->alu_input_1_mux && this->alu_input_2_mux && this->logger) {
         return;
@@ -50,6 +51,7 @@ void ForwardingUnit::initDependencies() {
     this->alu_input_1_mux = ALUInput1ForwardingMux::init();
     this->alu_input_2_mux = ALUInput2ForwardingMux::init();
     this->logger = Logger::init();
+    this->stage_synchronizer = StageSynchronizer::init();
 }
 
 void ForwardingUnit::run() {
@@ -80,6 +82,8 @@ void ForwardingUnit::run() {
 
             this->resetState();
             this->is_reset_flag_set = false;
+
+            this->stage_synchronizer->arriveReset();
 
             this->log("Reset.");
             continue;
@@ -200,9 +204,7 @@ void ForwardingUnit::setMEMWBStageRegisterRegWrite(bool is_asserted) {
 }
 
 void ForwardingUnit::reset() {
-    if (!this->logger) {
-        this->initDependencies();
-    }
+    std::lock_guard<std::mutex> forwarding_unit_lock (this->getModuleMutex());
 
     this->log("reset flag set.");
     this->is_reset_flag_set = true;

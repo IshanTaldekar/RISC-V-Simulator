@@ -16,6 +16,8 @@ class Logger {
     std::mutex mem_stage_mutex;
     std::mutex wb_stage_mutex;
 
+    std::mutex log_mutex;
+
     std::condition_variable if_stage_condition_variable;
     std::condition_variable id_stage_condition_variable;
     std::condition_variable ex_stage_condition_variable;

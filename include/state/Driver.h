@@ -22,6 +22,8 @@ class Driver: public Module {
     bool is_pause_flag_set;
     bool is_nop_flag_set;
 
+    bool is_verbose_execution_flag_asserted;
+
     InstructionMemory *instruction_memory;
     IFIDStageRegisters *if_id_stage_registers;
     IFAdder *if_adder;
@@ -47,6 +49,8 @@ public:
     void pause();
     void resume();
 
+    void assertVerboseExecutionFlag();
+
 private:
     void passProgramCounterToInstructionMemory(unsigned long pc);
     void passProgramCounterToIFAdder(unsigned long pc);
@@ -60,6 +64,8 @@ private:
 
     std::string getModuleTag() override;
     Stage getModuleStage() override;
+
+    void printState() const;
 };
 
 #endif //RISC_V_SIMULATOR_DRIVER_H

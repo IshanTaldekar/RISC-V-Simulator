@@ -21,7 +21,7 @@ IFAdder *IFAdder::init() {
 }
 
 void IFAdder::initDependencies() {
-    std::lock_guard<std::mutex> if_adder_lock (this->getModuleMutex());
+    std::lock_guard<std::mutex> if_adder_lock (this->getModuleDependencyMutex());
 
     if (this->if_mux && this->logger) {
         return;

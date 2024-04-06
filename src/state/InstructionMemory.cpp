@@ -26,7 +26,7 @@ InstructionMemory *InstructionMemory::init() {
 }
 
 void InstructionMemory::initDependencies() {
-    std::lock_guard<std::mutex> instruction_memory_lock (this->getModuleMutex());
+    std::lock_guard<std::mutex> instruction_memory_lock (this->getModuleDependencyMutex());
 
     if (this->if_id_stage_registers && this->logger && this->driver) {
         return;

@@ -12,6 +12,7 @@ class Logger;
 class Driver;
 class IFIDStageRegisters;
 class IDEXStageRegisters;
+class StageSynchronizer;
 
 class HazardDetectionUnit: public Module {
     unsigned long id_ex_register_destination;
@@ -32,6 +33,7 @@ class HazardDetectionUnit: public Module {
     Driver *driver;
     IFIDStageRegisters *if_id_stage_registers;
     IDEXStageRegisters *id_ex_stage_registers;
+    StageSynchronizer *stage_synchronizer;
 
 public:
     HazardDetectionUnit();

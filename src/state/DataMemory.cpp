@@ -20,6 +20,7 @@ DataMemory::DataMemory() {
 
     this->mem_wb_stage_registers = nullptr;
     this->logger = nullptr;
+    this->stage_synchronizer = nullptr;
 
     this->output_file_path = "../output/DataMemory";
     std::ofstream output_file (this->output_file_path + "-SS.log", std::ios::out);
@@ -37,7 +38,7 @@ DataMemory *DataMemory::init() {
 }
 
 void DataMemory::initDependencies() {
-    std::unique_lock<std::mutex> data_memory_lock (this->getModuleMutex());
+    std::unique_lock<std::mutex> data_memory_lock (this->getModuleDependencyMutex());
 
     if (this->mem_wb_stage_registers && this->logger) {
         return;
@@ -45,6 +46,7 @@ void DataMemory::initDependencies() {
 
     this->mem_wb_stage_registers = MEMWBStageRegisters::init();
     this->logger = Logger::init();
+    this->stage_synchronizer = StageSynchronizer::init();
 }
 
 void DataMemory::run() {
@@ -78,6 +80,8 @@ void DataMemory::run() {
             this->resetState();
             this->is_reset_flag_set = false;
 
+            this->stage_synchronizer->arriveReset();
+
             this->log("Reset.");
             continue;
         }
@@ -95,6 +99,8 @@ void DataMemory::run() {
         std::thread pass_read_data_thread (&DataMemory::passReadData, this, this->read_data);
         pass_read_data_thread.detach();
 
+        this->is_mem_write_asserted = false;
+        this->is_mem_read_asserted = false;
         this->is_address_set = false;
         this->is_write_data_set = false;
         this->is_mem_write_flag_set = false;
@@ -251,12 +257,6 @@ void DataMemory::resetState() {
     this->is_mem_write_asserted = false;
     this->is_mem_read_asserted = false;
     this->is_input_file_read = true;
-
-    std::ofstream output_file (
-            this->output_file_path + (this->getPipelineType() == PipelineType::Single ?  "-SS.log" : "-FS.log"),
-            std::ios::out
-    );
-    output_file.close();
 }
 
 void DataMemory::writeDataMemoryContentsToOutput() {
@@ -278,4 +278,12 @@ std::string DataMemory::getModuleTag() {
 
 Stage DataMemory::getModuleStage() {
     return Stage::MEM;
+}
+
+void DataMemory::clearDataMemoryOutputFile() {
+    std::ofstream output_file (
+            this->output_file_path + (this->getPipelineType() == PipelineType::Single ?  "-SS.log" : "-FS.log"),
+            std::ios::out
+    );
+    output_file.close();
 }

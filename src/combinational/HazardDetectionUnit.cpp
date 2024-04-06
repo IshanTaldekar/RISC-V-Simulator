@@ -17,6 +17,7 @@ HazardDetectionUnit::HazardDetectionUnit() {
 
     this->logger = nullptr;
     this->driver = nullptr;
+    this->stage_synchronizer = nullptr;
     this->if_id_stage_registers = nullptr;
     this->id_ex_stage_registers = nullptr;
 }
@@ -34,7 +35,7 @@ void HazardDetectionUnit::resume() {
 
 
 void HazardDetectionUnit::initDependencies() {
-    std::unique_lock<std::mutex> hazard_detection_unit_lock (this->getModuleMutex());
+    std::unique_lock<std::mutex> hazard_detection_unit_lock (this->getModuleDependencyMutex());
 
     if (this->logger && this->driver && this->if_id_stage_registers && this->id_ex_stage_registers) {
         return;
@@ -44,10 +45,11 @@ void HazardDetectionUnit::initDependencies() {
     this->driver = Driver::init();
     this->if_id_stage_registers = IFIDStageRegisters::init();
     this->id_ex_stage_registers = IDEXStageRegisters::init();
+    this->stage_synchronizer = StageSynchronizer::init();
 }
 
 HazardDetectionUnit *HazardDetectionUnit::init() {
-    std::lock_guard<std::mutex> hazard_detection_lock (initialization_mutex);
+    std::lock_guard<std::mutex> hazard_detection_lock (HazardDetectionUnit::initialization_mutex);
 
     if (HazardDetectionUnit::current_instance == nullptr) {
         HazardDetectionUnit::current_instance = new HazardDetectionUnit();
@@ -82,6 +84,8 @@ void HazardDetectionUnit::run() {
 
             this->resetState();
             this->is_reset_flag_set = false;
+
+            this->stage_synchronizer->arriveReset();
 
             this->log("Reset.");
             continue;
@@ -126,10 +130,6 @@ void HazardDetectionUnit::setIDEXRegisterDestination(unsigned long rd) {
 }
 
 void HazardDetectionUnit::setInstruction(Instruction *new_instruction) {
-    if (!this->logger) {
-        this->initDependencies();
-    }
-
     this->log("setInstruction waiting to acquire lock.");
 
     std::lock_guard<std::mutex> hazard_detection_unit_lock (this->getModuleMutex());
