@@ -85,11 +85,10 @@ void resetPipeline(Pipeline &pipeline) {
     pipeline.alu->reset();
     pipeline.hazard_detection_unit->reset();
     pipeline.forwarding_unit->reset();
-    pipeline.ex_mux_alu_input_1->reset();
-    pipeline.ex_mux_alu_input_2->reset();
-    pipeline.alu_input_1_forwarding_mux->reset();
-    pipeline.alu_input_2_forwarding_mux->reset();
-//    pipeline.ex_adder->reset();
+//    pipeline.ex_mux_alu_input_1->reset();
+//    pipeline.ex_mux_alu_input_2->reset();
+//    pipeline.alu_input_1_forwarding_mux->reset();
+//    pipeline.alu_input_2_forwarding_mux->reset();
 }
 
 void pausePipeline(Pipeline &pipeline) {
@@ -260,6 +259,14 @@ ActiveThreads runPipeline(const Pipeline &pipeline) {
     return active_threads;
 }
 
+void printStagesState(Pipeline &pipeline) {
+    pipeline.driver->assertVerboseExecutionFlag();
+    pipeline.if_id_stage_registers->assertVerboseExecutionFlag();
+    pipeline.id_ex_stage_registers->assertVerboseExecutionFlag();
+    pipeline.ex_mem_stage_registers->assertVerboseExecutionFlag();
+    pipeline.mem_wb_stage_registers->assertVerboseExecutionFlag();
+}
+
 void changeInstructionMemoryFile(Pipeline &pipeline, const std::string &new_file_path) {
     pipeline.instruction_memory->setInstructionMemoryInputFilePath(new_file_path);
 }
@@ -268,8 +275,15 @@ void changeDataMemoryFile(Pipeline &pipeline, const std::string &new_file_path) 
     pipeline.data_memory->setDataMemoryInputFilePath(new_file_path);
 }
 
+void clearOutputFiles(Pipeline &pipeline) {
+    pipeline.register_file->clearRegisterFileOutputFile();
+    pipeline.data_memory->clearDataMemoryOutputFile();
+}
+
 int main() {
     Pipeline pipeline = initializePipeline();
+//    printStagesState(pipeline);
+    clearOutputFiles(pipeline);
 
     changeInstructionMemoryFile(pipeline, "../input/imem.txt");
     changeDataMemoryFile(pipeline, "../input/dmem.txt");
@@ -281,16 +295,16 @@ int main() {
             sleep(1);
         } else {
             if (pipeline.driver->getPipelineType() == PipelineType::Single) {
-                sleep(5);
-                pausePipeline(pipeline);
+                resetPipeline(pipeline);
                 changePipelineType(pipeline, PipelineType::Five);
                 resetPipeline(pipeline);
-                sleep(5);
-
+                clearOutputFiles(pipeline);
                 resumePipeline(pipeline);
             } else {
                 break;
             }
         }
     }
+
+    killPipeline(pipeline);
 }

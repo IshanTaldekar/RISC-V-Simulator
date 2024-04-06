@@ -6,12 +6,14 @@
 #include "../common/Logger.h"
 #include "../combinational/mux/forwarding/ALUInput1ForwardingMux.h"
 #include "../combinational/mux/forwarding/ALUInput2ForwardingMux.h"
+#include "../common/StageSynchronizer.h"
 
 #include <iostream>
 
 class ALUInput1ForwardingMux;
 class ALUInput2ForwardingMux;
 class Logger;
+class StageSynchronizer;
 
 class ForwardingUnit: public Module {
     unsigned long register_source1;
@@ -37,6 +39,8 @@ class ForwardingUnit: public Module {
 
     ALUInput1ForwardingMux *alu_input_1_mux;
     ALUInput2ForwardingMux *alu_input_2_mux;
+
+    StageSynchronizer *stage_synchronizer;
 
     ALUInputMuxControlSignals alu_input_1_mux_control_signal;
     ALUInputMuxControlSignals alu_input_2_mux_control_signal;

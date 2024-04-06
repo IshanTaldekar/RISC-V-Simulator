@@ -29,7 +29,9 @@ class MEMWBStageRegisters: public Module {
     bool is_pause_flag_set;
     bool is_nop_asserted;
     bool is_nop_passed_flag_set;
-    bool is_nop_passed_flag_asserted{};
+    bool is_nop_passed_flag_asserted;
+
+    bool is_verbose_execution_flag_asserted;
 
     static MEMWBStageRegisters *current_instance;
     static std::mutex initialization_mutex;
@@ -62,18 +64,22 @@ public:
     void pause();
     void resume();
 
+    void assertVerboseExecutionFlag();
+
 private:
     void passReadDataToWBMux();
     void passALUResultToWBMux();
-    void passRegisterDestinationToRegisterFile();
-    void passRegisterDestinationToForwardingUnit();
-    void passRegWriteToForwardingUnit();
+    void passRegisterDestinationToRegisterFile(unsigned long rd);
+    void passRegisterDestinationToForwardingUnit(unsigned long rd);
+    void passRegWriteToForwardingUnit(bool is_asserted);
 
     void resetStage();
     void initDependencies() override;
 
     std::string getModuleTag() override;
     Stage getModuleStage() override;
+
+    void printState();
 };
 
 #endif //RISC_V_SIMULATOR_MEMWBSTAGEREGISTERS_H

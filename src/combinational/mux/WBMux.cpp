@@ -29,7 +29,7 @@ WBMux *WBMux::init() {
 }
 
 void WBMux::initDependencies() {
-    std::unique_lock<std::mutex> wb_mux_lock (this->getModuleMutex());
+    std::unique_lock<std::mutex> wb_mux_lock (this->getModuleDependencyMutex());
 
     if (this->register_file && this->alu_input_1_forwarding_mux && this->alu_input_2_forwarding_mux && this->logger) {
         return;

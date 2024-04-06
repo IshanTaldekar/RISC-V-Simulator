@@ -11,6 +11,7 @@ Driver::Driver() {
     this->is_reset_flag_set = false;
     this->is_pause_flag_set = false;
     this->is_nop_flag_set = true;
+    this->is_verbose_execution_flag_asserted = false;
 
     this->current_nop_set_operations = 0;
 
@@ -54,6 +55,8 @@ void Driver::pause() {
 }
 
 void Driver::resume() {
+    std::lock_guard<std::mutex> driver_lock (this->getModuleMutex());
+
     this->log("Resumed.");
 
     this->is_pause_flag_set = false;
@@ -95,7 +98,7 @@ Driver *Driver::init() {
 }
 
 void Driver::initDependencies() {
-    std::unique_lock<std::mutex> driver_lock (this->getModuleMutex());
+    std::unique_lock<std::mutex> driver_lock (this->getModuleDependencyMutex());
 
     if (this->instruction_memory && this->if_id_stage_registers && this->if_adder && this->logger &&
         this->stage_synchronizer) {
@@ -135,21 +138,46 @@ void Driver::run() {
             this->resetStage();
             this->is_reset_flag_set = false;
 
+            this->stage_synchronizer->arriveReset();
+
             this->log("Reset.");
             continue;
         }
 
         this->log("Woken up and acquired lock.");
 
-        std::thread pass_program_counter_to_if_adder(&Driver::passProgramCounterToIFAdder, this, this->program_counter);
-        std::thread pass_program_counter_to_instruction_memory(&Driver::passProgramCounterToInstructionMemory, this, this->program_counter);
-        std::thread pass_program_counter_thread (&Driver::passProgramCounterToIFIDStageRegisters, this, this->program_counter);
-        std::thread pass_nop_thread (&Driver::passNopToIFIDStageRegisters, this, this->is_nop_asserted);
+        if (this->is_verbose_execution_flag_asserted) {
+            this->printState();
+        }
 
-        pass_program_counter_to_if_adder.join();
-        pass_program_counter_to_instruction_memory.join();
-        pass_program_counter_thread.join();
-        pass_nop_thread.join();
+        std::thread pass_program_counter_to_if_adder(
+                &Driver::passProgramCounterToIFAdder,
+                this,
+                this->program_counter
+         );
+
+        std::thread pass_program_counter_to_instruction_memory(
+                &Driver::passProgramCounterToInstructionMemory,
+                this,
+                this->program_counter
+        );
+
+        std::thread pass_program_counter_thread (
+                &Driver::passProgramCounterToIFIDStageRegisters,
+                this,
+                this->program_counter
+        );
+
+        std::thread pass_nop_thread (
+                &Driver::passNopToIFIDStageRegisters,
+                this,
+                this->is_nop_asserted
+        );
+
+        pass_program_counter_to_if_adder.detach();
+        pass_program_counter_to_instruction_memory.detach();
+        pass_program_counter_thread.detach();
+        pass_nop_thread.detach();
 
         this->is_new_program_counter_set = false;
         this->is_nop_asserted = false;
@@ -222,4 +250,21 @@ std::string Driver::getModuleTag() {
 
 Stage Driver::getModuleStage() {
     return Stage::IF;
+}
+
+void Driver::printState() const {
+    std::cout << std::string(20, '.') << std::endl;
+    std::cout << "Driver" << std::endl;
+    std::cout << std::string(20, '.') << std::endl;
+
+    std::cout << "program_counter: " << this->program_counter << std::endl;
+    std::cout << "is_new_program_counter_set: " << this->is_new_program_counter_set << std::endl;
+    std::cout << "is_nop_asserted: " << this->is_nop_asserted << std::endl;
+    std::cout << "is_reset_flag_set: " << this->is_reset_flag_set << std::endl;
+    std::cout << "is_pause_flag_set: " << this->is_pause_flag_set << std::endl;
+    std::cout << "is_nop_flag_set: " << this->is_nop_flag_set << std::endl;
+}
+
+void Driver::assertVerboseExecutionFlag() {
+    this->is_verbose_execution_flag_asserted = true;
 }

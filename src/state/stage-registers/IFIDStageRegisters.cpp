@@ -15,6 +15,7 @@ IFIDStageRegisters::IFIDStageRegisters() {
     this->is_nop_flag_set = true;
     this->is_nop_passed_flag_asserted = false;
     this->is_nop_passed_flag_set = false;
+    this->is_verbose_execution_flag_asserted = false;
 
     this->current_nop_set_operations = 0;
 
@@ -99,7 +100,7 @@ IFIDStageRegisters *IFIDStageRegisters::init() {
 }
 
 void IFIDStageRegisters::initDependencies() {
-    std::unique_lock<std::mutex> if_id_stage_registers_lock (this->getModuleMutex());
+    std::unique_lock<std::mutex> if_id_stage_registers_lock (this->getModuleDependencyMutex());
 
     if (this->instruction && this->control && this->register_file && this->id_ex_stage_registers &&
         this->immediate_generator && this->stage_synchronizer && this->logger && this->hazard_detection_unit) {
@@ -144,6 +145,8 @@ void IFIDStageRegisters::run() {
             this->resetStage();
             this->is_reset_flag_set = false;
 
+            this->stage_synchronizer->arriveReset();
+
             this->log("Resetting stage.");
             continue;
         }
@@ -152,8 +155,12 @@ void IFIDStageRegisters::run() {
 
         this->instruction = new Instruction(this->instruction_bits);
         this->control = new Control(this->instruction);
-        this->control->setNop(this->is_nop_passed_flag_asserted ||
+        this->control->setNop(this->is_nop_asserted ||
                                 this->instruction->getType() == InstructionType::HALT);
+
+        if (this->is_verbose_execution_flag_asserted) {
+            this->printState();
+        }
 
         // Popup threads to pass data because barrier will have them sleep until synchronization condition is met
         std::thread pass_instruction_hazard_detection_unit_thread (
@@ -216,16 +223,16 @@ void IFIDStageRegisters::run() {
                 this->is_nop_passed_flag_asserted
         );
 
-        pass_instruction_hazard_detection_unit_thread.join();
-        pass_instruction_immediate_generator_thread.join();
-        pass_control_thread.join();
-        pass_program_counter_thread.join();
-        pass_read_registers_thread.join();
-        pass_register_destination_thread.join();
-        pass_register_source1_thread.join();
-        pass_register_source2_thread.join();
-        pass_instruction_id_ex_stage_registers_thread.join();
-        pass_nop_id_ex_stage_registers_thread.join();
+        pass_instruction_hazard_detection_unit_thread.detach();
+        pass_instruction_immediate_generator_thread.detach();
+        pass_control_thread.detach();
+        pass_program_counter_thread.detach();
+        pass_read_registers_thread.detach();
+        pass_register_destination_thread.detach();
+        pass_register_source1_thread.detach();
+        pass_register_source2_thread.detach();
+        pass_instruction_id_ex_stage_registers_thread.detach();
+        pass_nop_id_ex_stage_registers_thread.detach();
 
         this->is_instruction_set = false;
         this->is_program_counter_set = false;
@@ -364,10 +371,6 @@ void IFIDStageRegisters::passInstructionToHazardDetectionUnit(Instruction *curre
     this->log("Passed instruction to hazard detection unit.");
 }
 
-Instruction *IFIDStageRegisters::getInstruction() {
-    return this->instruction;
-}
-
 void IFIDStageRegisters::delayUpdateUntilNopFlagSet() {
     std::unique_lock<std::mutex> if_id_stage_registers_lock (this->getModuleMutex());
     this->getModuleConditionVariable().wait(
@@ -404,4 +407,27 @@ std::string IFIDStageRegisters::getModuleTag() {
 
 Stage IFIDStageRegisters::getModuleStage() {
     return Stage::IF;
+}
+
+void IFIDStageRegisters::printState() {
+    std::cout << std::string(20, '.') << std::endl;
+    std::cout << "IFIDStageRegisters" << std::endl;
+    std::cout << std::string(20, '.') << std::endl;
+
+    std::cout << "program_counter: " << this->program_counter << std::endl;
+    std::cout << "instruction_bits: " << this->instruction_bits << std::endl;
+    std::cout << "is_nop_passed_flag_asserted: " << this->is_nop_passed_flag_asserted << std::endl;
+    std::cout << "is_nop_asserted: " << this->is_nop_asserted << std::endl;
+    std::cout << "is_program_counter_set: " << this->is_program_counter_set << std::endl;
+    std::cout << "is_instruction_set: " << this->is_instruction_set << std::endl;
+    std::cout << "is_nop_flag_set: " << this->is_nop_flag_set << std::endl;
+    std::cout << "is_nop_passed_flag_set: " << this->is_nop_passed_flag_set << std::endl;
+    std::cout << "is_reset_flag_set: " << this->is_reset_flag_set << std::endl;
+    std::cout << "is_pause_flag_set: " << this->is_pause_flag_set << std::endl;
+
+    this->control->printState();
+}
+
+void IFIDStageRegisters::assertVerboseExecutionFlag() {
+    this->is_verbose_execution_flag_asserted = true;
 }

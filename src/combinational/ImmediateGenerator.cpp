@@ -22,7 +22,7 @@ ImmediateGenerator *ImmediateGenerator::init() {
 }
 
 void ImmediateGenerator::initDependencies() {
-    std::unique_lock<std::mutex> immediate_generator_lock (this->getModuleMutex());
+    std::unique_lock<std::mutex> immediate_generator_lock (this->getModuleDependencyMutex());
 
     if (this->id_ex_stage_registers && this->logger) {
         return;

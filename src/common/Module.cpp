@@ -7,6 +7,8 @@ Module::Module() {
 }
 
 void Module::kill() {
+    std::lock_guard<std::mutex> module_lock (this->module_mutex);
+
     this->is_alive = false;
     this->notifyModuleConditionVariable();
 }
@@ -37,13 +39,19 @@ PipelineType Module::getPipelineType() {
 }
 
 void Module::notifyModuleConditionVariable() {
-    this->getModuleConditionVariable().notify_one();
+    this->getModuleConditionVariable().notify_all();
 }
 
 void Module::log(const std::string &message) {
+    std::lock_guard<std::mutex> log_lock (this->log_mutex);
+
     if (!this->logger) {
         this->initDependencies();
     }
 
     this->logger->log(this->getModuleStage(), "[" + this->getModuleTag() + "] " + message);
+}
+
+std::mutex &Module::getModuleDependencyMutex() {
+    return this->dependency_mutex;
 }

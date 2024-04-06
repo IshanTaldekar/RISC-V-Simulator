@@ -201,3 +201,18 @@ void Control::passNopToIFIDStageRegisters(bool is_signal_asserted) {
 void Control::passNopToIDEXStageRegisters(bool is_signal_asserted) {
     this->id_ex_stage_registers->setNop(is_signal_asserted);
 }
+
+void Control::printState() {
+    std::cout << "control::is_reg_write_asserted: " << this->is_reg_write_asserted << std::endl;
+    std::cout << "control::is_pc_src_asserted: " << this->is_pc_src_asserted << std::endl;
+    std::cout << "control::is_alu_src_asserted: " << this->is_alu_src_asserted << std::endl;
+    std::cout << "control::is_mem_read_asserted: " << this->is_mem_read_asserted << std::endl;
+    std::cout << "control::is_mem_write_asserted: " << this->is_mem_write_asserted << std::endl;
+    std::cout << "control::is_mem_to_reg_asserted: " << this->is_mem_to_reg_asserted << std::endl;
+    std::cout << "control::is_branch_instruction: " << this->is_branch_instruction << std::endl;
+    std::cout << "control::is_alu_result_zero: " << this->is_alu_result_zero << std::endl;
+    std::cout << "control::is_jal_instruction: " << this->is_jal_instruction << std::endl;
+    std::cout << "control::is_halt_instruction: " << this->is_halt_instruction << std::endl;
+    std::cout << "control::is_nop_asserted_flag: " << this->is_nop_asserted_flag << std::endl;
+    std::cout << "control::alu_op: " << this->alu_op.to_string() << std::endl;
+}

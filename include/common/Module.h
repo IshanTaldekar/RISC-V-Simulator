@@ -17,6 +17,9 @@ class Module {
     std::mutex module_mutex;
     std::condition_variable module_condition_variable;
 
+    std::mutex log_mutex;
+    std::mutex dependency_mutex;
+
     PipelineType pipeline_type;
 
 public:
@@ -30,6 +33,8 @@ public:
     [[nodiscard]] bool isKilled() const;
 
     std::mutex &getModuleMutex();
+    std::mutex &getModuleDependencyMutex();
+
     std::condition_variable &getModuleConditionVariable();
 
     void setPipelineType(PipelineType current_type);

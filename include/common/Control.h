@@ -77,6 +77,8 @@ public:
     [[nodiscard]] bool isRegWriteAsserted() const;
     [[nodiscard]] bool isMemReadAsserted() const;
 
+    void printState();
+
 private:
     void generateSignals();
     void generateALUOpCode();

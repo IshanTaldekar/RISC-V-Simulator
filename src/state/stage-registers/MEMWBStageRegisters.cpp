@@ -17,6 +17,7 @@ MEMWBStageRegisters::MEMWBStageRegisters() {
     this->is_nop_asserted = false;
     this->is_nop_passed_flag_set = false;
     this->is_nop_passed_flag_asserted = false;
+    this->is_verbose_execution_flag_asserted = false;
 
     this->control = nullptr;
 
@@ -28,6 +29,8 @@ MEMWBStageRegisters::MEMWBStageRegisters() {
 }
 
 void MEMWBStageRegisters::reset() {
+    std::lock_guard<std::mutex> mem_wb_stage_registers_lock (this->getModuleMutex());
+
     this->is_reset_flag_set = true;
     this->notifyModuleConditionVariable();
 }
@@ -63,6 +66,8 @@ void MEMWBStageRegisters::pause() {
 }
 
 void MEMWBStageRegisters::resume() {
+    std::lock_guard<std::mutex> mem_wb_stage_registers_lock (this->getModuleMutex());
+
     this->is_pause_flag_set = false;
     this->notifyModuleConditionVariable();
 }
@@ -78,7 +83,7 @@ MEMWBStageRegisters *MEMWBStageRegisters::init() {
 }
 
 void MEMWBStageRegisters::initDependencies() {
-    std::unique_lock<std::mutex> mem_wb_stage_registers_lock (this->getModuleMutex());
+    std::unique_lock<std::mutex> mem_wb_stage_registers_lock (this->getModuleDependencyMutex());
 
     if (this->control && this->register_file && this->wb_mux && this->stage_synchronizer && this->forwarding_unit &&
         this->logger) {
@@ -121,6 +126,8 @@ void MEMWBStageRegisters::run() {
             this->resetStage();
             this->is_reset_flag_set = false;
 
+            this->stage_synchronizer->arriveReset();
+
             this->log("Reset.");
             continue;
         }
@@ -130,16 +137,34 @@ void MEMWBStageRegisters::run() {
         this->control->setNop(this->is_nop_passed_flag_asserted);
         this->control->toggleWBStageControlSignals();
 
+        if (this->is_verbose_execution_flag_asserted) {
+            this->printState();
+        }
+
         this->passReadDataToWBMux();
         this->passALUResultToWBMux();
 
-        std::thread pass_register_destination_register_file (&MEMWBStageRegisters::passRegisterDestinationToRegisterFile, this);
-        std::thread pass_register_destination_forwarding_unit (&MEMWBStageRegisters::passRegisterDestinationToForwardingUnit, this);
-        std::thread pass_reg_write_forwarding_unit (&MEMWBStageRegisters::passRegWriteToForwardingUnit, this);
+        std::thread pass_register_destination_register_file (
+                &MEMWBStageRegisters::passRegisterDestinationToRegisterFile,
+                this,
+                this->register_destination
+        );
 
-        pass_register_destination_register_file.join();
-        pass_register_destination_forwarding_unit.join();
-        pass_reg_write_forwarding_unit.join();
+        std::thread pass_register_destination_forwarding_unit (
+                &MEMWBStageRegisters::passRegisterDestinationToForwardingUnit,
+                this,
+                this->register_destination
+        );
+
+        std::thread pass_reg_write_forwarding_unit (
+                &MEMWBStageRegisters::passRegWriteToForwardingUnit,
+                this,
+                this->control->isRegWriteAsserted()
+        );
+
+        pass_register_destination_register_file.detach();
+        pass_register_destination_forwarding_unit.detach();
+        pass_reg_write_forwarding_unit.detach();
 
         this->is_read_data_set = false;
         this->is_alu_result_set = false;
@@ -147,7 +172,6 @@ void MEMWBStageRegisters::run() {
         this->is_control_set = false;
         this->is_nop_asserted = false;
         this->is_nop_passed_flag_set = false;
-        this->is_nop_passed_flag_asserted = false;
 
         this->stage_synchronizer->conditionalArriveSingleStage();
     }
@@ -245,21 +269,21 @@ void MEMWBStageRegisters::passReadDataToWBMux() {
     this->log("Passed read data to WBMux.");
 }
 
-void MEMWBStageRegisters::passRegisterDestinationToRegisterFile() {
+void MEMWBStageRegisters::passRegisterDestinationToRegisterFile(unsigned long rd) {
     this->log("Passing register destination to RegisterFile.");
-    this->register_file->setWriteRegister(this->register_destination);
+    this->register_file->setWriteRegister(rd);
     this->log("Passed register destination to RegisterFile.");
 }
 
-void MEMWBStageRegisters::passRegisterDestinationToForwardingUnit() {
+void MEMWBStageRegisters::passRegisterDestinationToForwardingUnit(unsigned long rd) {
     this->log("Passing register destination to ForwardingUnit.");
-    this->forwarding_unit->setMEMWBStageRegisterDestination(this->register_destination);
+    this->forwarding_unit->setMEMWBStageRegisterDestination(rd);
     this->log("Passed register destination to ForwardingUnit.");
 }
 
-void MEMWBStageRegisters::passRegWriteToForwardingUnit() {
+void MEMWBStageRegisters::passRegWriteToForwardingUnit(bool is_asserted) {
     this->log("Passing reg write to ForwardingUnit.");
-    this->forwarding_unit->setMEMWBStageRegisterRegWrite(this->control->isRegWriteAsserted());
+    this->forwarding_unit->setMEMWBStageRegisterRegWrite(is_asserted);
     this->log("Passed reg write to ForwardingUnit.");
 }
 
@@ -277,4 +301,29 @@ std::string MEMWBStageRegisters::getModuleTag() {
 
 Stage MEMWBStageRegisters::getModuleStage() {
     return Stage::MEM;
+}
+
+void MEMWBStageRegisters::printState() {
+    std::cout << std::string(20, '.') << std::endl;
+    std::cout << "MEMWBStageRegisters" << std::endl;
+    std::cout << std::string(20, '.') << std::endl;
+
+    std::cout << "read_data: " << this->read_data.to_ulong() << std::endl;
+    std::cout << "alu_result: " << this->alu_result.to_ulong() << std::endl;
+    std::cout << "register_destination: " << this->register_destination << std::endl;
+    std::cout << "is_read_data_set: " << this->is_read_data_set << std::endl;
+    std::cout << "is_alu_result_set: " << this->is_alu_result_set << std::endl;
+    std::cout << "is_register_destination_set: " << this->is_register_destination_set << std::endl;
+    std::cout << "is_control_set: " << this->is_control_set << std::endl;
+    std::cout << "is_reset_flag_set: " << this->is_reset_flag_set << std::endl;
+    std::cout << "is_pause_flag_set: " << this->is_pause_flag_set << std::endl;
+    std::cout << "is_nop_asserted: " << this->is_nop_asserted << std::endl;
+    std::cout << "is_nop_passed_flag_set: " << this->is_nop_passed_flag_set << std::endl;
+    std::cout << "is_nop_passed_flag_asserted: " << this->is_nop_passed_flag_asserted << std::endl;
+
+    this->control->printState();
+}
+
+void MEMWBStageRegisters::assertVerboseExecutionFlag() {
+    this->is_verbose_execution_flag_asserted = true;
 }

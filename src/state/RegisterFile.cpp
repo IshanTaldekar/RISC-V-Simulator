@@ -14,6 +14,7 @@ RegisterFile::RegisterFile() {
     this->is_pause_flag_set = false;
 
     this->is_reg_write_signal_asserted = false;
+    this->cycle_count = 0;
 
     this->register_source1 = 0UL;
     this->register_source2 = 0UL;
@@ -40,7 +41,7 @@ RegisterFile *RegisterFile::init() {
 }
 
 void RegisterFile::initDependencies() {
-    std::unique_lock<std::mutex> register_file_lock (this->getModuleMutex());
+    std::unique_lock<std::mutex> register_file_lock (this->getModuleDependencyMutex());
 
     if (this->logger && this->id_ex_stage_registers && this->stage_synchronizer) {
         return;
@@ -94,6 +95,8 @@ void RegisterFile::run() {
 
             this->is_reset_flag_set = false;
 
+            this->stage_synchronizer->arriveReset();
+
             this->log("Reset.");
             continue;
         }
@@ -120,9 +123,10 @@ void RegisterFile::run() {
             this->stage_synchronizer->conditionalArriveSingleStage();
         } else {
             this->writeDataToRegisterFile();
-            std::thread pass_data_thread (&RegisterFile::passReadRegisterDataToIDEXStageRegister, this);
-            pass_data_thread.join();
+            this->passReadRegisterDataToIDEXStageRegister();
         }
+
+        this->writeRegisterFileContentsToOutputFile();
 
         this->is_write_register_set = false;
         this->is_reg_write_signal_set = false;
@@ -271,20 +275,22 @@ void RegisterFile::resetState() {
     this->is_double_read_register_set = false;
     this->is_reg_write_signal_asserted = false;
 
+    this->cycle_count = 0;
+
     std::ofstream output_file (
-            this->output_file_path + (this->getPipelineType() == PipelineType::Single ?  "-SS.log" : "-FS.log"),
+            this->output_file_path + "-FS.log",
             std::ios::out
     );
     output_file.close();
 }
 
-void RegisterFile::writeRegisterFileContentsToOutputFile(int cycle_count) {
+void RegisterFile::writeRegisterFileContentsToOutputFile() {
     std::ofstream output_file (
             this->output_file_path + (this->getPipelineType() == PipelineType::Single ?  "-SS.log" : "-FS.log"),
             std::ios::app
     );
 
-    output_file << "State of RF after executing cycle:\t" << cycle_count << std::endl;
+    output_file << "State of RF after executing cycle:\t" << this->cycle_count++ << std::endl;
 
     for (const std::bitset<WORD_BIT_COUNT> &data: this->registers) {
         output_file << data.to_string() << std::endl;
@@ -299,4 +305,12 @@ std::string RegisterFile::getModuleTag() {
 
 Stage RegisterFile::getModuleStage() {
     return Stage::ID;
+}
+
+void RegisterFile::clearRegisterFileOutputFile() {
+    std::ofstream output_file (
+            this->output_file_path + (this->getPipelineType() == PipelineType::Single ?  "-SS.log" : "-FS.log"),
+            std::ios::out
+    );
+    output_file.close();
 }

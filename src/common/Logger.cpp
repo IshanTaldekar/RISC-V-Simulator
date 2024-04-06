@@ -68,6 +68,12 @@ void Logger::log(Stage current_stage, const std::string &message) {
 }
 
 void Logger::kill() {
+    std::lock_guard<std::mutex> if_logger_lock (this->if_stage_mutex);
+    std::lock_guard<std::mutex> id_logger_lock (this->id_stage_mutex);
+    std::lock_guard<std::mutex> ex_logger_lock (this->ex_stage_mutex);
+    std::lock_guard<std::mutex> mem_logger_lock (this->mem_stage_mutex);
+    std::lock_guard<std::mutex> wb_logger_lock (this->wb_stage_mutex);
+
     this->is_killed = true;
 
     this->if_stage_condition_variable.notify_all();
@@ -87,7 +93,7 @@ void Logger::enqueueIFStageMessage(const std::string &message) {
     );
 
     this->if_stage_messages_queue.push(message);
-    this->if_stage_condition_variable.notify_one();
+    this->if_stage_condition_variable.notify_all();
 }
 
 void Logger::enqueueIDStageMessage(const std::string &message) {
@@ -100,7 +106,7 @@ void Logger::enqueueIDStageMessage(const std::string &message) {
     );
 
     this->id_stage_messages_queue.push(message);
-    this->id_stage_condition_variable.notify_one();
+    this->id_stage_condition_variable.notify_all();
 }
 
 void Logger::enqueueEXStageMessage(const std::string &message) {
@@ -113,7 +119,7 @@ void Logger::enqueueEXStageMessage(const std::string &message) {
     );
 
     this->ex_stage_messages_queue.push(message);
-    this->ex_stage_condition_variable.notify_one();
+    this->ex_stage_condition_variable.notify_all();
 }
 
 void Logger::enqueueMEMStageMessage(const std::string &message) {
@@ -139,7 +145,7 @@ void Logger::enqueueWBStageMessage(const std::string &message) {
     );
 
     this->wb_stage_messages_queue.push(message);
-    this->wb_stage_condition_variable.notify_one();
+    this->wb_stage_condition_variable.notify_all();
 }
 
 void Logger::writeIFStageMessagesToFile() {
@@ -157,7 +163,7 @@ void Logger::writeIFStageMessagesToFile() {
             this->if_stage_messages_queue.pop();
         }
 
-        this->if_stage_condition_variable.notify_one();
+        this->if_stage_condition_variable.notify_all();
     }
 }
 
@@ -176,7 +182,7 @@ void Logger::writeIDStageMessagesToFile() {
             this->id_stage_messages_queue.pop();
         }
 
-        this->id_stage_condition_variable.notify_one();
+        this->id_stage_condition_variable.notify_all();
     }
 }
 
@@ -195,7 +201,7 @@ void Logger::writeEXStageMessagesToFile() {
             this->ex_stage_messages_queue.pop();
         }
 
-        this->ex_stage_condition_variable.notify_one();
+        this->ex_stage_condition_variable.notify_all();
     }
 }
 
@@ -214,7 +220,7 @@ void Logger::writeMEMStageMessagesToFile() {
             this->mem_stage_messages_queue.pop();
         }
 
-        this->mem_stage_condition_variable.notify_one();
+        this->mem_stage_condition_variable.notify_all();
     }
 }
 
@@ -233,6 +239,6 @@ void Logger::writeWBStageMessagesToFile() {
             this->wb_stage_messages_queue.pop();
         }
 
-        this->wb_stage_condition_variable.notify_one();
+        this->wb_stage_condition_variable.notify_all();
     }
 }

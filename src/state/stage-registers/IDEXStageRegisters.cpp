@@ -90,6 +90,10 @@ void IDEXStageRegisters::resetStage() {
     this->instruction = new Instruction(std::string(32, '0'));
     this->control = new Control(this->instruction);
 
+    this->read_data_1 = std::bitset<WORD_BIT_COUNT>(std::string(32, '0'));
+    this->read_data_2 = std::bitset<WORD_BIT_COUNT>(std::string(32, '0'));
+    this->immediate = std::bitset<WORD_BIT_COUNT>(std::string(32, '0'));
+
     this->program_counter = 0UL;
     this->register_destination = 0UL;
     this->register_source1 = 0UL;
@@ -103,6 +107,8 @@ void IDEXStageRegisters::pause() {
 }
 
 void IDEXStageRegisters::resume() {
+    std::lock_guard<std::mutex> id_ex_stage_registers_lock (this->getModuleMutex());
+
     this->is_pause_flag_set = false;
     this->notifyModuleConditionVariable();
 }
@@ -118,7 +124,7 @@ IDEXStageRegisters *IDEXStageRegisters::init() {
 }
 
 void IDEXStageRegisters::initDependencies() {
-    std::lock_guard<std::mutex> id_ex_stage_registers_lock (this->getModuleMutex());
+    std::lock_guard<std::mutex> id_ex_stage_registers_lock (this->getModuleDependencyMutex());
 
     if (this->ex_mux_alu_input_1 && this->ex_mux_alu_input_2 && this->ex_adder && this->forwarding_unit &&
         this->ex_mem_stage_register && this->stage_synchronizer && this->logger && this->hazard_detection_unit) {
@@ -165,6 +171,8 @@ void IDEXStageRegisters::run() {
             this->resetStage();
             this->is_reset_flag_set = false;
 
+            this->stage_synchronizer->arriveReset();
+
             this->log("Reset.");
             continue;
         }
@@ -176,8 +184,12 @@ void IDEXStageRegisters::run() {
             this->control = new Control(this->instruction);
         }
 
-        this->control->setNop(this->is_nop_passed_flag_asserted || this->is_nop_passed_flag_asserted);
+        this->control->setNop(this->is_nop_asserted);
         this->control->toggleEXStageControlSignals();
+
+        if (this->is_verbose_execution_flag_asserted) {
+            this->printState();
+        }
 
         std::thread pass_program_counter_ex_adder_thread (
                 &IDEXStageRegisters::passProgramCounterToEXAdder,
@@ -256,22 +268,22 @@ void IDEXStageRegisters::run() {
         std::thread pass_nop_ex_mem_stage_registers_thread (
                 &IDEXStageRegisters::passNopToEXMEMStageRegisters,
                 this,
-                this->is_nop_passed_flag_asserted || this->is_nop_asserted
+                this->is_nop_asserted
         );
 
-        pass_program_counter_ex_adder_thread.join();
-        pass_program_counter_ex_mux_alu_input_1_thread.join();
-        pass_read_data_1_ex_mux_alu_input_1_thread.join();
-        pass_read_data_2_ex_mux_alu_input_2_thread.join();
-        pass_immediate_ex_mux_alu_input_2_thread.join();
-        pass_immediate_ex_adder_thread.join();
-        pass_register_source_forwarding_unit_thread.join();
-        pass_mem_read_hazard_detection_unit_thread.join();
-        pass_register_destination_hazard_detection_unit_thread.join();
-        pass_register_destination_thread.join();
-        pass_read_data2_thread.join();
-        pass_control_thread.join();
-        pass_nop_ex_mem_stage_registers_thread.join();
+        pass_program_counter_ex_adder_thread.detach();
+        pass_program_counter_ex_mux_alu_input_1_thread.detach();
+        pass_read_data_1_ex_mux_alu_input_1_thread.detach();
+        pass_read_data_2_ex_mux_alu_input_2_thread.detach();
+        pass_immediate_ex_mux_alu_input_2_thread.detach();
+        pass_immediate_ex_adder_thread.detach();
+        pass_register_source_forwarding_unit_thread.detach();
+        pass_mem_read_hazard_detection_unit_thread.detach();
+        pass_register_destination_hazard_detection_unit_thread.detach();
+        pass_register_destination_thread.detach();
+        pass_read_data2_thread.detach();
+        pass_control_thread.detach();
+        pass_nop_ex_mem_stage_registers_thread.detach();
 
         this->is_single_read_register_data_set = false;
         this->is_double_read_register_data_set = false;
@@ -285,7 +297,6 @@ void IDEXStageRegisters::run() {
         this->is_register_source2_set = false;
         this->is_nop_passed_flag_set = false;
         this->is_nop_passed_flag_asserted = false;
-
         this->current_nop_set_operations = 0;
 
         this->stage_synchronizer->conditionalArriveSingleStage();
@@ -529,10 +540,6 @@ void IDEXStageRegisters::setRegisterSource2(unsigned long rs2) {
         this->delayUpdateUntilNopFlagSet();
     }
 
-    if (!this->logger) {
-        this->initDependencies();
-    }
-
     this->log("setRegisterSource2 waiting to acquire lock.");
 
     std::lock_guard<std::mutex> id_ex_stage_registers_lock (this->getModuleMutex());
@@ -656,4 +663,38 @@ std::string IDEXStageRegisters::getModuleTag() {
 
 Stage IDEXStageRegisters::getModuleStage() {
     return Stage::ID;
+}
+
+void IDEXStageRegisters::printState() {
+    std::cout << std::string(20, '.') << std::endl;
+    std::cout << "IDEXStageRegisters" << std::endl;
+    std::cout << std::string(20, '.') << std::endl;
+
+    std::cout << "read_data_1: " << this->read_data_1.to_ulong() << std::endl;
+    std::cout << "read_data_2: " << this->read_data_2.to_ulong() << std::endl;
+    std::cout << "immediate: " << this->immediate.to_ulong() << std::endl;
+    std::cout << "register_source1: " << this->register_source1 << std::endl;
+    std::cout << "register_source2: " << this->register_source2 << std::endl;
+    std::cout << "register_destination: " << this->register_destination << std::endl;
+    std::cout << "program_counter: " << this->program_counter << std::endl;
+    std::cout << "is_single_read_register_data_set: " << this->is_single_read_register_data_set << std::endl;
+    std::cout << "is_double_read_register_data_set: " << this->is_double_read_register_data_set << std::endl;
+    std::cout << "is_immediate_set: " << this->is_immediate_set << std::endl;
+    std::cout << "is_register_destination_set: " << this->is_register_destination_set << std::endl;
+    std::cout << "is_register_source1_set: " << this->is_register_source1_set << std::endl;
+    std::cout << "is_register_source2_set: " << this->is_register_source2_set << std::endl;
+    std::cout << "is_program_counter_set: " << this->is_program_counter_set << std::endl;
+    std::cout << "is_control_set: " << this->is_control_set << std::endl;
+    std::cout << "is_instruction_set: " << this->is_instruction_set << std::endl;
+    std::cout << "is_nop_passed_flag_set: " << this->is_nop_passed_flag_set << std::endl;
+    std::cout << "is_nop_asserted: " << this->is_nop_asserted << std::endl;
+    std::cout << "is_reset_flag_set: " << this->is_reset_flag_set << std::endl;
+    std::cout << "is_pause_flag_set: " << this->is_pause_flag_set << std::endl;
+    std::cout << "is_nop_passed_flag_asserted: " << this->is_nop_passed_flag_asserted << std::endl;
+
+    this->control->printState();
+}
+
+void IDEXStageRegisters::assertVerboseExecutionFlag() {
+    this->is_verbose_execution_flag_asserted = true;
 }

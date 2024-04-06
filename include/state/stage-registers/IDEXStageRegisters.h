@@ -59,6 +59,8 @@ class IDEXStageRegisters: public Module {
     bool is_nop_flag_set;
     bool is_nop_passed_flag_asserted;
 
+    bool is_verbose_execution_flag_asserted;
+
     EXMuxALUInput2 *ex_mux_alu_input_2;
     EXMuxALUInput1 *ex_mux_alu_input_1;
     EXAdder *ex_adder;
@@ -95,6 +97,8 @@ public:
     void resume();
     void changeStageAndReset(PipelineType new_pipeline_type);
 
+    void assertVerboseExecutionFlag();
+
 private:
     void passProgramCounterToEXAdder(unsigned long pc);
     void passProgramCounterToEXMuxALUInput1(unsigned long pc);
@@ -117,6 +121,8 @@ private:
 
     std::string getModuleTag() override;
     Stage getModuleStage() override;
+
+    void printState();
 };
 
 #endif //RISC_V_SIMULATOR_IDEXSTAGEREGISTERS_H

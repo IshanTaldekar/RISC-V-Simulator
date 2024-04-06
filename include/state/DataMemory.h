@@ -42,6 +42,7 @@ class DataMemory: public Module {
     static std::mutex initialization_mutex;
 
     MEMWBStageRegisters *mem_wb_stage_registers;
+    StageSynchronizer *stage_synchronizer;
 
     std::string output_file_path;
 
@@ -61,6 +62,7 @@ public:
 
     void reset();
     void writeDataMemoryContentsToOutput();
+    void clearDataMemoryOutputFile();
 
 private:
     void readDataMemoryFile();

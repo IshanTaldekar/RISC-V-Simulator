@@ -23,8 +23,7 @@ EXMEMStageRegisters::EXMEMStageRegisters() {
     this->is_pause_flag_set = false;
     this->is_nop_passed_flag_asserted = false;
     this->is_nop_passed_flag_set = false;
-
-    this->current_nop_set_operations = 0;
+    this->is_verbose_execution_flag_asserted = false;
 
     this->control = nullptr;
 
@@ -95,6 +94,8 @@ void EXMEMStageRegisters::pause() {
 }
 
 void EXMEMStageRegisters::resume() {
+    std::lock_guard<std::mutex> ex_mem_stage_registers_lock (this->getModuleMutex());
+
     this->log("Resumed.");
     this->is_pause_flag_set = false;
     this->notifyModuleConditionVariable();
@@ -111,7 +112,7 @@ EXMEMStageRegisters *EXMEMStageRegisters::init() {
 }
 
 void EXMEMStageRegisters::initDependencies() {
-    std::unique_lock<std::mutex> ex_mem_stage_registers_lock (this->getModuleMutex());
+    std::unique_lock<std::mutex> ex_mem_stage_registers_lock (this->getModuleDependencyMutex());
 
     if (this->control && this->data_memory && this->mem_wb_stage_registers && this->if_mux &&
         this->stage_synchronizer && this->alu_input_1_forwarding_mux && this->alu_input_2_forwarding_mux &&
@@ -159,6 +160,8 @@ void EXMEMStageRegisters::run() {
             this->resetStage();
             this->is_reset_flag_set = false;
 
+            this->stage_synchronizer->arriveReset();
+
             this->log("Reset.");
             continue;
         }
@@ -168,6 +171,10 @@ void EXMEMStageRegisters::run() {
         this->control->setNop(this->is_nop_passed_flag_asserted);
         this->control->setIsALUResultZero(this->is_alu_result_zero);
         this->control->toggleMEMStageControlSignals();
+
+        if (this->is_verbose_execution_flag_asserted) {
+            this->printState();
+        }
 
         std::thread pass_write_data_data_memory_thread (
                 &EXMEMStageRegisters::passWriteDataToDataMemory,
@@ -234,17 +241,17 @@ void EXMEMStageRegisters::run() {
                 this->is_nop_passed_flag_asserted
         );
 
-        pass_write_data_data_memory_thread.join();
-        pass_alu_result_data_memory_thread.join();
-        pass_branched_address_if_mux_thread.join();
-        pass_alu_result_alu_input_1_forwarding_mux_thread.join();
-        pass_alu_result_alu_input_2_forwarding_mux_thread.join();
-        pass_register_destination_forwarding_unit_thread.join();
-        pass_reg_write_forwarding_unit_thread.join();
-        pass_alu_result_thread.join();
-        pass_register_destination_thread.join();
-        pass_control_thread.join();
-        pass_nop_mem_wb_stage_registers_thread.join();
+        pass_write_data_data_memory_thread.detach();
+        pass_alu_result_data_memory_thread.detach();
+        pass_branched_address_if_mux_thread.detach();
+        pass_alu_result_alu_input_1_forwarding_mux_thread.detach();
+        pass_alu_result_alu_input_2_forwarding_mux_thread.detach();
+        pass_register_destination_forwarding_unit_thread.detach();
+        pass_reg_write_forwarding_unit_thread.detach();
+        pass_alu_result_thread.detach();
+        pass_register_destination_thread.detach();
+        pass_control_thread.detach();
+        pass_nop_mem_wb_stage_registers_thread.detach();
 
         this->is_branch_program_counter_set = false;
         this->is_alu_result_set = false;
@@ -255,8 +262,6 @@ void EXMEMStageRegisters::run() {
         this->is_nop_flag_asserted = false;
         this->is_nop_passed_flag_set = false;
         this->is_nop_passed_flag_asserted = false;
-
-        this->current_nop_set_operations = 0;
 
         this->stage_synchronizer->conditionalArriveSingleStage();
     }
@@ -469,9 +474,38 @@ void EXMEMStageRegisters::passNopToMEMWBStageRegisters(bool is_signal_asserted) 
 }
 
 std::string EXMEMStageRegisters::getModuleTag() {
-    return "IFAdder";
+    return "EXMEMStageRegisters";
 }
 
 Stage EXMEMStageRegisters::getModuleStage() {
     return Stage::EX;
+}
+
+void EXMEMStageRegisters::printState() {
+    std::cout << std::string(20, '.') << std::endl;
+    std::cout << "EXMEMStageRegisters" << std::endl;
+    std::cout << std::string(20, '.') << std::endl;
+
+    std::cout << "branch_program_counter: " << this->branch_program_counter << std::endl;
+    std::cout << "register_destination: " << this->register_destination << std::endl;
+    std::cout << "alu_result: " << this->alu_result.to_ulong() << std::endl;
+    std::cout << "read_data_2: " << this->alu_result.to_ulong() << std::endl;
+    std::cout << "is_alu_result_zero: " << this->is_alu_result_zero << std::endl;
+    std::cout << "is_branch_program_counter_set: " << this->is_branch_program_counter_set << std::endl;
+    std::cout << "is_alu_result_set: " << this->is_alu_result_set << std::endl;
+    std::cout << "is_read_data_2_set: " << this->is_read_data_2_set << std::endl;
+    std::cout << "is_register_destination_set: " << this->is_register_destination_set << std::endl;
+    std::cout << "is_alu_result_zero_flag_set: " << this->is_alu_result_zero_flag_set << std::endl;
+    std::cout << "is_control_set: " << this->is_control_set << std::endl;
+    std::cout << "is_nop_flag_asserted: " << this->is_nop_flag_asserted << std::endl;
+    std::cout << "is_nop_passed_flag_asserted: " << this->is_nop_passed_flag_asserted << std::endl;
+    std::cout << "is_reset_flag_set: " << this->is_reset_flag_set << std::endl;
+    std::cout << "is_pause_flag_set: " << this->is_pause_flag_set << std::endl;
+    std::cout << "is_nop_passed_flag_set: " << this->is_nop_passed_flag_set << std::endl;
+
+    this->control->printState();
+}
+
+void EXMEMStageRegisters::assertVerboseExecutionFlag() {
+    this->is_verbose_execution_flag_asserted = true;
 }

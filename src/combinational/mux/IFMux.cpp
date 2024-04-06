@@ -28,7 +28,7 @@ IFMux *IFMux::init() {
 }
 
 void IFMux::initDependencies() {
-    std::unique_lock<std::mutex> mux_lock (this->getModuleMutex());
+    std::unique_lock<std::mutex> mux_lock (this->getModuleDependencyMutex());
 
     if (this->driver && this->logger) {
         return;

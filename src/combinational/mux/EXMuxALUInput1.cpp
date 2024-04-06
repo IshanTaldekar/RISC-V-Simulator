@@ -30,7 +30,7 @@ EXMuxALUInput1 *EXMuxALUInput1::init() {
 }
 
 void EXMuxALUInput1::initDependencies() {
-    std::unique_lock<std::mutex> ex_mux_lock (this->getModuleMutex());
+    std::unique_lock<std::mutex> ex_mux_lock (this->getModuleDependencyMutex());
 
     if (this->alu_input_1_forwarding_mux && this->logger) {
         return;
