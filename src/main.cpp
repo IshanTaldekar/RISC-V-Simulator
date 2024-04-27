@@ -282,7 +282,7 @@ void clearOutputFiles(Pipeline &pipeline) {
 
 int main() {
     Pipeline pipeline = initializePipeline();
-//    printStagesState(pipeline);
+    printStagesState(pipeline);
     clearOutputFiles(pipeline);
 
     changeInstructionMemoryFile(pipeline, "../input/imem.txt");

@@ -76,7 +76,7 @@ void Driver::setProgramCounter(unsigned long value) {
 
     this->log("setProgramCounter acquired lock. Updating value.");
 
-    if (!this->is_nop_asserted) {
+    if (!this->is_nop_asserted || this->program_counter > value) {
         this->program_counter = value;
         this->log("setProgramCounter updated value.");
     } else {

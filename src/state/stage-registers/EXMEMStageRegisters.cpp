@@ -18,12 +18,15 @@ EXMEMStageRegisters::EXMEMStageRegisters() {
     this->is_register_destination_set = false;
     this->is_alu_result_zero_flag_set = false;
     this->is_control_set = false;
-    this->is_nop_flag_asserted = false;
+    this->is_nop_asserted = false;
     this->is_reset_flag_set = false;
     this->is_pause_flag_set = false;
     this->is_nop_passed_flag_asserted = false;
     this->is_nop_passed_flag_set = false;
+    this->is_nop_flag_set = true;
     this->is_verbose_execution_flag_asserted = false;
+
+    this->current_nop_set_operations = 0;
 
     this->control = nullptr;
 
@@ -64,6 +67,7 @@ void EXMEMStageRegisters::resetStage() {
         this->is_alu_result_zero_flag_set = false;
         this->is_control_set = false;
         this->is_nop_passed_flag_set = false;
+        this->is_nop_asserted = false;
     } else {
         this->is_branch_program_counter_set = true;
         this->is_alu_result_set = true;
@@ -73,8 +77,12 @@ void EXMEMStageRegisters::resetStage() {
         this->is_control_set = true;
         this->is_nop_passed_flag_asserted = true;
         this->is_nop_passed_flag_set = true;
+        this->is_nop_asserted = true;
     }
 
+    this->current_nop_set_operations = 0;
+
+    this->is_nop_flag_set = true;
     this->is_alu_result_zero = false;
     this->branch_program_counter = 0UL;
     this->register_destination = 0UL;
@@ -82,10 +90,7 @@ void EXMEMStageRegisters::resetStage() {
     this->alu_result = std::bitset<WORD_BIT_COUNT>(std::string(32, '0'));
     this->read_data_2 = std::bitset<WORD_BIT_COUNT>(std::string(32, '0'));
 
-    this->is_nop_flag_asserted = false;
-    this->is_reset_flag_set = false;
-
-    this->control = new Control(new Instruction(std::string(32, '0')));
+    this->control = new Control(new Instruction(std::string(32, '0')), this->getPipelineType());
 }
 
 void EXMEMStageRegisters::pause() {
@@ -120,7 +125,7 @@ void EXMEMStageRegisters::initDependencies() {
         return;
     }
 
-    this->control = new Control(new Instruction(std::string(32, '0')));
+    this->control = new Control(new Instruction(std::string(32, '0')), this->getPipelineType());
 
     this->data_memory = DataMemory::init();
     this->mem_wb_stage_registers = MEMWBStageRegisters::init();
@@ -143,7 +148,7 @@ void EXMEMStageRegisters::run() {
                 ex_mem_stage_registers_lock,
                 [this] {
                     return ((this->is_branch_program_counter_set && this->is_alu_result_set &&
-                            this->is_read_data_2_set && this->is_register_destination_set &&
+                            this->is_read_data_2_set && this->is_register_destination_set && this->is_nop_flag_set &&
                             this->is_alu_result_zero_flag_set && this->is_control_set && this->is_nop_passed_flag_set) &&
                             !this->is_pause_flag_set) || this->is_reset_flag_set || this->isKilled();
                 }
@@ -168,7 +173,7 @@ void EXMEMStageRegisters::run() {
 
         this->log("Woken up and acquired lock.");
 
-        this->control->setNop(this->is_nop_passed_flag_asserted);
+        this->control->setNop(this->is_nop_passed_flag_asserted || this->is_nop_asserted);
         this->control->setIsALUResultZero(this->is_alu_result_zero);
         this->control->toggleMEMStageControlSignals();
 
@@ -238,7 +243,7 @@ void EXMEMStageRegisters::run() {
         std::thread pass_nop_mem_wb_stage_registers_thread (
                 &EXMEMStageRegisters::passNopToMEMWBStageRegisters,
                 this,
-                this->is_nop_passed_flag_asserted
+                this->is_nop_passed_flag_asserted || this->is_nop_asserted
         );
 
         pass_write_data_data_memory_thread.detach();
@@ -259,9 +264,12 @@ void EXMEMStageRegisters::run() {
         this->is_register_destination_set = false;
         this->is_alu_result_zero_flag_set = false;
         this->is_control_set = false;
-        this->is_nop_flag_asserted = false;
+        this->is_nop_asserted = false;
         this->is_nop_passed_flag_set = false;
         this->is_nop_passed_flag_asserted = false;
+        this->is_nop_flag_set = false;
+
+        this->current_nop_set_operations = 0;
 
         this->stage_synchronizer->conditionalArriveSingleStage();
     }
@@ -270,13 +278,17 @@ void EXMEMStageRegisters::run() {
 void EXMEMStageRegisters::setBranchedProgramCounter(unsigned long value) {
     this->stage_synchronizer->conditionalArriveFiveStage();
 
+    if (this->getPipelineType() == PipelineType::Five) {
+        this->delayUpdateUntilNopFlagSet();
+    }
+
     this->log("setBranchedProgramCounter waiting to acquire lock.");
 
     std::lock_guard<std::mutex> ex_mem_stage_registers_lock (this->getModuleMutex());
 
     this->log("setBranchedProgramCounter acquired lock. Updating value.");
 
-    if (!this->is_nop_flag_asserted) {
+    if (!this->is_nop_asserted) {
         this->branch_program_counter = value;
         this->log("setBranchedProgramCounter updated value.");
     } else {
@@ -290,13 +302,17 @@ void EXMEMStageRegisters::setBranchedProgramCounter(unsigned long value) {
 void EXMEMStageRegisters::setALUResult(std::bitset<WORD_BIT_COUNT> value) {
     this->stage_synchronizer->conditionalArriveFiveStage();
 
+    if (this->getPipelineType() == PipelineType::Five) {
+        this->delayUpdateUntilNopFlagSet();
+    }
+
     this->log("setALUResult waiting to acquire lock.");
 
     std::lock_guard<std::mutex> ex_mem_stage_registers_lock (this->getModuleMutex());
 
     this->log("setALUResult acquired lock. Updating value.");
 
-    if (!this->is_nop_flag_asserted) {
+    if (!this->is_nop_asserted) {
         this->alu_result = value;
         this->log("setALUResult updated value.");
     } else {
@@ -310,13 +326,17 @@ void EXMEMStageRegisters::setALUResult(std::bitset<WORD_BIT_COUNT> value) {
 void EXMEMStageRegisters::setIsResultZeroFlag(bool asserted) {
     this->stage_synchronizer->conditionalArriveFiveStage();
 
+    if (this->getPipelineType() == PipelineType::Five) {
+        this->delayUpdateUntilNopFlagSet();
+    }
+
     this->log("setIsResultZeroFlag waiting to acquire lock.");
 
     std::lock_guard<std::mutex> ex_mem_stage_registers_lock (this->getModuleMutex());
 
     this->log("setIsResultZeroFlag acquired lock. Updating value.");
 
-    if (!this->is_nop_flag_asserted) {
+    if (!this->is_nop_asserted) {
         this->is_alu_result_zero = asserted;
         this->log("setIsResultZeroFlag updated value.");
     } else {
@@ -330,13 +350,17 @@ void EXMEMStageRegisters::setIsResultZeroFlag(bool asserted) {
 void EXMEMStageRegisters::setReadData2(std::bitset<WORD_BIT_COUNT> value) {
     this->stage_synchronizer->conditionalArriveFiveStage();
 
+    if (this->getPipelineType() == PipelineType::Five) {
+        this->delayUpdateUntilNopFlagSet();
+    }
+
     this->log("setReadData2 waiting to acquire lock.");
 
     std::lock_guard<std::mutex> ex_mem_stage_registers_lock (this->getModuleMutex());
 
     this->log("setReadData2 acquired lock. Updating value.");
 
-    if (!this->is_nop_flag_asserted) {
+    if (!this->is_nop_asserted) {
         this->read_data_2 = value;
         this->log("setReadData2 updated value.");
     } else {
@@ -350,13 +374,17 @@ void EXMEMStageRegisters::setReadData2(std::bitset<WORD_BIT_COUNT> value) {
 void EXMEMStageRegisters::setRegisterDestination(unsigned long value) {
     this->stage_synchronizer->conditionalArriveFiveStage();
 
+    if (this->getPipelineType() == PipelineType::Five) {
+        this->delayUpdateUntilNopFlagSet();
+    }
+
     this->log("setRegisterDestination waiting to acquire lock.");
 
     std::lock_guard<std::mutex> ex_mem_stage_registers_lock (this->getModuleMutex());
 
     this->log("setRegisterDestination acquired lock. Updating value.");
 
-    if (!this->is_nop_flag_asserted) {
+    if (!this->is_nop_asserted) {
         this->register_destination = value;
         this->log("setRegisterDestination updated value.");
     } else {
@@ -370,13 +398,17 @@ void EXMEMStageRegisters::setRegisterDestination(unsigned long value) {
 void EXMEMStageRegisters::setControl(Control *new_control) {
     this->stage_synchronizer->conditionalArriveFiveStage();
 
+    if (this->getPipelineType() == PipelineType::Five) {
+        this->delayUpdateUntilNopFlagSet();
+    }
+
     this->log("setControl waiting to acquire lock.");
 
     std::lock_guard<std::mutex> ex_mem_stage_registers_lock (this->getModuleMutex());
 
     this->log("setControl acquired lock. Updating value.");
 
-    if (this->is_nop_flag_asserted) {
+    if (this->is_nop_asserted) {
         this->log("setControl update skipped. NOP asserted.");
     } else {
         this->control = new_control;
@@ -390,17 +422,41 @@ void EXMEMStageRegisters::setControl(Control *new_control) {
 void EXMEMStageRegisters::setPassedNop(bool is_asserted) {
     this->stage_synchronizer->conditionalArriveFiveStage();
 
+    if (this->getPipelineType() == PipelineType::Five) {
+        this->delayUpdateUntilNopFlagSet();
+    }
+
     this->log("setPassedNop waiting to acquire lock.");
 
     std::lock_guard<std::mutex> ex_mem_stage_registers_lock (this->getModuleMutex());
 
     this->log("setPassedNop acquired lock.");
 
-    this->is_nop_passed_flag_asserted = is_asserted;
+    if (!this->is_nop_asserted) {
+        this->is_nop_passed_flag_asserted = is_asserted;
+    }
+
     this->is_nop_passed_flag_set = true;
 
     this->log("setPassedNop updated value.");
     this->notifyModuleConditionVariable();
+}
+
+void EXMEMStageRegisters::setNop(bool is_asserted) {
+    this->stage_synchronizer->conditionalArriveFiveStage();
+
+    this->log("setPassedNop waiting to acquire lock.");
+
+    std::lock_guard<std::mutex> ex_mem_stage_registers_lock (this->getModuleMutex());
+
+    this->log("setPassedNop acquired lock.");
+
+    this->is_nop_asserted |= is_asserted;
+
+    if (++this->current_nop_set_operations == REQUIRED_NOP_FLAG_SET_OPERATIONS) {
+        this->is_nop_flag_set = true;
+        this->getModuleConditionVariable().notify_all();
+    }
 }
 
 void EXMEMStageRegisters::passControlToMEMWBStageRegisters(Control *current_control) {
@@ -440,7 +496,7 @@ void EXMEMStageRegisters::passBranchedAddressToIFMux(unsigned long branched_addr
 }
 
 void EXMEMStageRegisters::assertSystemEnabledNop() {
-    this->is_nop_flag_asserted = true;
+    this->is_nop_asserted = true;
 }
 
 void EXMEMStageRegisters::passALUResultToALUInput1ForwardingMux(std::bitset<WORD_BIT_COUNT> data) {
@@ -481,6 +537,16 @@ Stage EXMEMStageRegisters::getModuleStage() {
     return Stage::EX;
 }
 
+void EXMEMStageRegisters::delayUpdateUntilNopFlagSet() {
+    std::unique_lock<std::mutex> ex_mem_stage_registers_lock (this->getModuleMutex());
+    this->getModuleConditionVariable().wait(
+            ex_mem_stage_registers_lock,
+            [this] {
+                return this->is_nop_flag_set;
+            }
+    );
+}
+
 void EXMEMStageRegisters::printState() {
     std::cout << std::string(20, '.') << std::endl;
     std::cout << "EXMEMStageRegisters" << std::endl;
@@ -497,7 +563,7 @@ void EXMEMStageRegisters::printState() {
     std::cout << "is_register_destination_set: " << this->is_register_destination_set << std::endl;
     std::cout << "is_alu_result_zero_flag_set: " << this->is_alu_result_zero_flag_set << std::endl;
     std::cout << "is_control_set: " << this->is_control_set << std::endl;
-    std::cout << "is_nop_flag_asserted: " << this->is_nop_flag_asserted << std::endl;
+    std::cout << "is_nop_asserted: " << this->is_nop_asserted << std::endl;
     std::cout << "is_nop_passed_flag_asserted: " << this->is_nop_passed_flag_asserted << std::endl;
     std::cout << "is_reset_flag_set: " << this->is_reset_flag_set << std::endl;
     std::cout << "is_pause_flag_set: " << this->is_pause_flag_set << std::endl;

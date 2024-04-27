@@ -33,6 +33,7 @@ public:
 
 private:
     Instruction *instruction;
+    PipelineType pipeline_type;
 
     RegisterFile *register_file;
     IFMux *if_mux;
@@ -56,15 +57,17 @@ private:
     bool is_jal_instruction;
     bool is_halt_instruction;
     bool is_nop_asserted_flag;
+    bool is_not_equal_branch_comparison_instruction_flag;
 
     std::bitset<ALU_OP_BIT_COUNT> alu_op;
 
     friend IDEXStageRegisters;
     friend EXMEMStageRegisters;
     friend MEMWBStageRegisters;
+    friend StageSynchronizer;
 
 public:
-    explicit Control(Instruction *instruction);
+    explicit Control(Instruction *instruction, PipelineType current_pipeline_type);
     static Control *deepCopy(Control *source);
 
     void setIsALUResultZero(bool is_result_zero);
@@ -86,6 +89,7 @@ private:
 
     void passNopToIFIDStageRegisters(bool is_signal_asserted);
     void passNopToIDEXStageRegisters(bool is_signal_asserted);
+    void passNopToEXMEMStageRegisters(bool is_signal_asserted);
 };
 
 #endif //RISC_V_SIMULATOR_CONTROL_H

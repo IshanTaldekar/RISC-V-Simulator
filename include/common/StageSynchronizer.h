@@ -29,7 +29,7 @@ class StageSynchronizer {
     PipelineType current_pipeline_type;
 
     static constexpr int SINGLE_STAGE_THREAD_COUNT = 6;
-    static constexpr int FIVE_STAGE_THREAD_COUNT = 31;
+    static constexpr int FIVE_STAGE_THREAD_COUNT = 34;
     static constexpr int RESET_THREAD_COUNT = 10;
 
     static StageSynchronizer *current_instance;

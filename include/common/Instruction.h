@@ -21,6 +21,7 @@ public:
 
 private:
     std::string instruction;
+
     std::unordered_map<std::string, InstructionType> opcode_to_type_mapping;
 
     static constexpr int FUNCT7_BASE_STRING_INDEX = 0;
@@ -32,7 +33,7 @@ private:
 
     // segments contain pairs (start index of segment and segment size)
     const std::vector<std::pair<int, int>> I_TYPE_IMMEDIATE_SEGMENTS {{0, 12}};
-    const std::vector<std::pair<int, int>> SB_TYPE_IMMEDIATE_SEGMENTS {{0, 7}, {20, 5}};
+    const std::vector<std::pair<int, int>> SB_TYPE_IMMEDIATE_SEGMENTS {{0, 1}, {24, 1}, {1, 6}, {20, 4}};
     const std::vector<std::pair<int, int>> J_TYPE_IMMEDIATE_SEGMENTS {{0, 20}};
 
 public:

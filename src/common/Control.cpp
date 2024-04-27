@@ -1,6 +1,7 @@
 #include "../../include/common/Control.h"
 
-Control::Control(Instruction *current_instruction) {
+Control::Control(Instruction *current_instruction, PipelineType current_pipeline_type) {
+    this->pipeline_type = current_pipeline_type;
     this->instruction = current_instruction;
 
     this->is_reg_write_asserted = false;
@@ -15,6 +16,7 @@ Control::Control(Instruction *current_instruction) {
     this->is_jal_instruction = false;
     this->is_halt_instruction = false;
     this->is_nop_asserted_flag = false;
+    this->is_not_equal_branch_comparison_instruction_flag = false;
 
     this->register_file = nullptr;
     this->if_mux = nullptr;
@@ -78,8 +80,9 @@ void Control::generateALUOpCode() {
                     this->instruction->getOpcode() == std::bitset<Instruction::OPCODE_BIT_COUNT>("0000011") ||
                     funct7 == std::bitset<Instruction::FUNCT7_BIT_COUNT>("0000000")) {
                 this->alu_op = std::bitset<ALU_OP_BIT_COUNT>("0000");  // Add
-            } else if (funct7 == std::bitset<Instruction::FUNCT7_BIT_COUNT>("0100000") &&
-                    this->instruction->getOpcode() != std::bitset<Instruction::OPCODE_BIT_COUNT>("0010011")) {
+            } else if ((funct7 == std::bitset<Instruction::FUNCT7_BIT_COUNT>("0100000") &&
+                    this->instruction->getOpcode() == std::bitset<Instruction::OPCODE_BIT_COUNT>("0010011")) ||
+                    this->instruction->getOpcode() == std::bitset<Instruction::OPCODE_BIT_COUNT>("1100011")) {
                 this->alu_op = std::bitset<ALU_OP_BIT_COUNT>("0001");  // Subtract
             }
         } else if (funct3 == std::bitset<Instruction::FUNCT3_BIT_COUNT>("100")) {
@@ -96,6 +99,9 @@ void Control::generateALUOpCode() {
     } else {
         this->alu_op = std::bitset<ALU_OP_BIT_COUNT>("0000");  // Add (Default)
     }
+
+    this->is_not_equal_branch_comparison_instruction_flag = this->instruction->getType() == InstructionType::B &&
+            this->instruction->getFunct3().to_string() == "001";
 }
 
 void Control::setIsALUResultZero(bool is_result_zero) {
@@ -119,8 +125,9 @@ void Control::toggleMEMStageControlSignals() {
         this->initDependencies();
     }
 
-    this->is_pc_src_asserted = this->is_pc_src_asserted && this->is_alu_result_zero && this->is_branch_instruction &&
-            !this->is_nop_asserted_flag;
+    this->is_pc_src_asserted = this->is_pc_src_asserted &&
+            (this->is_alu_result_zero ^ this->is_not_equal_branch_comparison_instruction_flag) &&
+            this->is_branch_instruction && !this->is_nop_asserted_flag;
 
     this->if_mux->assertControlSignal(this->is_pc_src_asserted && !this->is_nop_asserted_flag);
     this->data_memory->setMemWrite(this->is_mem_write_asserted && !this->is_nop_asserted_flag);
@@ -129,21 +136,27 @@ void Control::toggleMEMStageControlSignals() {
     std::thread pass_nop_if_id_registers_thread (
             &Control::passNopToIFIDStageRegisters,
             this,
-            (this->is_pc_src_asserted || this->is_jal_instruction) && !this->is_nop_asserted_flag
+            (this->is_pc_src_asserted || this->is_jal_instruction) && this->pipeline_type == PipelineType::Five &&
+            !this->is_nop_asserted_flag
     );
 
     std::thread pass_nop_id_ex_registers_thread (
             &Control::passNopToIDEXStageRegisters,
             this,
-            (this->is_pc_src_asserted || this->is_jal_instruction) && !this->is_nop_asserted_flag
+            (this->is_pc_src_asserted || this->is_jal_instruction) && this->pipeline_type == PipelineType::Five &&
+            !this->is_nop_asserted_flag
     );
 
-    if ((this->is_pc_src_asserted || this->is_jal_instruction) && !this->is_nop_asserted_flag) {
-        this->ex_mem_stage_registers->assertSystemEnabledNop();
-    }
+    std::thread pass_nop_ex_mem_registers_thread (
+            &Control::passNopToEXMEMStageRegisters,
+            this,
+            (this->is_pc_src_asserted || this->is_jal_instruction) && this->pipeline_type == PipelineType::Five &&
+            !this->is_nop_asserted_flag
+    );
 
     pass_nop_if_id_registers_thread.detach();
     pass_nop_id_ex_registers_thread.detach();
+    pass_nop_ex_mem_registers_thread.detach();
 }
 
 void Control::toggleWBStageControlSignals() {
@@ -153,6 +166,23 @@ void Control::toggleWBStageControlSignals() {
 
     this->register_file->setRegWriteSignal(this->is_reg_write_asserted && !this->is_nop_asserted_flag);
     this->wb_mux->assertControlSignal(this->is_mem_to_reg_asserted && !this->is_nop_asserted_flag);
+
+    std::thread pass_nop_id_ex_registers_thread (
+            &Control::passNopToIDEXStageRegisters,
+            this,
+            (this->is_pc_src_asserted || this->is_jal_instruction) && this->pipeline_type == PipelineType::Five &&
+            !this->is_nop_asserted_flag
+    );
+
+    std::thread pass_nop_ex_mem_registers_thread (
+            &Control::passNopToEXMEMStageRegisters,
+            this,
+            (this->is_pc_src_asserted || this->is_jal_instruction) && this->pipeline_type == PipelineType::Five &&
+            !this->is_nop_asserted_flag
+    );
+
+    pass_nop_id_ex_registers_thread.detach();
+    pass_nop_ex_mem_registers_thread.detach();
 }
 
 void Control::initDependencies() {
@@ -177,7 +207,7 @@ Control *Control::deepCopy(Control *source) {
         return nullptr;
     }
 
-    auto *deep_copy = new Control(source->instruction);
+    auto *deep_copy = new Control(source->instruction, source->pipeline_type);
     if (source->is_nop_asserted_flag) {
         deep_copy->is_nop_asserted_flag = true;
     } else {
@@ -200,6 +230,10 @@ void Control::passNopToIFIDStageRegisters(bool is_signal_asserted) {
 
 void Control::passNopToIDEXStageRegisters(bool is_signal_asserted) {
     this->id_ex_stage_registers->setNop(is_signal_asserted);
+}
+
+void Control::passNopToEXMEMStageRegisters(bool is_signal_asserted) {
+    this->ex_mem_stage_registers->setNop(is_signal_asserted);
 }
 
 void Control::printState() {

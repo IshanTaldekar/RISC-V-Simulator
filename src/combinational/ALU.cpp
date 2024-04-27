@@ -128,8 +128,8 @@ void ALU::run() {
                 this->is_result_zero
         );
 
-        pass_result_thread.join();
-        pass_zero_flag_thread.join();
+        pass_result_thread.detach();
+        pass_zero_flag_thread.detach();
 
         this->is_alu_op_set = false;
         this->is_input1_set = false;

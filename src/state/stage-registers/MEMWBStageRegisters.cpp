@@ -58,7 +58,7 @@ void MEMWBStageRegisters::resetStage() {
     this->alu_result = std::bitset<WORD_BIT_COUNT>(std::string(32, '0'));
     this->register_destination = 0L;
 
-    this->control = new Control(new Instruction(std::string(32, '0')));
+    this->control = new Control(new Instruction(std::string(32, '0')), this->getPipelineType());
 }
 
 void MEMWBStageRegisters::pause() {
@@ -90,7 +90,7 @@ void MEMWBStageRegisters::initDependencies() {
         return;
     }
 
-    this->control = new Control(new Instruction(std::string(32, '0')));
+    this->control = new Control(new Instruction(std::string(32, '0')), this->getPipelineType());
 
     this->register_file = RegisterFile::init();
     this->wb_mux = WBMux::init();

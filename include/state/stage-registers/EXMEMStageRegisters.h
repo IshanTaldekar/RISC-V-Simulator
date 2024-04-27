@@ -37,11 +37,12 @@ class EXMEMStageRegisters: public Module {
     bool is_register_destination_set;
     bool is_alu_result_zero_flag_set;
     bool is_control_set;
-    bool is_nop_flag_asserted;
+    bool is_nop_asserted;
     bool is_nop_passed_flag_asserted;
     bool is_reset_flag_set;
     bool is_pause_flag_set;
     bool is_nop_passed_flag_set;
+    bool is_nop_flag_set;
 
     bool is_verbose_execution_flag_asserted;
 
@@ -56,6 +57,9 @@ class EXMEMStageRegisters: public Module {
 
     static EXMEMStageRegisters *current_instance;
     static std::mutex initialization_mutex;
+
+    static constexpr int REQUIRED_NOP_FLAG_SET_OPERATIONS = 2;
+    int current_nop_set_operations;
 
 public:
     EXMEMStageRegisters();
@@ -76,6 +80,7 @@ public:
     void pause();
     void resume();
     void changeStageAndReset(PipelineType new_pipeline_type);
+    void setNop(bool is_asserted);
     void setPassedNop(bool is_asserted);  // Passing Nop between stages
 
     void assertVerboseExecutionFlag();
@@ -92,6 +97,7 @@ private:
     void passBranchedAddressToIFMux(unsigned long branched_address);
     void passControlToMEMWBStageRegisters(Control *control);
     void passNopToMEMWBStageRegisters(bool is_signal_asserted);
+    void delayUpdateUntilNopFlagSet();
 
     void resetStage();
     void initDependencies() override;

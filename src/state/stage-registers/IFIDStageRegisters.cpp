@@ -75,7 +75,7 @@ void IFIDStageRegisters::resetStage() {
     this->program_counter = 0UL;
     this->instruction_bits = std::string(32, '0');
     this->instruction = new Instruction(this->instruction_bits);
-    this->control = new Control(this->instruction);
+    this->control = new Control(this->instruction, this->getPipelineType());
 }
 
 void IFIDStageRegisters::pause() {
@@ -108,7 +108,7 @@ void IFIDStageRegisters::initDependencies() {
     }
 
     this->instruction = new Instruction(std::string(32, '0'));
-    this->control = new Control(this->instruction);
+    this->control = new Control(this->instruction, this->getPipelineType());
 
     this->register_file = RegisterFile::init();
     this->id_ex_stage_registers = IDEXStageRegisters::init();
@@ -154,7 +154,7 @@ void IFIDStageRegisters::run() {
         this->log("Woken up and acquired lock.");
 
         this->instruction = new Instruction(this->instruction_bits);
-        this->control = new Control(this->instruction);
+        this->control = new Control(this->instruction, this->getPipelineType());
         this->control->setNop(this->is_nop_asserted ||
                                 this->instruction->getType() == InstructionType::HALT);
 

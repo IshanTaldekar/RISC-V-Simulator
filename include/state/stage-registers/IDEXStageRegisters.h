@@ -69,8 +69,8 @@ class IDEXStageRegisters: public Module {
     ForwardingUnit *forwarding_unit;
     HazardDetectionUnit *hazard_detection_unit;
 
-    static constexpr int REQUIRED_NOP_FLAG_SET_OPERATIONS = 2;
-    int current_nop_set_operations{};
+    static constexpr int REQUIRED_NOP_FLAG_SET_OPERATIONS = 3;
+    int current_nop_set_operations;
 
 public:
     IDEXStageRegisters();

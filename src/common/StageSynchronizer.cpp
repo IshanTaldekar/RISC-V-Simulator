@@ -105,7 +105,7 @@ void StageSynchronizer::onCompletionSingleStage() {
     std::cout << "=> Cycle: " << this->current_cycle++ << std::endl;
 
     if (this->mem_wb_stage_registers->isExecutingHaltInstruction()) {
-        if (!this->mem_wb_stage_registers->is_nop_asserted) {
+        if (!this->mem_wb_stage_registers->is_nop_asserted && !this->mem_wb_stage_registers->is_nop_passed_flag_asserted) {
             this->halt_detected = true;
         }
     }

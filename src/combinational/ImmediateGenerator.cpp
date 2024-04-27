@@ -78,25 +78,43 @@ void ImmediateGenerator::loadImmediateToIDEXStageRegisters() {
 
     std::bitset<WORD_BIT_COUNT> result;
 
-    if (type == InstructionType::B || type == InstructionType::S || type == InstructionType::I) {
+    if (type == InstructionType::S || type == InstructionType::I) {
         std::bitset<Instruction::GENERAL_IMMEDIATE_BIT_COUNT> current_immediate = this->instruction->getImmediate();
 
-        if (current_immediate[Instruction::GENERAL_IMMEDIATE_BIT_COUNT - 1]) {
-            result.set();
+        bool is_negative_number = current_immediate[Instruction::GENERAL_IMMEDIATE_BIT_COUNT - 1];
+
+        if (is_negative_number) {
+            for (int i = Instruction::GENERAL_IMMEDIATE_BIT_COUNT; i < result.size(); ++i) {
+                result[i] = true;
+            }
         }
 
         for (int i = 0; i < Instruction::GENERAL_IMMEDIATE_BIT_COUNT; ++i) {
-            result[i] = current_immediate[i];
+            result[i] = current_immediate[i] == 1;
         }
     } else if (type == InstructionType::J) {
         std::bitset<Instruction::J_TYPE_IMMEDIATE_BIT_COUNT> current_immediate = this->instruction->getImmediateJ();
 
-        if (current_immediate[Instruction::J_TYPE_IMMEDIATE_BIT_COUNT - 1]) {
-            result.set();
+        for (int i = 0; i < Instruction::J_TYPE_IMMEDIATE_BIT_COUNT; ++i) {
+            result[i + 1] = current_immediate[i];
         }
 
-        for (int i = 0; i < Instruction::J_TYPE_IMMEDIATE_BIT_COUNT; ++i) {
-            result[i] = current_immediate[i];
+        if (current_immediate[Instruction::J_TYPE_IMMEDIATE_BIT_COUNT - 1]) {
+            for (int i = Instruction::J_TYPE_IMMEDIATE_BIT_COUNT + 1; i < result.size(); ++i) {
+                result[i] = true;
+            }
+        }
+    } else if (type == InstructionType::B) {
+        std::bitset<Instruction::GENERAL_IMMEDIATE_BIT_COUNT> current_immediate = this->instruction->getImmediate();
+
+        for (int i = 0; i < Instruction::GENERAL_IMMEDIATE_BIT_COUNT; ++i) {
+            result[i + 1] = current_immediate[i] == 1;
+        }
+
+        if (current_immediate[Instruction::GENERAL_IMMEDIATE_BIT_COUNT - 1]) {
+            for (int i = Instruction::GENERAL_IMMEDIATE_BIT_COUNT + 1; i < result.size(); ++i) {
+                result[i] = true;
+            }
         }
     }
 

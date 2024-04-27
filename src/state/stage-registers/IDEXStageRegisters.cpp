@@ -24,6 +24,7 @@ IDEXStageRegisters::IDEXStageRegisters() {
     this->is_nop_flag_set = true;
     this->is_nop_passed_flag_set = false;
     this->is_nop_passed_flag_asserted = false;
+    this->is_verbose_execution_flag_asserted = false;
 
     this->instruction = nullptr;
     this->control = nullptr;
@@ -69,7 +70,6 @@ void IDEXStageRegisters::resetStage() {
         this->is_register_source1_set = false;
         this->is_register_source2_set = false;
         this->is_instruction_set = false;
-        this->is_nop_flag_set = true;
         this->is_nop_passed_flag_set = false;
         this->is_nop_asserted = false;
     } else {
@@ -88,7 +88,7 @@ void IDEXStageRegisters::resetStage() {
 
     this->is_nop_flag_set = true;
     this->instruction = new Instruction(std::string(32, '0'));
-    this->control = new Control(this->instruction);
+    this->control = new Control(this->instruction, this->getPipelineType());
 
     this->read_data_1 = std::bitset<WORD_BIT_COUNT>(std::string(32, '0'));
     this->read_data_2 = std::bitset<WORD_BIT_COUNT>(std::string(32, '0'));
@@ -98,8 +98,7 @@ void IDEXStageRegisters::resetStage() {
     this->register_destination = 0UL;
     this->register_source1 = 0UL;
     this->register_source2 = 0UL;
-
-    this->is_reset_flag_set = false;
+    this->current_nop_set_operations = 0;
 }
 
 void IDEXStageRegisters::pause() {
@@ -181,7 +180,7 @@ void IDEXStageRegisters::run() {
 
         if (!this->control || !this->instruction) {
             this->instruction = new Instruction(std::string(32, '0'));
-            this->control = new Control(this->instruction);
+            this->control = new Control(this->instruction, this->getPipelineType());
         }
 
         this->control->setNop(this->is_nop_asserted);
@@ -297,6 +296,7 @@ void IDEXStageRegisters::run() {
         this->is_register_source2_set = false;
         this->is_nop_passed_flag_set = false;
         this->is_nop_passed_flag_asserted = false;
+        this->is_nop_flag_set = false;
         this->current_nop_set_operations = 0;
 
         this->stage_synchronizer->conditionalArriveSingleStage();
